@@ -102,7 +102,6 @@ class MerchantController extends Controller
         // print_r($exec_phrase); exit();
         chdir('../');
         exec($exec_phrase, $var, $result);
-
         return redirect()->route('home');
     }
 }
