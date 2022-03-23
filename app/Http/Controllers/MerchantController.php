@@ -5,13 +5,123 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+
 use App\Models\Deposit;
+use App\Models\User;
+use Twilio\Rest\Client;
+use Mail;
 
 class MerchantController extends Controller
 {
     public function index()
     {
         return view('merchants.index');
+    }
+
+    public function checkUser(Request $request)
+    {
+        $user = User::where(
+            'wallet_address',
+            $request->wallet_address
+        )->first();
+
+        if (empty($user)) {
+            return response()->json(['user_exist' => 'no']);
+            // print_r("dfdefdfd"); exit();
+        } else {
+            // return redirect()
+            //     ->route()
+            //     ->with('WALLET_ADDRESS', $request->WALLET_ADDRESS)
+            //     ->with('AMOUNT', $request->AMOUNT);
+        }
+    }
+
+    public function selectOtp(Request $request)
+    {
+        return view('merchants.select-otp')->with('data', $request->data);
+    }
+
+    public function sendMobileOtp(Request $request)
+    {
+        $random_code = random_int(100000, 999999);
+
+        $aUser = new User;
+        $aUser->mobile_number = $request->mobile_number;
+        $aUser->wallet_address = $request->wallet_address;
+        $aUser->otp_value = $random_code;
+        $saved = $aUser->save();
+
+        if ($saved) {
+            $text = 'Sending the mobile verification code: ' . $random_code;
+            $otp_data['phone'] = $request->mobile_number;
+            $otp_data['text'] = $text;
+            $this->sendSMS($otp_data);
+            return response()->json(['success' => "success"]);
+        } else {
+            return view('error-500');
+        }
+    }
+
+    protected function sendSMS($data)
+    {
+        $sid = 'ACff03be6cdd84b244ef95ec58ec7b4689';
+        $token = '3ee55f03cf4da970e837d189232f5fcf';
+
+        $client = new Client($sid, $token);
+        return $client->messages->create($data['phone'], [
+            'from' => '+14302041158',
+            'body' => $data['text'],
+        ]);
+    }
+
+    public function submitMobileOtp(Request $request) {
+        $mobile_number = $request->wallet_address;
+        $aUser = User::where('wallet_address', $wallet_address)->first();
+        if (empty($aUser)) {
+            return response()->json(['success' => 'fail']);
+        }
+
+        if ($aUser->opt_value == $request->submit_value) {
+            return response()->json(['success' => 'success']);
+        } else {
+            return response()->json(['success' => 'fail']);
+        }
+    }
+
+    public function sendEmailOtp(Request $request)
+    {
+        $random_code = random_int(100000, 999999);
+        $email = $request->email_address;
+        $data = ['name' => 'Verification', 'code' => $random_code];
+
+        $aUser = new User;
+        $aUser->email = $email;
+        $aUser->otp_value = $random_code;
+        $aUser->wallet_address = $request->wallet_address;
+        $aUser->save();
+
+        Mail::send('merchants.email-otp', $data, function ($message) use (
+            $email
+        ) {
+            $message
+                ->to($email, 'GAMERE')
+                ->subject('GAMERE email confirming request');
+            $message->from('JAX@gamepay.com', 'GAMERE');
+        });
+    }
+
+    public function submitEmailOtp(Request $request) {
+        $email = $request->wallet_address;
+        $aUser = User::where('wallet_address', $wallet_address)->first();
+        if (empty($aUser)) {
+            return response()->json(['success' => 'fail']);
+        }
+
+        if ($aUser->opt_value == $request->submit_value) {
+            return response()->json(['success' => 'success']);
+        } else {
+            return response()->json(['success' => 'fail']);
+        }
     }
 
     public function sendCashlesso(Request $request)

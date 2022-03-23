@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>" />
+<meta name="csrf-token" content="{{ csrf_token() }}" />
 <title>Merchant Checkout Page</title>
 <style type="text/css">
 body {
@@ -61,8 +61,8 @@ function submitForm() {
 <!-- <body onload="submitForm();"> -->
 <body>
     <div class="new">
-        <form method="post" action="<?php echo e(route('send-cashlesso')); ?>" name="frm1">
-            <input type="hidden" name="_token" id="csrf_token" value="<?php echo e(csrf_token()); ?>" />
+        <form method="post" action="{{ route('send-cashlesso')}}" name="frm1">
+            <input type="hidden" name="_token" id="csrf_token" value="{{ csrf_token() }}" />
             <table width="500" border="0" align="center" cellpadding="0" cellspacing="0" class="gradientbg">
                 <tr>
                     <td colspan="3" align="center" valign="middle"></td>
@@ -147,4 +147,3 @@ function submitForm() {
     getAccount();
 </script>
 </html>
-<?php /**PATH E:\gamepay\resources\views/merchants/index.blade.php ENDPATH**/ ?>

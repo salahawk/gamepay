@@ -14,6 +14,20 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'MerchantController@index')->name('home');
+Route::post('/user/check', 'MerchantController@checkUser')->name('check-user');
+Route::get('/otp/select', 'MerchantController@selectOtp')->name('select-otp');
+
+Route::post('/otp/mobile/send', 'MerchantController@sendMobileOtp')->name('send-mobile-otp');
+Route::post('/otp/mobile/submit', 'MerchantController@submitMobileOtp')->name('submit-mobile-otp');
+
+Route::post('/otp/email/send', 'MerchantController@sendEmailOtp')->name('send-email-otp');
+Route::post('/otp/email/submit', 'MerchantController@submitEmailOtp')->name('submit-email-otp');
+
+Route::get('/kyc', 'MerchantController@kyc')->name('kyc');
+
+
+
+
 Route::post('/cashlesso/send', 'MerchantController@sendCashlesso')->name('send-cashlesso');
 Route::post('/cashlesso/response', 'MerchantController@responseCashlesso')->name('response-cashlesso');
 

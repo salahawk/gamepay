@@ -1,0 +1,85 @@
+.modal.modal-left .modal-dialog,
+.modal.modal-right .modal-dialog,
+.modal.modal-top .modal-dialog,
+.modal.modal-bottom .modal-dialog {
+  -webkit-transform: translate3d(0%, 0, 0);
+  -ms-transform: translate3d(0%, 0, 0);
+  -o-transform: translate3d(0%, 0, 0);
+  transform: translate3d(0%, 0, 0);
+}
+
+
+/* Top and Bottom */
+
+.modal.modal-top .modal-dialog,
+.modal.modal-bottom .modal-dialog {
+  position: fixed;
+  margin: auto;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+.modal.modal-top .modal-content,
+.modal.modal-bottom .modal-content {
+  height: auto;
+  overflow-y: auto;
+}
+
+.modal.modal-top .modal-body,
+.modal.modal-bottom .modal-body {
+  padding: 15px 15px;
+}
+
+
+/* Bottom */
+
+.modal.modal-bottom.fade .modal-dialog {
+  bottom: -100%;
+  -webkit-transition: opacity 0.3s linear, bottom 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, bottom 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, bottom 0.3s ease-out;
+  transition: opacity 0.3s linear, bottom 0.3s ease-out;
+}
+
+.modal.modal-bottom.fade.show .modal-dialog {
+  bottom: 0;
+}
+
+.modal.modal-bottom.fade .modal-dialog {
+  bottom: -100%;
+}
+
+
+
+/* Footer */
+
+.modal-footer-fixed {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #fff;
+  border-radius: 0;
+}
+
+/* XS */
+
+.modal.modal-left.xs .modal-body,
+.modal.modal-right.xs .modal-body {
+  padding: 15px;
+}
+
+/* Full screen modal menu indicators */
+
+a.has-sub:after { font-family: "FontAwesome"; }
+a.has-sub:after { content: "\f107"; margin-left: 1rem; }
+a.has-sub[aria-expanded="true"]:after { content: "\f106"; }
+
+
+.modal-bottom .modal-header { background:none; border-bottom:none}
+.modal-bottom .modal-header, .modal-bottom .modal-content {-webkit-border-top-left-radius: 15px;
+-webkit-border-top-right-radius: 15px;
+-moz-border-radius-topleft: 15px;
+-moz-border-radius-topright: 15px;
+border-top-left-radius: 15px;
+border-top-right-radius: 15px;}
