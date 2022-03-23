@@ -1,3 +1,14 @@
+<script>
+    $(document).ready(function($) {
+        var url = window.location.href;
+        $('ul.categories li').each(function() {
+            $(this).removeClass('opend');
+        });
+        $('ul li a[href="' + url + '"]').parents('li').addClass('opend');
+        $('ul li a[href="' + url + '"]').parents('ul').css('display', "block");
+        $('li.opend').children('a').attr('style', 'color: #ff5722 !important');
+    });
+</script>
 <?php
 //session_start(); 
 
@@ -89,7 +100,7 @@ if(isset($_SESSION['usertype']) && $_SESSION['usertype']=='admin'){?>
 <?php }else{ ?>
 
 <ul class="categories">
-    <li class="opend"><i class="fa fa-home fa-fw" aria-hidden="true"></i><a href="dashboard.php"> Dashboard</a>
+    <li class="opend"><i class="fa fa-home fa-fw" aria-hidden="true"></i><a href="{{ route('admin.dashboard') }}"> Dashboard</a>
     </li>
 
     <li class="arr"><i class="fa fa-file-text fa-fw"></i><a href="all_email_deposit.php">Today Deposits by
@@ -116,17 +127,4 @@ if(isset($_SESSION['usertype']) && $_SESSION['usertype']=='admin'){?>
 </ul>
 <?php } ?>
 @section('footer_script')
-<script>
-    $(document).ready(function($) {
-        var url = window.location.href;
-        let scrambles = url.split("/");
-
-        $('ul.categories li').each(function() {
-            $(this).removeClass('opend');
-        });
-        $('ul li a[href="' + scrambles[scrambles.length - 1] + '"]').parents('li').addClass('opend');
-        $('ul li a[href="' + scrambles[scrambles.length - 1] + '"]').parents('ul').css('display', "block");
-        $('li.opend').children('a').attr('style', 'color: #ff5722 !important');
-    });
-</script>
 @endsection
