@@ -20,6 +20,11 @@ Route::post('/cashlesso/response', 'MerchantController@responseCashlesso')->name
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], function() {
     Route::get('deposits', 'DepositController@index')->name('deposits');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+    Route::get('success', 'SuccessController@index')->name('success');
+    Route::get('pending', 'PendingController@index')->name('pending');
+
     Route::get('deposits/data', 'DepositController@data')->name('deposits.data');
+    Route::get('success/data', 'SuccessController@data')->name('success.data');
+    Route::get('pending/data', 'PendingController@data')->name('pending.data');
 });
 

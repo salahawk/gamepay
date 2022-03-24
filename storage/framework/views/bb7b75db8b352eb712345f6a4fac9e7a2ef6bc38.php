@@ -1,12 +1,12 @@
-@extends('admin.layouts.app')
 
-@section('header_style')
-    <link href="{{ asset('assets/js/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/js/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet"
+
+<?php $__env->startSection('header_style'); ?>
+    <link href="<?php echo e(asset('assets/js/datatables/datatables.min.css')); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo e(asset('assets/js/datatables/plugins/bootstrap/datatables.bootstrap.css')); ?>" rel="stylesheet"
         type="text/css" />
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="welcome">
         <div class="container-fluid">
             <div class="row">
@@ -122,23 +122,23 @@
     <br>
 
     <!-- section -->
-@endsection
-@section('footer_script')
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js"></script> --}}
-    {{-- <script src="{{ asset('assets/js/main.js') }}"></script> --}}
-    {{-- <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script> --}}
-    {{-- <script src="vendor/jquery-easing/jquery.easing.min.js"></script> --}}
-    {{-- <script src="{{ asset('assets/js/datatables/dataTable.js') }}"></script> --}}
-    {{-- <script src="{{ asset('assets/js/datatables/dataTables.min.js') }}"></script> --}}
-    {{-- <script src="{{ asset('assets/js/datatables/plugins/bootstrap/datatables.bootstrap.js' )}}" type="text/javascript"></script> --}}
-    {{-- <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script> --}}
-    {{-- <script src="{{ asset('js/pages/datatables-demo.js') }}"></script> --}}
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('footer_script'); ?>
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <script>
         var table = $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: "{{ route('admin.deposits.data') }}",
+            url: "<?php echo e(route('admin.deposits.data')); ?>",
             type: "GET"
         },
         columns: [
@@ -152,4 +152,6 @@
         ],
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH E:\Collabrate_bluepadu\gamepay\resources\views/admin/deposits/index.blade.php ENDPATH**/ ?>

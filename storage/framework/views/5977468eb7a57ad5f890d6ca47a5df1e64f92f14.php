@@ -91,7 +91,7 @@ if(isset($_SESSION['usertype']) && $_SESSION['usertype']=='admin'){?>
 <ul class="categories">
     <li class="opend" id = "dash_liID">
         <i class="fa fa-home fa-fw" aria-hidden="true"></i>
-        <a href="{{ route('admin.dashboard') }}"> Dashboard</a>
+        <a href="<?php echo e(route('admin.dashboard')); ?>"> Dashboard</a>
     </li>
     <li class="arr">
         <i class="fa fa-file-text fa-fw"></i>
@@ -101,9 +101,9 @@ if(isset($_SESSION['usertype']) && $_SESSION['usertype']=='admin'){?>
         <i class="fa fa-envelope fa-fw"></i>
         <a href="#">Deposits</a>
         <ul class="side-nav-dropdown">
-            <li><a href="{{ route('admin.deposits') }}">View All Deposit</a></li>
-            <li><a href="{{ route('admin.success') }}">View Success</a></li>
-            <li><a href="{{ route('admin.pending') }}">View Failure / Initiated</a></li>
+            <li><a href="<?php echo e(route('admin.deposits')); ?>">View All Deposit</a></li>
+            <li><a href="<?php echo e(route('admin.success')); ?>">View Success</a></li>
+            <li><a href="<?php echo e(route('admin.pending')); ?>">View Failure / Initiated</a></li>
             <li><a href="#">Check Status</a></li>
             <li><a href="#">Two Days Missed Deposit</a></li>
             <li><a href="#">View Missed Deposit</a></li>
@@ -132,4 +132,4 @@ if(isset($_SESSION['usertype']) && $_SESSION['usertype']=='admin'){?>
             window.location.replace($(this).children('a').attr('href'));
         });
     });
-</script>
+</script><?php /**PATH E:\Collabrate_bluepadu\gamepay\resources\views/admin/layouts/leftmenu.blade.php ENDPATH**/ ?>
