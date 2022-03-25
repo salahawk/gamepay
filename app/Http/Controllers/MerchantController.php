@@ -25,14 +25,28 @@ class MerchantController extends Controller
             $request->wallet_address
         )->first();
 
-        if (empty($user)) {
-            return response()->json(['user_exist' => 'no']);
-            // print_r("dfdefdfd"); exit();
+        if (!$user->is_verified) {
+            return response()->json(['user_verified' => 'no']);
         } else {
-            // return redirect()
-            //     ->route()
-            //     ->with('WALLET_ADDRESS', $request->WALLET_ADDRESS)
-            //     ->with('AMOUNT', $request->AMOUNT);
+            return response()->json([
+                'user_verified' => 'yes',
+                'user_id' => $user->id,
+            ]);
+        }
+    }
+
+    public function validateVpa(Request $request)
+    {
+        $auth_token = $this->getAuthToken();
+        if ($this->_validateVpa($auth_token, $request->payer_address)) {
+            $user = User::find($request->user_id)->first();
+            $user->payer_address = $request->payer_address;
+            $user->amount = $request->amount;
+            $user->save();
+            // return response()->json(['status' => 'success']);
+            return redirect()->route('send-deposit', ['user_id' => $user->id, 'authToken' => $auth_token]);
+        } else {
+            return response()->json(['status' => 'fail']);
         }
     }
 
@@ -45,7 +59,7 @@ class MerchantController extends Controller
     {
         $random_code = random_int(100000, 999999);
 
-        $aUser = new User;
+        $aUser = new User();
         $aUser->mobile_number = $request->mobile_number;
         $aUser->wallet_address = $request->wallet_address;
         $aUser->otp_value = $random_code;
@@ -56,7 +70,7 @@ class MerchantController extends Controller
             $otp_data['phone'] = $request->mobile_number;
             $otp_data['text'] = $text;
             $this->sendSMS($otp_data);
-            return response()->json(['success' => "success"]);
+            return response()->json(['success' => 'success']);
         } else {
             return view('error-500');
         }
@@ -74,7 +88,8 @@ class MerchantController extends Controller
         ]);
     }
 
-    public function submitMobileOtp(Request $request) {
+    public function submitMobileOtp(Request $request)
+    {
         $mobile_number = $request->wallet_address;
         $aUser = User::where('wallet_address', $wallet_address)->first();
         if (empty($aUser)) {
@@ -94,7 +109,7 @@ class MerchantController extends Controller
         $email = $request->email_address;
         $data = ['name' => 'Verification', 'code' => $random_code];
 
-        $aUser = new User;
+        $aUser = new User();
         $aUser->email = $email;
         $aUser->otp_value = $random_code;
         $aUser->wallet_address = $request->wallet_address;
@@ -110,7 +125,8 @@ class MerchantController extends Controller
         });
     }
 
-    public function submitEmailOtp(Request $request) {
+    public function submitEmailOtp(Request $request)
+    {
         $email = $request->wallet_address;
         $aUser = User::where('wallet_address', $wallet_address)->first();
         if (empty($aUser)) {
@@ -124,37 +140,37 @@ class MerchantController extends Controller
         }
     }
 
-    public function sendCashlesso(Request $request)
+    public function sendDeposit(Request $request)
     {
-        $appId = '1026610611162108';
-        $appSecret = '6a25d71992a04ae2';
-        $orderType = 'SALE';
-        $orderCurrency = 'INR';
+        $aUser = User::find($request->user_id)->first();
+        // Validate VPA
+        $url = 'https://uat.cashlesso.com/pgws/upi/validateVpa';
+
+        $pay_id = env('PAY_ID');
+        $orderAmount = $aUser->amount;
+        $orderId = $aUser->cust_name . random_int(1000, 9999);
         $orderCurrencyId = '356';
-        $productinfo = $request['PRODUCT_DESC'];
-        $orderId = random_int(100000000, 999999999);
-        $orderAmount = $request['AMOUNT'];
-        $customerName = $request['CUST_NAME'];
-        $customerPhone = $request['CUST_PHONE'];
-        $customerEmail = $request['CUST_EMAIL'];
-        $customerAddress = $request['CUST_STREET_ADDRESS1'];
-        $customerZip = $request['CUST_ZIP'];
-        $gwUrl = 'https://uat.cashlesso.com/pgui/jsp/paymentrequest';
-        $returnUrl = 'http://127.0.0.1:8000/cashlesso/response';
+        $payeAddress = $aUser->payer_address;
+        $customerEmail = $aUser->email;
+        $customerPhone = $aUser->mobile_number;
+        $productinfo = 'GAMERE';
+        $customerName = $aUser->cust_name;
+        $customerId = $orderId;
+
+        $gwUrl = 'https://uat.cashlesso.com/pgws/upi/initiateCollect';
+        $returnUrl = 'http://127.0.0.1:8000/upi/response';
 
         $signValues = [
-            'PAY_ID' => $appId,
-            'ORDER_ID' => $orderId,
+            'PAY_ID' => $pay_id,
             'AMOUNT' => $orderAmount,
-            'TXNTYPE' => $orderType,
-            'CUST_NAME' => $customerName,
-            'CUST_STREET_ADDRESS1' => $customerAddress,
-            'CUST_ZIP' => $customerZip,
-            'CUST_PHONE' => $customerPhone,
-            'CUST_EMAIL' => $customerEmail,
-            'PRODUCT_DESC' => $request['PRODUCT_DESC'],
+            'ORDER_ID' => $orderId,
             'CURRENCY_CODE' => $orderCurrencyId,
-            'RETURN_URL' => $returnUrl,
+            'PAYER_ADDRESS' => $payeAddress,
+            'CUST_EMAIL' => $customerEmail,
+            'CUST_PHONE' => $customerPhone,
+            'PRODUCT_DESC' => $productinfo,
+            'CUST_NAME' => $customerName,
+            'CUST_ID' => $customerId,
         ];
 
         $post_data = $signValues;
@@ -167,14 +183,124 @@ class MerchantController extends Controller
         foreach ($signValues as $k => $v) {
             array_push($signHashArr, "$k=$v");
         }
-        $signHashValue = implode('~', $signHashArr) . $appSecret;
+        $signHashValue = implode('~', $signHashArr) . env('SALT');
         $requestHash = strtoupper(hash('sha256', $signHashValue));
         $post_data['HASH'] = $requestHash;
-        $post_data['gwUrl'] = $gwUrl;
-        // $data = http_build_query($post_data);
 
-        return view('merchants.sender')->with('signValues', $post_data);
+				$curlCollet = curl_init();
+
+				curl_setopt_array($curlCollet, array(
+					CURLOPT_URL => 'https://uat.cashlesso.com/pgws/upi/initiateCollect',
+					CURLOPT_RETURNTRANSFER => true,
+					CURLOPT_ENCODING => '',
+					CURLOPT_MAXREDIRS => 10,
+					CURLOPT_TIMEOUT => 0,
+					CURLOPT_FOLLOWLOCATION => true,
+					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+					CURLOPT_CUSTOMREQUEST => 'POST',
+					CURLOPT_POSTFIELDS =>'{
+					"PAY_ID":  "'.env('PAY_ID').'",
+					"AMOUNT":  "'.$orderAmount.'",
+					"ORDER_ID":  "'.$orderId.'",
+					"CURRENCY_CODE":  "'.$orderCurrencyId.'",
+					"PAYER_ADDRESS":  "'.$payeAddress.'",
+					"CUST_EMAIL":  "'.$customerEmail.'",
+					"CUST_PHONE":  "'.$customerPhone.'",
+					"HASH":  "'.$requestHash.'",
+					"PRODUCT_DESC":  "'.$productinfo.'",
+					"CUST_NAME":  "'.$customerName.'",
+					"CUST_ID":  "'.$customerId.'"
+				}',
+					CURLOPT_HTTPHEADER => array(
+					'Content-Type: application/json',
+					"Authorization: Bearer $request->authToken") 
+				));
+
+				$responseCollect = curl_exec($curlCollet);
+
+        curl_close($curlCollet);
+
+				$responsePayment=json_decode($responseCollect);
+				$orderId=$responsePayment->ORDER_ID;
+				
+				$aDeposit = new Deposit;
+				$aDeposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
+				$aDeposit->txnid = $responsePayment->TXN_ID;
+				if (!empty($responsePayment->CURRENCY_CODE)) {
+					$aDeposit->currency_code = $responsePayment->CURRENCY_CODE;
+				}
+				$aDeposit->status = $responsePayment->STATUS;
+				$aDeposit->payment_id	 = $responsePayment->PAY_ID;
+				$aDeposit->order_id = $responsePayment->ORDER_ID;
+				$aDeposit->amount = $orderAmount;
+				if (!empty($responsePayment->TOTAL_AMOUNT)) {
+					$aDeposit->total_amount = $responsePayment->TOTAL_AMOUNT;
+				}
+				$aDeposit->cust_name = $customerName;
+				$aDeposit->hash = $responsePayment->HASH;
+				if (!empty($responsePayment->TOTAL_AMOUNT)) {
+					$aDeposit->acq_id = $responsePayment->ACQ_ID;
+				}
+				$aDeposit->email = $customerEmail;
+				$aDeposit->phone = $customerPhone;
+				$aDeposit->payer_address = $payeAddress;
+				$aDeposit->wallet = $aUser->wallet_address;
+				$aDeposit->productinfo = $productinfo;
+				$aDeposit->save();
+
+				//echo '<pre>';
+				//print_r($responsePayment);
+				
+				if($responsePayment->RESPONSE_CODE==000 && $responsePayment->STATUS=='Sent to Bank'){
+					// $data['status']=$responsePayment->STATUS;
+					// $data['responseCode']=$responsePayment->RESPONSE_CODE;
+					$orderId=$responsePayment->ORDER_ID;
+					
+					//$this->load->view('upipay',$data);
+					// $orderId=base64_encode($responsePayment->ORDER_ID);
+					// redirect("../responsehandle.php?id=$orderId");
+					return view('merchants.upi-response')->with('orderId', $orderId);
+				}else{
+					// if(isset($responsePayment->STATUS)){
+					// 	$data['status']=$responsePayment->STATUS;
+					// }else{
+					// 	$data['status']='';
+					// }
+					// $data['responseCode']=$responsePayment->RESPONSE_CODE;
+					// $orderId=base64_encode($responsePayment->ORDER_ID);
+					$orderId=$responsePayment->ORDER_ID;
+					//$this->load->view('upipay',$data);
+					return view('merchants.upi-response')->with('orderId', $orderId);
+					// redirect("../responsehandle.php?id=$orderId");	
+				}
+        
     }
+
+		public function upiResponse(Request $request) {
+			$aDeposit = Deposit::where('order_id', $reqeust->ORDER_ID)->first();
+			$aDeposit->status = $request->STATUS;
+			$aDeposit->auto_refund_eligible = $request->AUTO_REFUND_ELIGIBLE;
+			$aDeposit->status = $request->STATUS;
+			$aDeposit->save();
+
+			$sample = Deposit::where('wallet', $aDeposit->wallet)->get();
+			$num = $sample->count();
+			// mint tokens
+			$exec_phrase = 'node contract-interact.js ' . $aDeposit->wallet . ' ' . $aDeposit->amount . ' ' . $num;
+
+			chdir('../');
+			exec($exec_phrase, $var, $result);
+		}
+
+		public function mintManual(Request $request) {
+			$aDeposit = Deposit::where($request->wallet_address)->get();
+			$num = $aDeposit->count();
+
+			$exec_phrase = 'node contract-interact.js ' . $aDeposit->wallet . ' ' . $aDeposit->amount . ' ' . $num;
+
+			chdir('../');
+			exec($exec_phrase, $var, $result);
+		}
 
     public function responseCashlesso(Request $request)
     {
@@ -213,5 +339,184 @@ class MerchantController extends Controller
         chdir('../');
         exec($exec_phrase, $var, $result);
         return redirect()->route('home');
+    }
+
+    protected function getAuthToken()
+    {
+        $appSecret = 'ad53f6ca708448b1';
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://uat.cashlesso.com/pgws/oauth/generateToken',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{
+                                    "CLIENT_ID": "OWJvbzR6ODk2ZE1UVXB1NFRaVnl3MHZRL2ozWmVRRlQ4OWFwMkt3UzJvbz0=",
+                                    "CLIENT_SECRET": "D5D3B6FBD9C94D1ACFDED14D6FDD0DAE84C5552078C59976DCCE406E6C780000"
+                                    }',
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        ]);
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $json = json_decode($response);
+        // print_r(json_decode($response)->RESPONSE_MESSAGE); exit();
+        // if ($json->RESPONSE_MESSAGE == "SUCCESS") {
+        //     return $json->AUTHENTICATION_TOKEN;
+        // }
+
+        $authToken = $json->AUTHENTICATION_TOKEN;
+        return $authToken;
+        // print_r($authToken); exit();
+        // return 'false';
+
+        // Creating array for Hashing
+        // $pay_id = '1016601009105737';
+        // $orderAmount = $amt;
+        // $orderId = random_int(100000000, 999999999);
+        // $orderCurrencyId = '356';
+        // $payeAddress = $person->wallet_address;
+        // $customerEmail = $person->email;
+        // $customerPhone = $person->mobile_number;
+        // $productinfo = "Gamere Token";
+        // $customerName = "test";
+
+        // // $signValues = [
+        // // 	"PAY_ID" => $pay_id,
+        // // 	"AMOUNT" => $orderAmount,
+        // // 	"ORDER_ID" => $orderId,
+        // // 	"CURRENCY_CODE" => $orderCurrencyId,
+        // // 	"PAYER_ADDRESS" => $payeAddress,
+        // // 	"CUST_EMAIL" => $customerEmail,
+        // // 	"CUST_PHONE" => $customerPhone,
+        // // 	"PRODUCT_DESC" => $productinfo,
+        // // 	"CUST_NAME" => $customerName,
+        // // 	"CUST_ID" => $orderId
+        // // ];
+
+        // $signValues = [
+        // 	"PAY_ID" => 1016601009105737,
+        // 	"AMOUNT" => 100,
+        // 	"ORDER_ID" => 123456,
+        // 	"CURRENCY_CODE" => 356,
+        // 	"PAYER_ADDRESS" => '0xd4654ad4ad4sad4sa6dwq886wa4d5',
+        // 	"CUST_EMAIL" => 'padum3955@gmail.com',
+        // 	"CUST_PHONE" => '17794440516',
+        // 	"PRODUCT_DESC" => 'desc',
+        // 	"CUST_NAME" => 'test',
+        // 	"CUST_ID" => 'testID'
+        // ];
+
+        // $requestHash = "";
+        // $signHashValue = "";
+        // $signHashArr = array();
+
+        // ksort($signValues);
+        // foreach($signValues as $k=>$v) {
+        // 	array_push($signHashArr,"$k=$v");
+        // }
+
+        // $signHashValue = implode("~", $signHashArr) . $appSecret;
+        // $requestHash = strtoupper(hash("sha256", $signHashValue));
+
+        // $curlCollet = curl_init();
+
+        // curl_setopt_array($curlCollet, array(
+        //   CURLOPT_URL => 'https://www.cashlesso.com/pgws/upi/initiateCollect',
+        //   CURLOPT_RETURNTRANSFER => true,
+        //   CURLOPT_ENCODING => '',
+        //   CURLOPT_MAXREDIRS => 10,
+        //   CURLOPT_TIMEOUT => 0,
+        //   CURLOPT_FOLLOWLOCATION => true,
+        //   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //   CURLOPT_CUSTOMREQUEST => 'POST',
+        //   CURLOPT_POSTFIELDS =>'{
+        //                             "PAY_ID":  "'.$pay_id.'",
+        //                             "AMOUNT":  "'.$orderAmount.'",
+        //                             "ORDER_ID":  "'.$orderId.'",
+        //                             "CURRENCY_CODE":  "356",
+        //                             "PAYER_ADDRESS":  "'.$payeAddress.'",
+        //                             "CUST_EMAIL":  "'.$customerEmail.'",
+        //                             "CUST_PHONE":  "'.$customerPhone.'",
+        //                             "HASH":  "'.$requestHash.'",
+        //                             "PRODUCT_DESC":  "'.$productinfo.'",
+        //                             "CUST_NAME":  "'.$customerName.'",
+        //                             "CUST_ID":  "'.$orderId.'"
+        //                         }',
+        //   CURLOPT_HTTPHEADER => array(
+        // 	'Content-Type: application/json',
+        // 	"Authorization: Bearer $authToken")
+        // ));
+
+        // $responseCollect = curl_exec($curlCollet);
+
+        // curl_close($curlCollet);
+
+        // $responsePayment=json_decode($responseCollect);
+        // // $orderId=$responsePayment->ORDER_ID;
+        // print_r($responsePayment); exit();
+    }
+
+    protected function _validateVpa($authToken, $payeAddress)
+    {
+        $signValues = [
+            'PAY_ID' => env('PAY_ID'),
+            'PAYER_ADDRESS' => $payeAddress,
+        ];
+
+        $requestHash = '';
+        $signHashValue = '';
+        $signHashArr = [];
+
+        ksort($signValues);
+        foreach ($signValues as $k => $v) {
+            array_push($signHashArr, "$k=$v");
+        }
+        $signHashValue = implode('~', $signHashArr) . env('SALT');
+        $hash = strtoupper(hash('sha256', $signHashValue));
+        $curlupi = curl_init();
+
+        curl_setopt_array($curlupi, [
+            CURLOPT_URL => 'https://uat.cashlesso.com/pgws/upi/validateVpa',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>
+																	'{
+																			"PAY_ID":  "' . env('PAY_ID') .'",
+																			"PAYER_ADDRESS":  "' .
+																						$payeAddress .
+																						'",
+																			"HASH":"' .
+																								$hash .
+																								'"
+																		}',
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                "Authorization: Bearer $authToken",
+            ],
+        ]);
+        // Get UPI transaction inforamtion
+        $responseUPI = curl_exec($curlupi);
+        $responsecode = json_decode($responseUPI);
+
+        curl_close($curlupi);
+
+        if ($responsecode->STATUS == 'Success') {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

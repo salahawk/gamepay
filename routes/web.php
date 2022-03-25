@@ -23,6 +23,13 @@ Route::post('/otp/mobile/submit', 'MerchantController@submitMobileOtp')->name('s
 Route::post('/otp/email/send', 'MerchantController@sendEmailOtp')->name('send-email-otp');
 Route::post('/otp/email/submit', 'MerchantController@submitEmailOtp')->name('submit-email-otp');
 
+Route::post('/vpa/validate', 'MerchantController@validateVpa')->name('validate-vpa');
+
+Route::get('/deposit/send', 'MerchantController@sendDeposit')->name('send-deposit');
+Route::post('/upi/response', 'MerchantController@upiResponse')->name('upi-response');
+
+Route::post('/mint/manual', 'MerchantController@mintManual')->name('mint-manual');
+
 Route::get('/kyc', 'MerchantController@kyc')->name('kyc');
 
 
