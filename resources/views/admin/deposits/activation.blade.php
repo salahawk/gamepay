@@ -1,8 +1,8 @@
+@extends('admin.layouts.app')
 
-
-<?php $__env->startSection('header_style'); ?>
-    <link href="<?php echo e(asset('assets/js/datatables/datatables.min.css')); ?>" rel="stylesheet" type="text/css" />
-    <link href="<?php echo e(asset('assets/js/datatables/plugins/bootstrap/datatables.bootstrap.css')); ?>" rel="stylesheet"
+@section('header_style')
+    <link href="{{ asset('assets/js/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/js/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet"
         type="text/css" />
     <script>
         function exportExcel() {
@@ -11,11 +11,11 @@
             window.location.href = 'success_deposit_export.php?fromdate=' + fromdate + '&todate=' + todate;
         }
         var pos;
-        <?php if(isset($_SESSION['usertype']) && $_SESSION['usertype'] != 'admin'): ?>
+        @if (isset($_SESSION['usertype']) && $_SESSION['usertype'] != 'admin')
             pos=5;
-        <?php else: ?>
+        @else
             pos=4;
-        <?php endif; ?>
+        @endif
         $(document).ready(function() {
             $('#dataTable').DataTable({
                 "order": [
@@ -24,9 +24,9 @@
             });
         });
     </script>
-<?php $__env->stopSection(); ?>
+@endsection
 
-<?php $__env->startSection('content'); ?>
+@section('content')
     <div class="welcome">
         <div class="container-fluid">
             <div class="row">
@@ -42,22 +42,22 @@
         <div class="main-frms">
             <div class="av-b total-dep">
                 <div class="box-cs">
-                    <?php if(isset($_SESSION['support']) && $_SESSION['support'] == 1): ?>
+                    @if (isset($_SESSION['support']) && $_SESSION['support'] == 1)
                         $totDeposit=0;
-                    <?php endif; ?>
+                    @endif
                     <span>Total Deposits Today </span>
-                    <input type="text" class="inn-box" readonly="" value="&#8377 <?php echo e($totDeposit); ?>">
+                    <input type="text" class="inn-box" readonly="" value="&#8377 {{ $totDeposit }}">
                 </div>
             </div>
-            <?php if((isset($_POST['todate']) && $_POST['todate'] != '') || (isset($_POST['fromdate']) && $_POST['fromdate'] != '')): ?>
+            @if ((isset($_POST['todate']) && $_POST['todate'] != '') || (isset($_POST['fromdate']) && $_POST['fromdate'] != ''))
                 <div class="av-b d total-dep">
                     <div class="box-cs">
                         <span>Net Amount </span>
                         <input type="text" class="inn-box" readonly=""
-                            value="&#8377; <?php echo e($rowDatasum['amount'] - $rowDatasum2['fees']); ?>">
+                            value="&#8377; {{ $rowDatasum['amount'] - $rowDatasum2['fees'] }}">
                     </div>
                 </div>
-            <?php endif; ?>
+            @endif
         </div>
     </section>
     <form action="" method="post">
@@ -116,17 +116,17 @@
 
                 <div class="table-responsive">
 
-                    <table class="table table-bordered" id="dataTable1">
+                    <table class="table table-bordered" id="dataTable3">
 
                         <thead>
                             <tr>
-                                <th>Transaction ID</th>
-                                <th>Email</th>
-                                <th>Gateway</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Transaction Date</th>
-                                <th>Provider</th>
+                                <th>wallet_address</th>
+                                <th>mobile_number</th>
+                                <th>otp_value</th>
+                                <th>email</th>
+                                <th>is_verified</th>
+                                <th>created_at</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -140,9 +140,9 @@
     </section>
     <br>
     <br>
-<?php $__env->stopSection(); ?>
+@endsection
 
-<?php $__env->startSection('footer_script'); ?>
+@section('footer_script')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js"></script>
@@ -155,44 +155,42 @@
     <script src="js/demo/datatables-demo.js"></script>
 
     <script>
-        var table = $('#dataTable1').DataTable({
+        var table = $('#dataTable3').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
-                url: "<?php echo e(route('admin.success.data')); ?>",
+                url: "{{ route('admin.activation.data') }}",
                 type: "GET"
             },
             columns: [{
-                    data: 'txnid',
-                    name: 'txnid'
+                    data: 'wallet_address',
+                    name: 'wallet_address'
+                },
+                {
+                    data: 'mobile_number',
+                    name: 'mobile_number'
+                },
+                {
+                    data: 'otp_value',
+                    name: 'otp_value'
                 },
                 {
                     data: 'email',
                     name: 'email'
                 },
                 {
-                    data: 'bank',
-                    name: 'bank'
+                    data: 'is_verified',
+                    name: 'is_verified'
                 },
                 {
-                    data: 'amount',
-                    name: 'amount'
+                    data: 'created_at',
+                    name: 'created_at'
                 },
                 {
-                    data: 'status',
-                    name: 'status'
-                },
-                {
-                    data: 'created_date',
-                    name: 'created_date'
-                },
-                {
-                    data: 'provider',
-                    name: 'provider'
+                    data: 'action',
+                    name: 'action'
                 },
             ],
         });
     </script>
-<?php $__env->stopSection(); ?>
-
-<?php echo $__env->make('admin.layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH E:\Collabrate_bluepadu\gamepay\resources\views/admin/deposits/success.blade.php ENDPATH**/ ?>
+@endsection

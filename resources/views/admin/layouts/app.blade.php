@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700,800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
-
+    
     @yield('header_style')
 
 </head>
@@ -69,17 +69,6 @@
     </script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     
-    <script>
-        $(document).ready(function($) {
-            var url = window.location.href;
-            $('ul.categories li').each(function() {
-                $(this).removeClass('opend');
-            });
-            $('ul li a[href="' + url + '"]').parents('li').addClass('opend');
-            $('ul li a[href="' + url + '"]').parents('ul').css('display', "block");
-            $('li.opend').children('a').attr('style', 'color: #ff5722 !important');
-        });
-    </script>
     @yield('footer_script')
 </body>
 

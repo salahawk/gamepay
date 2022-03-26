@@ -1,7 +1,5 @@
 <?php
-//session_start(); 
 
-// Teeanpathi Panel
 if(isset($_SESSION['usertype']) && $_SESSION['usertype']=='admin'){?>
 <ul class="categories">
     <li class="opend">
@@ -93,13 +91,10 @@ if(isset($_SESSION['usertype']) && $_SESSION['usertype']=='admin'){?>
         <i class="fa fa-home fa-fw" aria-hidden="true"></i>
         <a href="<?php echo e(route('admin.dashboard')); ?>"> Dashboard</a>
     </li>
-    <li class="arr">
-        <i class="fa fa-file-text fa-fw"></i>
-        <a href="#">Today Deposits by Email</a>
-    </li>
+    
     <li class="arr">
         <i class="fa fa-envelope fa-fw"></i>
-        <a href="#">Deposits</a>
+        <a href="<?php echo e(route('admin.deposits')); ?>">Deposits</a>
         <ul class="side-nav-dropdown">
             <li><a href="<?php echo e(route('admin.deposits')); ?>">View All Deposit</a></li>
             <li><a href="<?php echo e(route('admin.success')); ?>">View Success</a></li>
@@ -109,15 +104,15 @@ if(isset($_SESSION['usertype']) && $_SESSION['usertype']=='admin'){?>
             <li><a href="#">View Missed Deposit</a></li>
         </ul>
     </li>
-    <li class="arr"><i class="fa fa-users fa-fw"></i><a href="#">Transactions</a>
+    
+    <li class="arr"><i class="fa fa-arrow-up fa-fw"></i><a href="<?php echo e(route('admin.activation')); ?>">Users</a>
         <ul class="side-nav-dropdown">
-            <li><a href="#">View Transaction</a></li>
-            <li><a href="#">View Txn Summary</a></li>
-
+            <li><a href="<?php echo e(route('admin.activation')); ?>">Activation</a></li>
         </ul>
     </li>
 </ul>
 <?php } ?>
+
 <script>
     $(document).ready(function($) {
         var url = window.location.href;
