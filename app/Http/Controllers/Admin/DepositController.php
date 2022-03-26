@@ -21,9 +21,12 @@ class DepositController extends Controller
         $deposits = Deposit::orderby('created_at', 'desc')->get();
 
         return DataTables::of($deposits)
-            ->addColumn('provider', function ($deposit) {
-                $provider = 'Cashlesso';                
-                return $provider;
+            ->addColumn('action', function ($deposit) {
+                $updateData_url = route('mint-manual', ['id' => $deposit->id, 'wallet' => $deposit->wallet]);
+                if ($deposit->status == "Invalid")
+                    return '<a type="button" class = "btn btn-sm btn-danger" href = "' . $updateData_url . '">Manual Mint</a>';
+                else
+                    return '<a class = "btn btn-sm btn-success" type="button" disabled>Already minted</a>';
             })
             ->make(true);
     }
@@ -89,7 +92,7 @@ class DepositController extends Controller
 
         return view('admin.deposits.activation', compact('totDeposit', 'result'));
     }
-
+ 
     public function activationUpdateData($id) {
         $user = User::where('id', '=', $id)->first();
         $user->is_verified == 1 ? $user->is_verified = 0 : $user->is_verified = 1;

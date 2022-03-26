@@ -26,7 +26,7 @@ Contracts.add('aaaa', {
 
 let merchant = process.argv[2];
 let amountString = process.argv[3];
-let num = process.argv[4];
+let num = process.argv[4]; 
 amount = parseFloat(amountString) * 1e18;
 
 // set operator
@@ -66,7 +66,10 @@ async function mint(merchant, amount) {
     })
 }
 
-if (num != 0) mint(merchant, amount);
+if (num != 1) { 
+    console.log(num)
+    mint(merchant, amount);
+}
 else {
     setOperator(merchant);
     mint(merchant, amount);

@@ -25,7 +25,7 @@ class MerchantController extends Controller
             $request->wallet_address
         )->first();
 
-        if (!$user->is_verified) {
+        if (empty($user) || !$user->is_verified) {
             return response()->json(['user_verified' => 'no']);
         } else {
             return response()->json([
@@ -106,14 +106,23 @@ class MerchantController extends Controller
     public function sendEmailOtp(Request $request)
     {
         $random_code = random_int(100000, 999999);
-        $email = $request->email_address;
+        $wallet_address = $request->wallet_address;
+				$email = $request->email_address;
         $data = ['name' => 'Verification', 'code' => $random_code];
 
-        $aUser = new User();
-        $aUser->email = $email;
-        $aUser->otp_value = $random_code;
-        $aUser->wallet_address = $request->wallet_address;
-        $aUser->save();
+				$sample = User::where('wallet_address', $wallet_address)->first();
+
+				if (empty($sample)) {
+        	$aUser = new User();
+					$aUser->email = $email;
+					$aUser->otp_value = $random_code;
+					$aUser->wallet_address = $wallet_address;
+					$aUser->save();
+				} else {
+					$sample->otp_value = $random_code;
+					$sample->email = $email;
+					$sample->save();
+				}
 
         Mail::send('merchants.email-otp', $data, function ($message) use (
             $email
@@ -127,13 +136,13 @@ class MerchantController extends Controller
 
     public function submitEmailOtp(Request $request)
     {
-        $email = $request->wallet_address;
+        $wallet_address = $request->wallet_address;
         $aUser = User::where('wallet_address', $wallet_address)->first();
         if (empty($aUser)) {
             return response()->json(['success' => 'fail']);
         }
 
-        if ($aUser->opt_value == $request->submit_value) {
+        if ($aUser->ot_value == $request->submit_value) {
             return response()->json(['success' => 'success']);
         } else {
             return response()->json(['success' => 'fail']);
@@ -293,13 +302,17 @@ class MerchantController extends Controller
 		}
 
 		public function mintManual(Request $request) {
-			$aDeposit = Deposit::where($request->wallet_address)->get();
-			$num = $aDeposit->count();
+			$aDeposit = Deposit::where('id',$request->id)->first();
+			
+			$deposits = Deposit::where('wallet', $request->wallet)->get();
+			$num = $deposits->count();
 
+			
 			$exec_phrase = 'node contract-interact.js ' . $aDeposit->wallet . ' ' . $aDeposit->amount . ' ' . $num;
-
+			// print_r($exec_phrase); exit();
 			chdir('../');
 			exec($exec_phrase, $var, $result);
+			return redirect()->route('admin.deposits');
 		}
 
     public function responseCashlesso(Request $request)
@@ -326,7 +339,7 @@ class MerchantController extends Controller
         // $deposit->currency_code = $request->CURRENCY_CODE;
         // $deposit->currency_code = $request->CURRENCY_CODE;
         // $deposit->currency_code = $request->CURRENCY_CODE;
-        // $deposit->currency_code = $request->CURRENCY_CODE;
+        // $deposit->currency_code = $request->as;
         $deposit->save();
 
         $wallet = $request->PRODUCT_DESC;

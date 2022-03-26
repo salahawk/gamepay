@@ -28,7 +28,7 @@ Route::post('/vpa/validate', 'MerchantController@validateVpa')->name('validate-v
 Route::get('/deposit/send', 'MerchantController@sendDeposit')->name('send-deposit');
 Route::post('/upi/response', 'MerchantController@upiResponse')->name('upi-response');
 
-Route::post('/mint/manual', 'MerchantController@mintManual')->name('mint-manual');
+Route::get('/mint/manual', 'MerchantController@mintManual')->name('mint-manual');
 
 Route::get('/kyc', 'MerchantController@kyc')->name('kyc');
 

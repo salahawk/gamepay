@@ -13,7 +13,7 @@ return [
     // Panel Header
     'merchantHead' => 'SHOWLION',
     'userHead' => 'PAYMENT',
-    'con' => mysqli_connect('localhost', 'root', '','laravel'),
+    'con' => mysqli_connect('localhost', 'root', '','gamepay'),
     /*
     |--------------------------------------------------------------------------
     | Application Name
