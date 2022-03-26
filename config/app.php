@@ -2,6 +2,18 @@
 
 return [
 
+    'merchantKey' => 'SHOWLION-PAYHUBZ',
+    'merchantId' => 26,
+    'companyId' => 11,
+
+    // User logo
+    'merchantUser' =>'Rapidpay User',
+    'paymentUser' =>'Payment User',
+
+    // Panel Header
+    'merchantHead' => 'SHOWLION',
+    'userHead' => 'PAYMENT',
+    'con' => mysqli_connect('localhost', 'root', '','laravel'),
     /*
     |--------------------------------------------------------------------------
     | Application Name

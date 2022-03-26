@@ -4,19 +4,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>" />
     <title>Admin Panel</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    {{-- <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet"> --}}
-    {{-- <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css"> --}}
+    
+    
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700,800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/css/main.css')); ?>">
     
-    @yield('header_style')
+    <?php echo $__env->yieldContent('header_style'); ?>
 
 </head>
 
@@ -25,7 +25,7 @@
     <aside class="side-nav" id="show-side-navigation1">
         <i class="fa fa-bars close-aside hidden-sm hidden-md hidden-lg" data-close="show-side-navigation1"></i>
         <div class="heading">
-            <img src="{{ asset('assets/img/newlogo.jpg') }}" alt="">
+            <img src="<?php echo e(asset('assets/img/newlogo.jpg')); ?>" alt="">
             <div class="info">
                 <h3><a href="#">User</a></h3>
                 <?php if (isset($_SESSION['usertype']) && $_SESSION['usertype'] == 'admin') {
@@ -40,16 +40,16 @@
                 ?>
             </div>
         </div>
-        @include('admin.layouts.leftmenu')
+        <?php echo $__env->make('admin.layouts.leftmenu', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     </aside>
 
     <section id="contents">
         <nav class="navbar navbar-default">
-            @include('admin.layouts.header')
+            <?php echo $__env->make('admin.layouts.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         </nav>
 
         <!--content start-->
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
         <!--content end-->
 
     </section>
@@ -69,7 +69,8 @@
     </script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     
-    @yield('footer_script')
+    <?php echo $__env->yieldContent('footer_script'); ?>
 </body>
 
 </html>
+<?php /**PATH E:\Collabrate_bluepadu\gamepay\resources\views/admin/layouts/app.blade.php ENDPATH**/ ?>

@@ -41,6 +41,14 @@ Route::post('/cashlesso/response', 'MerchantController@responseCashlesso')->name
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], function() {
     Route::get('deposits', 'DepositController@index')->name('deposits');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+    Route::get('success', 'DepositController@successIndex')->name('success');
+    Route::get('pending', 'DepositController@pendingIndex')->name('pending');
+    Route::get('activation', 'DepositController@activationIndex')->name('activation');
+
     Route::get('deposits/data', 'DepositController@data')->name('deposits.data');
+    Route::get('success/data', 'DepositController@successData')->name('success.data');
+    Route::get('pending/data', 'DepositController@pendingData')->name('pending.data');
+    Route::get('activation/data', 'DepositController@activationData')->name('activation.data');
+    Route::get('activation/updateData/{id}', 'DepositController@activationUpdateData')->name('activation.updateData');
 });
 

@@ -1,11 +1,11 @@
-@extends('admin.layouts.app')
 
-@section('header_style')
-	  <link href="{{ asset('assets/js/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/js/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
-@endsection
 
-@section('content')
+<?php $__env->startSection('header_style'); ?>
+	  <link href="<?php echo e(asset('assets/js/datatables/datatables.min.css')); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo e(asset('assets/js/datatables/plugins/bootstrap/datatables.bootstrap.css')); ?>" rel="stylesheet" type="text/css" />
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content'); ?>
 
 <div class="welcome">
   <div class="container-fluid">
@@ -27,7 +27,7 @@
         <div class="panel-crd crd-1">
       <div class="simple-widget">
             <div class="growth"><i class="fa fa-file-text" aria-hidden="true"></i></div>
-            <h3> {{ $settelemeAmt }}</h3>
+            <h3> <?php echo e($settelemeAmt); ?></h3>
             <p>Settlement</p>
             <div class="more-div">
               <a href="view_gw_settlement.php" class="more-btn">More</a>
@@ -39,7 +39,7 @@
         <div class="panel-crd crd-2">
       <div class="simple-widget">
             <div class="growth"><i class="fa fa-money" aria-hidden="true"></i></div>
-            <h3> {{ $expenseAmt }}</h3>
+            <h3> <?php echo e($expenseAmt); ?></h3>
             <p>Expenses</p>
             <div class="more-div">
               <a href="view_expenses.php" class="more-btn">More</a>
@@ -51,7 +51,7 @@
         <div class="panel-crd crd-3">
       <div class="simple-widget">
             <div class="growth"><i class="fa fa-arrow-up" aria-hidden="true"></i></div>
-            <h3> {{ $cashoutamount }}</h3>
+            <h3> <?php echo e($cashoutamount); ?></h3>
             <p>Cash Outs</p>
             <div class="more-div">
               <a href="view_cash_detail.php" class="more-btn">More</a>
@@ -63,7 +63,7 @@
         <div class="panel-crd crd-1">
           <div class="simple-widget" style="background-image: -webkit-linear-gradient(right, #11f16b, #08ad4f);">
             <div class="growth"><i class="fa fa-credit-card-alt" aria-hidden="true"></i></div>
-            <h3> {{ $total_avilable_balance }}</h3>
+            <h3> <?php echo e($total_avilable_balance); ?></h3>
             <p>Available Balance</p>
             <div class="more-div">
               <a href="" class="more-btn">More</a>
@@ -123,19 +123,19 @@
             <ul class="pieID legend">
               <li>
                 <em>Settlements</em>
-                <span>{{ $settelemeAmt }}</span>
+                <span><?php echo e($settelemeAmt); ?></span>
               </li>
               <li>
                 <em>Expenses</em>
-                <span> {{ $expenseAmt }}</span>
+                <span> <?php echo e($expenseAmt); ?></span>
               </li>
               <li>
                 <em>Cashouts</em>
-                <span> {{ $cashoutamount }}</span>
+                <span> <?php echo e($cashoutamount); ?></span>
               </li>
               <li>
                 <em>Available balance</em>
-                <span> {{ $total_avilable_balance }}</span>
+                <span> <?php echo e($total_avilable_balance); ?></span>
               </li>
             </ul>
         </section>
@@ -143,7 +143,7 @@
     </div>
   </div>
 
-      <script src=" {{asset('assets/js/createPie.js') }}"></script>
+      <script src=" <?php echo e(asset('assets/js/createPie.js')); ?>"></script>
 
   <hr>
 </section>
@@ -171,28 +171,28 @@
               </tr>
             </thead>
             <tbody id="myTable">
-              @foreach($lastrecord as $rowfive)
+              <?php $__currentLoopData = $lastrecord; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rowfive): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
               <tr>
-                <td><a id="ord-id" href="">{{ $rowfive['txnid'] }}</a></td>
-                <td><a id="ord-id" href="">{{ $rowfive['email'] }}</a></td>
+                <td><a id="ord-id" href=""><?php echo e($rowfive['txnid']); ?></a></td>
+                <td><a id="ord-id" href=""><?php echo e($rowfive['email']); ?></a></td>
                 <td>
-                  <span class="text-muted"><i class="wb wb-time"></i>{{ $rowfive['created_date'] }}</span>
+                  <span class="text-muted"><i class="wb wb-time"></i><?php echo e($rowfive['created_date']); ?></span>
                 </td>
-                <td>{{ $rowfive['amount'] }}</td>
+                <td><?php echo e($rowfive['amount']); ?></td>
                 <td>
-                  @php
+                  <?php
                     $status = strtoupper(substr($rowfive['status'], 0, 1));
-                  @endphp
-                  @if ($status=='S')
-                    <div class="badge badge-table badge-success">{{ $rowfive['status'] }}</div>
-                  @elseif ($status=='F')
-                    <div class="badge badge-table badge-canceled">{{ $rowfive['status'] }}</div>
-                  @elseif ($status=='')
-                    <div class="badge badge-table badge-pending">{{ 'Initiated' }}</div>
-                  @endif
+                  ?>
+                  <?php if($status=='S'): ?>
+                    <div class="badge badge-table badge-success"><?php echo e($rowfive['status']); ?></div>
+                  <?php elseif($status=='F'): ?>
+                    <div class="badge badge-table badge-canceled"><?php echo e($rowfive['status']); ?></div>
+                  <?php elseif($status==''): ?>
+                    <div class="badge badge-table badge-pending"><?php echo e('Initiated'); ?></div>
+                  <?php endif; ?>
                 </td>
               </tr>
-              @endforeach
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
           </table>
         </div>
@@ -202,9 +202,11 @@
 <br>
 <br>
 </section>
-@endsection
-@section('footer_script')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('footer_script'); ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js"></script>
-<script src="{{asset('assets/js/main.js') }}"></script>
-<script src="{{asset('js/demo/datatables-demo.js') }}"></script>
-@endsection
+<script src="<?php echo e(asset('assets/js/main.js')); ?>"></script>
+<script src="<?php echo e(asset('js/demo/datatables-demo.js')); ?>"></script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH E:\Collabrate_bluepadu\gamepay\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>

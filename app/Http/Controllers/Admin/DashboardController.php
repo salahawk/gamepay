@@ -10,21 +10,17 @@ use App\Models\Deposit;
 class DashboardController extends Controller
 {
     public function index() {
-        $merchantKey="SHOWLION-PAYHUBZ";
-        $merchantId=26;
-        $companyId=11;
-
-        // User logo
-        $merchantUser="Rapidpay User";
-        $paymentUser="Payment User";
-
-        // Panel Header
-        $merchantHead='SHOWLION';
-        $userHead='PAYMENT';
-
+        $merchantKey = config('app.merchantKey');
+        $merchantId = config('app.merchantId');
+        $companyId = config('app.companyId');
+        $merchantUser = config('app.merchantUser');
+        $paymentUser = config('app.paymentUser');
+        $merchantHead = config('app.merchantHead');
+        $userHead = config('app.userHead');
+        
         // Fileuploadpath
         $filepath='showlion';
-        $con = mysqli_connect('localhost', 'root', '','laravel');
+        $con = config('app.con');
         $date=date('Y-m-d');
         $days_ago = date('Y-m-d', strtotime('-10 days', strtotime($date)));
 
