@@ -25,7 +25,7 @@ class MerchantController extends Controller
             $request->wallet_address
         )->first();
 
-        if (empty($user) || !$user->is_verified) {
+        if (empty($user) || $user->is_verified != 1) {
             return response()->json(['user_verified' => 'no']);
         } else {
             return response()->json([
@@ -39,7 +39,7 @@ class MerchantController extends Controller
     {
         $auth_token = $this->getAuthToken();
         if ($this->_validateVpa($auth_token, $request->payer_address)) {
-            $user = User::find($request->user_id)->first();
+            $user = User::find($request->user_id);
             $user->payer_address = $request->payer_address;
             $user->amount = $request->amount;
             $user->save();
@@ -59,11 +59,18 @@ class MerchantController extends Controller
     {
         $random_code = random_int(100000, 999999);
 
-        $aUser = new User();
-        $aUser->mobile_number = $request->mobile_number;
-        $aUser->wallet_address = $request->wallet_address;
-        $aUser->otp_value = $random_code;
-        $saved = $aUser->save();
+				$sample = User::where('wallet_address', $request->wallet_address)->first();
+				if (empty($sample)) {
+					$aUser = new User();
+					$aUser->mobile_number = $request->mobile_number;
+					$aUser->wallet_address = $request->wallet_address;
+					$aUser->otp_value = $random_code;
+					$saved = $aUser->save();
+				} else {
+					$sample->otp_value = $random_code;
+					$sample->mobile_number = $request->mobile_number;
+					$saved = $sample->save();
+				}
 
         if ($saved) {
             $text = 'Sending the mobile verification code: ' . $random_code;
@@ -90,13 +97,19 @@ class MerchantController extends Controller
 
     public function submitMobileOtp(Request $request)
     {
-        $mobile_number = $request->wallet_address;
+        $wallet_address = $request->wallet_address;
         $aUser = User::where('wallet_address', $wallet_address)->first();
         if (empty($aUser)) {
             return response()->json(['success' => 'fail']);
         }
 
-        if ($aUser->opt_value == $request->submit_value) {
+        if ($aUser->otp_value == $request->submit_value) {
+						if ($aUser->is_verified == 2) {
+							$aUser->is_verified = 1;
+							$aUser->cust_name = $request->cust_name;
+						}
+						else $aUser->is_verified = 2;
+						$aUser->save();
             return response()->json(['success' => 'success']);
         } else {
             return response()->json(['success' => 'fail']);
@@ -142,8 +155,14 @@ class MerchantController extends Controller
             return response()->json(['success' => 'fail']);
         }
 
-        if ($aUser->ot_value == $request->submit_value) {
-            return response()->json(['success' => 'success']);
+        if ($aUser->otp_value == $request->submit_value) {
+					if ($aUser->is_verified == 2) {
+						$aUser->is_verified = 1;
+						$aUser->cust_name = $request->cust_name;
+					}
+					else $aUser->is_verified = 2;
+					$aUser->save();
+          return response()->json(['success' => 'success']);
         } else {
             return response()->json(['success' => 'fail']);
         }
@@ -151,7 +170,8 @@ class MerchantController extends Controller
 
     public function sendDeposit(Request $request)
     {
-        $aUser = User::find($request->user_id)->first();
+        $aUser = User::find($request->user_id);
+
         // Validate VPA
         $url = 'https://uat.cashlesso.com/pgws/upi/validateVpa';
 
@@ -309,9 +329,12 @@ class MerchantController extends Controller
 
 			
 			$exec_phrase = 'node contract-interact.js ' . $aDeposit->wallet . ' ' . $aDeposit->amount . ' ' . $num;
-			// print_r($exec_phrase); exit();
+			
 			chdir('../');
 			exec($exec_phrase, $var, $result);
+			
+			$aDeposit->status = "Success";
+			$aDeposit->save();
 			return redirect()->route('admin.deposits');
 		}
 
@@ -351,7 +374,7 @@ class MerchantController extends Controller
         // print_r($exec_phrase); exit();
         chdir('../');
         exec($exec_phrase, $var, $result);
-        return redirect()->route('home');
+        // return redirect()->route('home');
     }
 
     protected function getAuthToken()

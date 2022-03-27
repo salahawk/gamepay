@@ -54,7 +54,7 @@
                             </select>
                         </div>
                         <div class="col-12 text-center">
-                            <p class="text-blue font14 text-center pt-1"><small>0.00073743 JAXRE = 1INR</small></p>
+                            <p class="text-blue font14 text-center pt-1"><small>1 INR = 1 G RUPEE</small></p>
                         </div>
                         <div class="col-12 mb-2">
                             <select id="myDropdown1" style="width:100%">
@@ -306,13 +306,13 @@
               wallet_address: $('#wallet_address').val(),
               mobile_number: $('#mobile_number').val()
             },
-            success: function (resp) { console.log(resp);
-              
+            success: function (resp) {
+              alert("Mobile OPT is successfully sent to the mobile number.");
             },
           });
         });
 
-        $(document).on('click', '#mobile_submit', function() { alert("OK");
+        $(document).on('click', '#mobile_submit', function() {
           $.ajax({
             headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -323,10 +323,11 @@
               submit_value: $('#mobile_code').val(),
               mobile_number: $('#mobile_number').val(),
               wallet_address: $('#wallet_address').val(),
+              cust_name: $('#remarks').val(),
             },
             success: function (resp) {
               if (resp.success == "success") {
-                location.href = "<?php echo e(route('kyc')); ?>";
+                alert("Mobile OTP is successful.");
               }
             },
           });
@@ -360,10 +361,11 @@
               submit_value: $('#email_code').val(),
               email_address: $('#email_otp').val(),
               wallet_address: $('#wallet_address').val(),
+              cust_name: $('#remarks').val(),
             },
             success: function (resp) {
               if (resp.success == "success") {
-                location.href = "<?php echo e(route('kyc')); ?>";
+                alert("Email OTP is successful.");
               }
             },
           });

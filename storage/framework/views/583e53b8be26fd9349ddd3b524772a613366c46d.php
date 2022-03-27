@@ -104,7 +104,7 @@
                             <tr>
                                 <th>Transaction ID</th>
                                 <th>Email</th>
-                                <th>Gateway</th>
+                                <th>Name</th>
                                 <th>Amount</th>
                                 <th>Status</th>
                                 <th>Transaction Date</th>
@@ -144,7 +144,7 @@
         columns: [
             {data: 'txnid', name: 'txnid'},
             {data: 'email', name: 'email'},
-            {data: 'bank', name: 'bank'},
+            {data: 'cust_name', name: 'cust_name'},
             {data: 'amount', name: 'amount'},
             {data: 'status', name: 'status'},
             {data: 'created_date', name: 'created_date'},
