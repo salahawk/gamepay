@@ -555,4 +555,8 @@ class MerchantController extends Controller
             return false;
         }
     }
+
+    public function kycIndex() {
+        return view('merchants.kyc');
+    }
 }
