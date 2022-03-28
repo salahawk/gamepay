@@ -30,7 +30,7 @@ Route::post('/upi/response', 'MerchantController@upiResponse')->name('upi-respon
 
 Route::get('/mint/manual', 'MerchantController@mintManual')->name('mint-manual');
 
-Route::get('/kyc', 'MerchantController@kyc')->name('kyc');
+Route::get('/kyc', 'MerchantController@kycIndex')->name('kyc');
 
 
 

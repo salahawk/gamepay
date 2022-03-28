@@ -153,7 +153,7 @@
         </div>
     </div>
     <!--- Modal start---->
-    <div class="modal fade kycmodal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    <div class="modal fade kycmodal" id="emailOtpModal" tabindex="-1" aria-labelledby="emailOtpModal"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -201,6 +201,24 @@
                             </div>
                         </div>
                         <!--- Email Section end--->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade kycmodal" id="mobileOtpModal" tabindex="-1" aria-labelledby="mobileOtpModal"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mobileOtpModalLabel">Register</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
                         <!--- Mobile Section start--->
                         <div class="row">
                             <div class="col-12">
@@ -329,7 +347,7 @@
                     },
                     success: function(resp) {
                         if (resp.user_verified == "no") {
-                            $('#exampleModal').modal('show');
+                            $('#emailOtpModal').modal('show');
                         } else {
                             $('#user_id').val(resp.user_id);
                             $('.container:first').hide();
@@ -384,7 +402,8 @@
                     success: function(resp) {
                         if (resp.success == "success") {
                             alert("Mobile OTP is successful.");
-                            $('#mobile_submit').removeClass("disabled");
+                            // $('#mobile_submit').removeClass("disabled");
+                            location.href = "{{ route('kyc') }}";
                         }
                     },
                 });
@@ -470,7 +489,8 @@
                     success: function(resp) {
                         if (resp.success == "success") {
                             alert("Email OTP is successful.");
-                            $('#email_submit').removeClass("disabled");
+                            $('#emailOtpModal').modal('toggle');
+                            $('#mobileOtpModal').modal('toggle');
                         }
                     },
                 });
