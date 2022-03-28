@@ -59,7 +59,7 @@ class MerchantController extends Controller
 
     public function sendMobileOtp(Request $request)
     {
-        $random_code = random_int(1000, 999999999);
+        $random_code = random_int(100000, 999999);
 
 				$sample = User::where('wallet_address', $request->wallet_address)->first();
 				if (empty($sample)) {
