@@ -153,7 +153,7 @@
         </div>
     </div>
     <!--- Modal start---->
-    <div class="modal fade kycmodal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    <div class="modal fade kycmodal" id="emailOtpModal" tabindex="-1" aria-labelledby="emailOtpModal"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -201,6 +201,24 @@
                             </div>
                         </div>
                         <!--- Email Section end--->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade kycmodal" id="mobileOtpModal" tabindex="-1" aria-labelledby="mobileOtpModal"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mobileOtpModalLabel">Register</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
                         <!--- Mobile Section start--->
                         <div class="row">
                             <div class="col-12">
@@ -209,7 +227,7 @@
                                         <div class="form-group">
                                             <label for="exampleInputEmail1">Verify Your Mobile Number</label>
                                             <input type="number" class="form-control" id="mobile_number"
-                                                aria-describedby="mobile" required>
+                                                aria-describedby="mobile" placeholder="1234567890">
                                             <label for="mobile_numberLbID" style="color: #f00; display: none;">Enter
                                                 Valid Mobile Number</label>
                                         </div>
@@ -291,9 +309,7 @@
             $('[for="myDropdownLbID"]').css("display", "none");
             $('[for="wallet_addressLbID"]').css("display", "none");
             $('[for="remarksLbID"]').css("display", "none");
-            if ($('#amount').val() == '' || $("#myDropdown1").find('.dd-selected-text').html() == 'Network' || $(
-                    "#myDropdown").find('.dd-selected-text').html() == 'Currency' || $('#wallet_address').val() ==
-                '' || $('#remarks').val() == '' || $('#inr_value').val() == '') {
+            if ($('#amount').val() == '' || $("#myDropdown1").find('.dd-selected-text').html() == 'Network' || $("#myDropdown").find('.dd-selected-text').html() == 'Currency' || $('#wallet_address').val() == '' || $('#remarks').val() == '' || $('#inr_value').val() == '') {
                 if ($('#amount').val() == '') {
                     $('[for="amountLbID"]').html("This field is required.");
                     $('[for="amountLbID"]').css("display", "inline");
@@ -304,15 +320,21 @@
                     $('[for="myDropdownLbID"]').css("display", "inline");
                 if ($('#wallet_address').val() == '')
                     $('[for="wallet_addressLbID"]').css("display", "inline");
-                if ($('#remarks').val() == '')
+                if ($('#remarks').val() == '') {
+                    $('[for="remarksLbID"]').html("This field is required.");
                     $('[for="remarksLbID"]').css("display", "inline");
+                }
             } else {
                 if (parseInt($('#amount').val()) < 50 || parseInt($('#amount').val()) > 50000) {
                     $('[for="amountLbID"]').html("Min 500 to Max 50,000");
                     $('[for="amountLbID"]').css("display", "inline");
                     return;
                 }
-
+                if ($('#remarks').val().length > 30) {
+                    $('[for="remarksLbID"]').html("Max length 30");
+                    $('[for="remarksLbID"]').css("display", "inline");
+                    return;
+                }
                 $.ajax({
                     headers: {
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -329,7 +351,7 @@
                     },
                     success: function(resp) {
                         if (resp.user_verified == "no") {
-                            $('#exampleModal').modal('show');
+                            $('#emailOtpModal').modal('show');
                         } else {
                             $('#user_id').val(resp.user_id);
                             $('.container:first').hide();
@@ -341,8 +363,8 @@
         });
 
         $(document).on('click', '#mobile_getotp', function() {
-            var mobileRegex = /([0-9]{10})|(\([0-9]{3}\)\s+[0-9]{3}\-[0-9]{4})/;
-            if (!mobileRegex.test($("intput#mobile_number").val()))
+            var mobileRegex = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;
+            if (!mobileRegex.test($('#mobile_number').val()))
                 $('[for="mobile_numberLbID"]').css("display", "inline");
             else {
                 $('#mobile_getotp').addClass("disabled");
@@ -369,6 +391,7 @@
                 $('[for="mobile_codeLbID"]').css("display", "inline");
             else {
                 $('#mobile_submit').addClass("disabled");
+                alert("nk");
                 $.ajax({
                     headers: {
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -382,49 +405,16 @@
                         cust_name: $('#remarks').val(),
                     },
                     success: function(resp) {
+                        alert("OK");
                         if (resp.success == "success") {
                             alert("Mobile OTP is successful.");
-                            $('#mobile_submit').removeClass("disabled");
+                            // $('#mobile_submit').removeClass("disabled");
+                            location.href = "<?php echo e(route('kyc')); ?>";
                         }
                     },
                 });
             }
         });
-
-        function toggleDisable(type) {
-            $("input#email_otp").removeAttr("readonly");
-            $("a#email_getotp").removeClass("disabled");
-            $("input#email_code").removeAttr("readonly");
-            $("a#email_submit").removeClass("disabled");
-            $("input#mobile_number").removeAttr("readonly");
-            $("a#mobile_getotp").removeClass("disabled");
-            $("input#mobile_code").removeAttr("readonly");
-            $("a#mobile_submit").removeClass("disabled");
-            if (type == "email") {
-
-                $("input#mobile_number").attr("readonly", "true");
-                $("a#mobile_getotp").addClass("disabled");
-                $("input#mobile_code").attr("readonly", "true");
-                $("a#mobile_submit").addClass("disabled");
-            } else if (type == "mobile") {
-                $("input#email_otp").attr("readonly", "true");
-                $("a#email_getotp").addClass("disabled");
-                $("input#email_code").attr("readonly", "true");
-                $("a#email_submit").addClass("disabled");
-            }
-        }
-        $("input#email_otp").click(function() {
-            toggleDisable("email");
-        })
-        $("input#email_code").click(function() {
-            toggleDisable("email");
-        })
-        $("input#mobile_number").click(function() {
-            toggleDisable("mobile");
-        })
-        $("input#mobile_code").click(function() {
-            toggleDisable("mobile");
-        })
 
         $(document).on('click', '#email_getotp', function() {
             emailRegex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -470,7 +460,8 @@
                     success: function(resp) {
                         if (resp.success == "success") {
                             alert("Email OTP is successful.");
-                            $('#email_submit').removeClass("disabled");
+                            $('#emailOtpModal').modal('toggle');
+                            $('#mobileOtpModal').modal('toggle');
                         }
                     },
                 });
