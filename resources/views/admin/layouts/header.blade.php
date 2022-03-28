@@ -16,10 +16,15 @@
     </div>
     <div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
-            <li><a href="#" title="Expand screen"><i data-show="show-side-navigation1"
-                        class="fa fa-bars show-side-btn"></i></a></li>
+            <li><a href="#" title="Expand screen"><i data-show="show-side-navigation1" class="fa fa-bars show-side-btn"></i></a></li>
             <li><a title="Log Out" class="log-out" href="logout.php"><i class="fa fa-power-off"
                         aria-hidden="true"></i></a></li>
         </ul>
     </div>
 </div>
+<script>
+    $('[title="Expand screen"]').click(function() {
+        $('.side-nav').toggleClass("show-side-nav");
+        $('#contents').toggleClass("margin");
+    });
+</script>
