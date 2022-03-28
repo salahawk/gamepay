@@ -498,6 +498,7 @@
         });
 
         $(document).on('click', '.btnSubmit', function() {
+            $(this).prop('disabled', true);
             $.ajax({
                 headers: {
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -510,6 +511,7 @@
                     amount: $('#amount').val(),
                 },
                 success: function(resp) {
+                    $('.btnSubmit').prop('disabled', false);
                     // if (resp.status == "fail") {
                     //   alert("Sorry, but you are no longer valid to make a transaction.");
                     // }
