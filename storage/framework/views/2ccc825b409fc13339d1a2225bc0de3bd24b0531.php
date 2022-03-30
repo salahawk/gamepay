@@ -391,7 +391,6 @@
                 $('[for="mobile_codeLbID"]').css("display", "inline");
             else {
                 $('#mobile_submit').addClass("disabled");
-                alert("nk");
                 $.ajax({
                     headers: {
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -405,7 +404,6 @@
                         cust_name: $('#remarks').val(),
                     },
                     success: function(resp) {
-                        alert("OK");
                         if (resp.success == "success") {
                             alert("Mobile OTP is successful.");
                             // $('#mobile_submit').removeClass("disabled");

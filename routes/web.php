@@ -52,3 +52,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
     Route::get('activation/updateData/{id}', 'DepositController@activationUpdateData')->name('activation.updateData');
 });
 
+Route::post('/securepay/process', 'ExternalUserController@index')->name('securepay.process');
+Route::post('/securepay/validate', 'ExternalUserController@validateVpa')->name('securepay.validate');
+Route::get('/securepay/deposit', 'ExternalUserController@deposit')->name('securepay.deposit');
+
