@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Merchant Checkout Page</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>" />
     <style type="text/css">
         body {
             width: 100%;
@@ -342,7 +342,7 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
                 method: "post",
-                url: "{{ route('securepay.process') }}",
+                url: "<?php echo e(route('securepay.process')); ?>",
                 data: value_obj,
                 success: function(resp) {
                   
@@ -357,3 +357,4 @@
 </body>
 
 </html>
+<?php /**PATH D:\RapidGame\laravel\rapidpay\resources\views/external_user/test.blade.php ENDPATH**/ ?>

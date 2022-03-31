@@ -13,7 +13,7 @@ class ExternalUserController extends Controller
     public function index(Request $request)
     {
         // validate key and salt
-        $salt = 'salt';
+        $salt = 'salt123456789';
         // validate hash
         $key = $request->KEY;
         $txn_id = $request->TXNID;
@@ -91,7 +91,7 @@ class ExternalUserController extends Controller
             '|' .
             $salt;
 
-        $hash_value = hash('sha512', $hash_string);
+        $hash_value = hash('sha256', $hash_string);
 
         if ($hash != $hash_value) {
             return view('external_user.error');
@@ -117,14 +117,22 @@ class ExternalUserController extends Controller
         $sample->hash = $hash;
         $saved = $sample->save();
         // return response success->upi, fail->error
-        if ($saved) {
-            return view('external_user.get-payer-address')->with(
-                'external_user_id',
-                $sample->id
-            );
+        
+        if ($saved) {//print_r("sdfasdfasdfasdfasdfasdfasdfasdfasdfa"); exit();
+            return redirect()->route('securepay.upi', [
+                'external_user_id' => $sample->id,
+            ]);
         } else {
             return view('external_user.error');
         }
+    }
+
+    public function getUpi(Request $request)
+    {
+        return view('external_user.get-payer-address')->with(
+            'external_user_id',
+            $request->external_user_id
+        );
     }
 
     public function validateVpa(Request $request)
@@ -134,7 +142,7 @@ class ExternalUserController extends Controller
             $ext = External_user::find($request->external_user_id);
             $ext->payer_address = $request->payer_address;
             $ext->save();
-            // return response()->json(['status' => 'success']);
+            
             return redirect()->route('securepay.deposit', [
                 'external_user_id' => $ext->id,
                 'authToken' => $auth_token,
@@ -145,7 +153,7 @@ class ExternalUserController extends Controller
     }
 
     public function deposit(Request $request)
-    {
+    { 
         $ext = External_user::find($request->external_user_id);
 
         // Validate VPA
@@ -440,6 +448,7 @@ class ExternalUserController extends Controller
         }
         $signHashValue = implode('~', $signHashArr) . env('SALT');
         $hash = strtoupper(hash('sha256', $signHashValue));
+
         $curlupi = curl_init();
 
         curl_setopt_array($curlupi, [
@@ -451,16 +460,11 @@ class ExternalUserController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>
-                '{
-                  	"PAY_ID":  "' . env('PAY_ID') . '",
-																			"PAYER_ADDRESS":  "' .
-                $payeAddress .
-                '",
-																			"HASH":"' .
-                $hash .
-                '"
-																		}',
+            CURLOPT_POSTFIELDS =>'{
+                                    "PAY_ID":  "' .  env('PAY_ID') . '",
+                                    "PAYER_ADDRESS":  "' . $payeAddress . '",
+                                    "HASH":"' . $hash . '"
+                                }',
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
                 "Authorization: Bearer $authToken",
@@ -472,7 +476,7 @@ class ExternalUserController extends Controller
         $responsecode = json_decode($responseUPI);
 
         curl_close($curlupi);
-
+print_r($responsecode); exit();
         if ($responsecode->STATUS == 'Success') {
             return true;
         } else {
@@ -483,5 +487,10 @@ class ExternalUserController extends Controller
     public function kycIndex()
     {
         return view('merchants.kyc');
+    }
+
+    public function test()
+    {
+        return view('external_user.test');
     }
 }

@@ -22,7 +22,7 @@
 </head>
 
 <body>
-    <div class="container" style="padding-top: 10%; display: none">
+    <div class="container" style="padding-top: 10%; display: block">
         <div class="row justify-content-center align-items-center">
             <div class="col-lg-10">
                 <div class="middlepage1 shadow p-4 text-center"> <img src="<?php echo e(asset('assets/img/upi.png')); ?>"

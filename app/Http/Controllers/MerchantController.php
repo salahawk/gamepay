@@ -256,7 +256,9 @@ class MerchantController extends Controller
 				
 				$aDeposit = new Deposit;
 				$aDeposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
-				$aDeposit->txnid = $responsePayment->TXN_ID;
+				if (!empty($responsePayment->TXN_ID)) {
+          $aDeposit->txnid = $responsePayment->TXN_ID;
+        }
 				if (!empty($responsePayment->CURRENCY_CODE)) {
 					$aDeposit->currency_code = $responsePayment->CURRENCY_CODE;
 				}
@@ -438,16 +440,11 @@ class MerchantController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>
-																	'{
-																			"PAY_ID":  "' . env('PAY_ID') .'",
-																			"PAYER_ADDRESS":  "' .
-																						$payeAddress .
-																						'",
-																			"HASH":"' .
-																								$hash .
-																								'"
-																		}',
+            CURLOPT_POSTFIELDS =>'{
+                                    "PAY_ID":  "' . env('PAY_ID') .'",
+                                    "PAYER_ADDRESS":  "' . $payeAddress .	'",
+                                    "HASH":"' .	$hash . '"
+                                  }',
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
                 "Authorization: Bearer $authToken",

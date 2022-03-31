@@ -81,15 +81,17 @@
                         </div>
                         <div class="col-12 mb-2">
                             <input type="text" class="form-control border-radius6" id="wallet_address"
-                                aria-describedby="name" placeholder="Enter Destination Address">
+                                aria-describedby="name" placeholder="Enter Destination Address" >
                             <label for="wallet_addressLbID" style="color: #f00; display: none;">This field is
                                 required.</label>
                             <p class="text-blue font14 text-center pt-1 pb-0 mb-0"><small>Ex:
                                     0xd4654ad4ad4sad4sa6dwq886wa4d5</small></p>
                         </div>
                         <div class="col-12 mb-2">
+                            <input type="hidden" class="form-control border-radius6" id="customer_name" aria-describedby="name"
+                                placeholder="Remarks">
                             <input type="text" class="form-control border-radius6" id="remarks" aria-describedby="name"
-                                placeholder="Customer Name">
+                                placeholder="Remarks">
                             <label for="remarksLbID" style="color: #f00; display: none;">This field is required.</label>
                         </div>
                         <div class="col-12 mb-2">
@@ -325,7 +327,7 @@
                     $('[for="remarksLbID"]').css("display", "inline");
                 }
             } else {
-                if (parseInt($('#amount').val()) < 50 || parseInt($('#amount').val()) > 50000) {
+                if (parseInt($('#amount').val()) < 500 || parseInt($('#amount').val()) > 50000) {
                     $('[for="amountLbID"]').html("Min 500 to Max 50,000");
                     $('[for="amountLbID"]').css("display", "inline");
                     return;
@@ -346,7 +348,8 @@
                         network: $("#myDropdown1").find('.dd-selected-text').text(),
                         currency: $("#myDropdown").find('.dd-selected-text').text(),
                         wallet_address: $('#wallet_address').val(),
-                        cust_name: $('#remarks').val(),
+                        cust_name: $('#customer_name').val(),
+                        remarks: $('#remarks').val(),
                         inr_value: $('#inr_value').val()
                     },
                     success: function(resp) {
@@ -496,6 +499,15 @@
         $("input#amount").blur(function() {
             $("input#inr_value").val($(this).val());
         })
+
+        $('#wallet_address').on('keypress', function (event) {
+            var regex = new RegExp("^[a-zA-Z0-9]+$");
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+            if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+            }
+        });
     </script>
 </body>
 
