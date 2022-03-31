@@ -250,7 +250,7 @@ class MerchantController extends Controller
 				$responseCollect = curl_exec($curlCollet);
 
         curl_close($curlCollet);
-print_r($responseCollect); exit();
+
 				$responsePayment=json_decode($responseCollect);
 				$orderId=$responsePayment->ORDER_ID;
 				

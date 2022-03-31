@@ -110,9 +110,7 @@
                             <a href="#" class="btn btn-primary border-radius6 w-100 disabled" id="confirm_pay">Continue
                                 to Pay</a>
                         </div>
-                        <div class="col-12 mb-2 pt-2">
-                            <div class="text-center"><img src="<?php echo e(asset('assets/img/upi.png')); ?>" /></div>
-                        </div>
+                        
                     </div>
                 </div>
 
@@ -501,6 +499,15 @@
         })
 
         $('#wallet_address').on('keypress', function (event) {
+            var regex = new RegExp("^[a-zA-Z0-9]+$");
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+            if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+            }
+        });
+
+        $('#remarks').on('keypress', function (event) {
             var regex = new RegExp("^[a-zA-Z0-9]+$");
             var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
             if (!regex.test(key)) {
