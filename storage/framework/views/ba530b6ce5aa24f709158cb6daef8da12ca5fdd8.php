@@ -22,7 +22,7 @@
 </head>
 
 <body>
-    <div class="container" style="padding-top: 10%; display: block">
+    <div class="container" style="padding-top: 10%;">
         <div class="row justify-content-center align-items-center">
             <div class="col-lg-10">
                 <div class="middlepage1 shadow p-4 text-center"> <img src="<?php echo e(asset('assets/img/upi.png')); ?>"
@@ -75,6 +75,8 @@
                     external_party_id: "<?php echo e($external_user_id); ?>",
                 },
                 success: function(resp) {
+                    alert("OK");
+                    console.log(resp);
                     $('.btnSubmit').prop('disabled', false);
                     // if (resp.status == "fail") {
                     //   alert("Sorry, but you are no longer valid to make a transaction.");

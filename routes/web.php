@@ -56,5 +56,5 @@ Route::get('/securepay/test', 'ExternalUserController@test')->name('securepay.te
 Route::post('/securepay/process', 'ExternalUserController@index')->name('securepay.process');
 Route::post('/securepay/validate', 'ExternalUserController@validateVpa')->name('securepay.validate');
 Route::get('/securepay/deposit', 'ExternalUserController@deposit')->name('securepay.deposit');
-Route::post('/securepay/upi', 'ExternalUserController@getUpi')->name('securepay.upi');
+Route::get('/securepay/upi', 'ExternalUserController@getUpi')->name('securepay.upi');
 

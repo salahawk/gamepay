@@ -293,6 +293,7 @@
         let str = '';
         // let hashCalculated = '';
         $('#submit_button').on('click', function() {
+            str = '';
             // caculate hash based on input params
             let formVal = $('#form1').serialize();
             value_obj = formVal.split("&").map(each => each.split("=")).reduce((a, b) => {
@@ -345,9 +346,12 @@
                 url: "{{ route('securepay.process') }}",
                 data: value_obj,
                 success: function(resp) {
-                  
+                    hashCalculated = '';
+                    str = '';
+                    value_obj = '';
                 },
             });
+            
             // send ajax to securepay/process
         });
 

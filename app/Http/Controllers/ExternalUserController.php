@@ -93,9 +93,10 @@ class ExternalUserController extends Controller
 
         $hash_value = hash('sha256', $hash_string);
 
-        if ($hash != $hash_value) {
+        if ($hash != $hash_value) { 
             return view('external_user.error');
         }
+        
         // insert DB
         $sample = new External_user();
         $sample->key = $key;
@@ -119,9 +120,11 @@ class ExternalUserController extends Controller
         // return response success->upi, fail->error
         
         if ($saved) {//print_r("sdfasdfasdfasdfasdfasdfasdfasdfasdfa"); exit();
-            return redirect()->route('securepay.upi', [
-                'external_user_id' => $sample->id,
-            ]);
+            // return redirect()->route('securepay.upi', [
+            //     'external_user_id' => $sample->id,
+            // ]);
+            return view('external_user.get-payer-address')
+                ->with('external_user_id', $sample->id);
         } else {
             return view('external_user.error');
         }
@@ -129,10 +132,8 @@ class ExternalUserController extends Controller
 
     public function getUpi(Request $request)
     {
-        return view('external_user.get-payer-address')->with(
-            'external_user_id',
-            $request->external_user_id
-        );
+        return view('external_user.get-payer-address')
+                ->with('external_user_id', $request->external_user_id);
     }
 
     public function validateVpa(Request $request)

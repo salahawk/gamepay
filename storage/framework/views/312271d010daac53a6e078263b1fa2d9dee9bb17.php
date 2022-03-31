@@ -152,7 +152,7 @@
                 </tr>
                 <tr>
                     <td colspan="3" align="center" valign="middle"
-                        class="signup-headingbg borderleftradius borderrightradius">Checkout Page</td>
+                        class="signup-headingbg borderleftradius borderrightradius">From Post</td>
                 </tr>
                 <tr>
                     <td align="right" valign="middle">&nbsp;</td>
@@ -219,7 +219,7 @@
                 <tr>
                     <td width="28%" align="right" valign="middle" class="labelfont">REMARKS: </td>
                     <td width="65%" align="left" valign="middle"><input type="text" name="REMARKS"
-                            class="signuptextfield" value="" autocomplete="off" /></td>
+                            class="signuptextfield" value="Testing remarks" autocomplete="off" readonly /></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>
                 <tr>
@@ -245,26 +245,26 @@
 
                     <td width="28%" align="right" valign="middle" class="labelfont">SURL: </td>
                     <td width="65%" align="left" valign="middle"><input type="text" name="SURL" class="signuptextfield"
-                            value="" autocomplete="off" /></td>
+                            value="https://gamepay.online/securepay/success" autocomplete="off" readonly/></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>
                 <tr>
 
                     <td width="28%" align="right" valign="middle" class="labelfont">EURL: </td>
                     <td width="65%" align="left" valign="middle"><input type="text" name="EURL" class="signuptextfield"
-                            value="" autocomplete="off" /></td>
+                            value="https://gamepay.online/securepay/fail" autocomplete="off" readonly/></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>
                 <tr>
 
                     <td width="28%" align="right" valign="middle" class="labelfont">CURL: </td>
                     <td width="65%" align="left" valign="middle"><input type="text" name="CURL" class="signuptextfield"
-                            value="" autocomplete="off" /></td>
+                            value="https://gamepay.online/securepay/callback" autocomplete="off" readonly/></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>
-                <tr>
+                <tr style="display: none;">
                     <td width="28%" align="right" valign="middle" class="labelfont">HASH: </td>
-                    <td width="65%" align="left" valign="middle"><input type="text" name="HASH" class="signuptextfield"
+                    <td width="65%" align="left" valign="middle"><input type="hidden" name="HASH" class="signuptextfield"
                             value="" autocomplete="off" id="hash" readonly /></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>
@@ -273,7 +273,7 @@
                 </tr>
                 <tr>
                     <td colspan="3" align="center" valign="middle">
-                        <input type="button" id="submit_button" class="signupbutton" value="Pay Now" />
+                        <input type="button" id="submit_button" class="signupbutton" value="Deposit" />
                     </td>
                 </tr>
                 <tr>
@@ -293,6 +293,7 @@
         let str = '';
         // let hashCalculated = '';
         $('#submit_button').on('click', function() {
+            str = '';
             // caculate hash based on input params
             let formVal = $('#form1').serialize();
             value_obj = formVal.split("&").map(each => each.split("=")).reduce((a, b) => {
@@ -345,9 +346,12 @@
                 url: "<?php echo e(route('securepay.process')); ?>",
                 data: value_obj,
                 success: function(resp) {
-                  
+                    hashCalculated = '';
+                    str = '';
+                    value_obj = '';
                 },
             });
+            
             // send ajax to securepay/process
         });
 
