@@ -152,7 +152,7 @@
                 </tr>
                 <tr>
                     <td colspan="3" align="center" valign="middle"
-                        class="signup-headingbg borderleftradius borderrightradius">Checkout Page</td>
+                        class="signup-headingbg borderleftradius borderrightradius">From Post</td>
                 </tr>
                 <tr>
                     <td align="right" valign="middle">&nbsp;</td>
@@ -262,7 +262,7 @@
                             value="https://gamepay.online/securepay/callback" autocomplete="off" readonly/></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>
-                <tr>
+                <tr style="display: none;">
                     <td width="28%" align="right" valign="middle" class="labelfont">HASH: </td>
                     <td width="65%" align="left" valign="middle"><input type="hidden" name="HASH" class="signuptextfield"
                             value="" autocomplete="off" id="hash" readonly /></td>
@@ -273,7 +273,7 @@
                 </tr>
                 <tr>
                     <td colspan="3" align="center" valign="middle">
-                        <input type="button" id="submit_button" class="signupbutton" value="Pay Now" />
+                        <input type="button" id="submit_button" class="signupbutton" value="Deposit" />
                     </td>
                 </tr>
                 <tr>
