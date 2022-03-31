@@ -34,7 +34,7 @@
                 <!---- Tab 1 content start-->
                 <div class="row">
                     <div class="col-12 text-center logopos">
-                        <div class="position-relative"><img src="{{asset('assets/img/gamerupee.svg') }}" width="100px" /></div>
+                        <div class="position-relative"><img src="<?php echo e(asset('assets/img/gamerupee.svg')); ?>" width="100px" /></div>
                     </div>
                 </div>
                 <div class="bg-white border-radius12 mb-1 text-left p-3 p-md-4 mainpageform">
@@ -228,3 +228,4 @@
 </body>
 
 </html>
+<?php /**PATH D:\RapidGame\laravel\rapidpay\resources\views/merchants/kyc.blade.php ENDPATH**/ ?>
