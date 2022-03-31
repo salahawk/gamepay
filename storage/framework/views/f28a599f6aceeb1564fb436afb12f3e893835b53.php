@@ -1,1 +1,0 @@
-<?php /**PATH D:\RapidGame\laravel\rapidpay\resources\views/external_user/error.blade.php ENDPATH**/ ?>
