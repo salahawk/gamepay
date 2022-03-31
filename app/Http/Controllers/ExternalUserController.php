@@ -211,42 +211,19 @@ class ExternalUserController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>
-                '{
-					"PAY_ID":  "' .
-                env('PAY_ID') .
-                '",
-					"AMOUNT":  "' .
-                $orderAmount .
-                '",
-					"ORDER_ID":  "' .
-                $orderId .
-                '",
-					"CURRENCY_CODE":  "' .
-                $orderCurrencyId .
-                '",
-					"PAYER_ADDRESS":  "' .
-                $payeAddress .
-                '",
-					"CUST_EMAIL":  "' .
-                $customerEmail .
-                '",
-					"CUST_PHONE":  "' .
-                $customerPhone .
-                '",
-					"HASH":  "' .
-                $requestHash .
-                '",
-					"PRODUCT_DESC":  "' .
-                $productinfo .
-                '",
-					"CUST_NAME":  "' .
-                $customerName .
-                '",
-					"CUST_ID":  "' .
-                $customerId .
-                '"
-				}',
+            CURLOPT_POSTFIELDS => '{
+                                    "PAY_ID":  "' . env('PAY_ID') . '",
+                                    "AMOUNT":  "' . $orderAmount . '",
+                                    "ORDER_ID":  "' . $orderId . '",
+                                    "CURRENCY_CODE":  "' . $orderCurrencyId . '",
+                                    "PAYER_ADDRESS":  "' . $payeAddress . '",
+                                    "CUST_EMAIL":  "' . $customerEmail . '",
+                                    "CUST_PHONE":  "' . $customerPhone . '",
+                                    "HASH":  "' . $requestHash . '",
+                                    "PRODUCT_DESC":  "' . $productinfo . '",
+                                    "CUST_NAME":  "' . $customerName . '",
+                                    "CUST_ID":  "' . $customerId . '"
+                                }',
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
                 "Authorization: Bearer $request->authToken",
@@ -476,7 +453,7 @@ class ExternalUserController extends Controller
         $responsecode = json_decode($responseUPI);
 
         curl_close($curlupi);
-print_r($responsecode); exit();
+
         if ($responsecode->STATUS == 'Success') {
             return true;
         } else {

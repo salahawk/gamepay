@@ -219,7 +219,7 @@
                 <tr>
                     <td width="28%" align="right" valign="middle" class="labelfont">REMARKS: </td>
                     <td width="65%" align="left" valign="middle"><input type="text" name="REMARKS"
-                            class="signuptextfield" value="" autocomplete="off" /></td>
+                            class="signuptextfield" value="Testing remarks" autocomplete="off" readonly /></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>
                 <tr>
@@ -245,26 +245,26 @@
 
                     <td width="28%" align="right" valign="middle" class="labelfont">SURL: </td>
                     <td width="65%" align="left" valign="middle"><input type="text" name="SURL" class="signuptextfield"
-                            value="" autocomplete="off" /></td>
+                            value="https://gamepay.online/securepay/success" autocomplete="off" readonly/></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>
                 <tr>
 
                     <td width="28%" align="right" valign="middle" class="labelfont">EURL: </td>
                     <td width="65%" align="left" valign="middle"><input type="text" name="EURL" class="signuptextfield"
-                            value="" autocomplete="off" /></td>
+                            value="https://gamepay.online/securepay/fail" autocomplete="off" readonly/></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>
                 <tr>
 
                     <td width="28%" align="right" valign="middle" class="labelfont">CURL: </td>
                     <td width="65%" align="left" valign="middle"><input type="text" name="CURL" class="signuptextfield"
-                            value="" autocomplete="off" /></td>
+                            value="https://gamepay.online/securepay/callback" autocomplete="off" readonly/></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>
                 <tr>
                     <td width="28%" align="right" valign="middle" class="labelfont">HASH: </td>
-                    <td width="65%" align="left" valign="middle"><input type="text" name="HASH" class="signuptextfield"
+                    <td width="65%" align="left" valign="middle"><input type="hidden" name="HASH" class="signuptextfield"
                             value="" autocomplete="off" id="hash" readonly /></td>
                     <td width="7%" align="left" valign="middle">&nbsp;</td>
                 </tr>

@@ -250,7 +250,7 @@ class MerchantController extends Controller
 				$responseCollect = curl_exec($curlCollet);
 
         curl_close($curlCollet);
-
+print_r($responseCollect); exit();
 				$responsePayment=json_decode($responseCollect);
 				$orderId=$responsePayment->ORDER_ID;
 				
@@ -262,7 +262,9 @@ class MerchantController extends Controller
 				if (!empty($responsePayment->CURRENCY_CODE)) {
 					$aDeposit->currency_code = $responsePayment->CURRENCY_CODE;
 				}
-				$aDeposit->status = $responsePayment->STATUS;
+        if (!empty($responsePayment->CURRENCY_CODE)) {
+          $aDeposit->status = $responsePayment->STATUS;
+        }
 				$aDeposit->payment_id	 = $responsePayment->PAY_ID;
 				$aDeposit->order_id = $responsePayment->ORDER_ID;
 				$aDeposit->amount = $orderAmount;
