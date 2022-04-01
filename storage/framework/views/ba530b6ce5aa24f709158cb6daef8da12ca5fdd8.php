@@ -4,18 +4,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>" />
     <title>Gamerupee</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <!-- P2P Additional CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/css/style.css')); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    {{-- <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" --}}
-    {{-- rel="stylesheet"> --}}
+    
+    
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
         integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
 
@@ -25,7 +25,7 @@
     <div class="container" style="padding-top: 10%;">
         <div class="row justify-content-center align-items-center">
             <div class="col-lg-10">
-                <div class="middlepage1 shadow p-4 text-center"> <img src="{{ asset('assets/img/upi.png') }}"
+                <div class="middlepage1 shadow p-4 text-center"> <img src="<?php echo e(asset('assets/img/upi.png')); ?>"
                         class="img-fluid" />
                     <h3 class="text-center text-dark font-weight-bold">UPI Payment</h3>
                     <div class="row justify-content-center align-items-center">
@@ -69,12 +69,13 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
                 method: "post",
-                url: "{{ route('securepay.validate') }}",
+                url: "<?php echo e(route('securepay.validate')); ?>",
                 data: {
                     payer_address: $('input[name="payeraddress"]').val(),
-                    external_user_id: "{{ $external_user_id }}",
+                    external_user_id: "<?php echo e($external_user_id); ?>",
                 },
                 success: function(resp) {
+                    alert("OK");
                     console.log(resp);
                     $('.btnSubmit').prop('disabled', false);
                     // if (resp.status == "fail") {
@@ -87,4 +88,4 @@
     </script>
 </body>
 
-</html>
+</html><?php /**PATH D:\RapidGame\laravel\rapidpay\resources\views/external_user/get-payer-address.blade.php ENDPATH**/ ?>

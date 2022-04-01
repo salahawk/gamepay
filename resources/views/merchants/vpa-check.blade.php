@@ -109,9 +109,8 @@ opacity: 1;
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
 <script>
-  alert("sdfsdf");
 	$(document).ready(function() {
-		$(document).on('click', '.btnSubmit', function() { alert("OK")
+		$(document).on('click', '.btnSubmit', function() { 
       $.ajax({
         headers: {
             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),

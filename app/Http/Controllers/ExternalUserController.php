@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 use App\Models\External_user;
+use App\Models\External_deposit;
 
 class ExternalUserController extends Controller
 {
@@ -15,7 +16,7 @@ class ExternalUserController extends Controller
         // validate key and salt
         $salt = 'salt123456789';
         // validate hash
-        $key = $request->KEY;
+        $key = $request->KEY; var_dump($key);
         $txn_id = $request->TXNID;
         $amount = $request->AMOUNT;
         $customer_name = $request->CUSTOMER_NAME;
@@ -92,7 +93,7 @@ class ExternalUserController extends Controller
             $salt;
 
         $hash_value = hash('sha256', $hash_string);
-
+// var_dump($hash_value);
         if ($hash != $hash_value) { 
             return view('external_user.error');
         }
@@ -119,12 +120,10 @@ class ExternalUserController extends Controller
         $saved = $sample->save();
         // return response success->upi, fail->error
         
-        if ($saved) {//print_r("sdfasdfasdfasdfasdfasdfasdfasdfasdfa"); exit();
-            // return redirect()->route('securepay.upi', [
-            //     'external_user_id' => $sample->id,
-            // ]);
-            return view('external_user.get-payer-address')
-                ->with('external_user_id', $sample->id);
+        if ($saved) {
+            return redirect()->route('securepay.upi', [
+                'external_user_id' => $sample->id,
+            ]);
         } else {
             return view('external_user.error');
         }
@@ -138,9 +137,9 @@ class ExternalUserController extends Controller
 
     public function validateVpa(Request $request)
     {
-        $auth_token = $this->getAuthToken();
+        $auth_token = $this->getAuthToken(); 
         if ($this->_validateVpa($auth_token, $request->payer_address)) {
-            $ext = External_user::find($request->external_user_id);
+            $ext = External_user::where('id', $request->external_user_id)->first();
             $ext->payer_address = $request->payer_address;
             $ext->save();
             
@@ -259,7 +258,7 @@ class ExternalUserController extends Controller
         $aDeposit->email = $customerEmail;
         $aDeposit->phone = $customerPhone;
         $aDeposit->payer_address = $payeAddress;
-        $aDeposit->wallet = $aUser->wallet_address;
+        $aDeposit->wallet = $ext->wallet_address;
         $aDeposit->productinfo = $productinfo;
         $aDeposit->save();
 
