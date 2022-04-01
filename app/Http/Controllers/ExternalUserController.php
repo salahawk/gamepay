@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-use App\Models\External_user;
-use App\Models\External_deposit;
+use App\Models\User;
+use App\Models\Deposit;
+use App\Models\External_request;
 
 class ExternalUserController extends Controller
 {
@@ -16,7 +17,7 @@ class ExternalUserController extends Controller
         // validate key and salt
         $salt = 'salt123456789';
         // validate hash
-        $key = $request->KEY; var_dump($key);
+        $key = $request->KEY;
         $txn_id = $request->TXNID;
         $amount = $request->AMOUNT;
         $customer_name = $request->CUSTOMER_NAME;
@@ -53,7 +54,7 @@ class ExternalUserController extends Controller
             empty($eurl) ||
             empty($curl) ||
             empty($hash)
-        ) {
+        ) {var_dump("empty");
             return view('external_user.error');
         }
 
@@ -94,16 +95,18 @@ class ExternalUserController extends Controller
 
         $hash_value = hash('sha256', $hash_string);
 
-        if ($hash != $hash_value) { 
+        if ($hash != $hash_value) { var_dump("hash error");
             return view('external_user.error');
         }
         
         // check user if existing by wallet and email
-        $user = External_user::where('address', $address)
+        $user = User::where('wallet_address', $address)
                             ->where('email', $email)
-                            ->where('email_status', 1)
-                            ->where('kyc_status', 1)
-                            ->where('mobile_status', 1)->first();
+                            ->where('email_status', 'verified')
+                            ->where('kyc_status', 'verified')
+                            ->where('mobile_status', 'verified')
+                            ->where('is_external', 1)
+                            ->first();
         
         if (!empty($user)) { // redirect to the verification
           return redirect()->route('securepay.upi', [
@@ -112,16 +115,16 @@ class ExternalUserController extends Controller
         }
 
         // insert DB
-        $sample = new External_user();
+        $sample = new User();
         $sample->key = $key;
         $sample->txn_id = $txn_id;
         $sample->amount = $amount;
-        $sample->customer_name = $customer_name;
+        $sample->cust_name = $customer_name;
         $sample->email = $email;
-        $sample->phone = $phone;
+        $sample->mobile = $phone;
         $sample->crypto = $crypto;
         $sample->network = $network;
-        $sample->address = $address;
+        $sample->wallet_address = $address;
         $sample->remarks = $remarks;
         $sample->kyc_status = $kyc_status;
         $sample->email_status = $email_status;
@@ -130,12 +133,17 @@ class ExternalUserController extends Controller
         $sample->eurl = $eurl;
         $sample->curl = $curl;
         $sample->hash = $hash;
+        $sample->is_external = 1;
         $saved = $sample->save();
 
         $user_id = $sample->id;
         // redirect to the verification
         if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
           return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status'));
+        } else {
+            return redirect()->route('securepay.upi', [
+                'external_user_id' => $user_id,
+            ]);
         }
     }
 
@@ -149,7 +157,7 @@ class ExternalUserController extends Controller
     {
         $auth_token = $this->getAuthToken(); 
         if ($this->_validateVpa($auth_token, $request->payer_address)) {
-            $ext = External_user::where('id', $request->external_user_id)->first();
+            $ext = User::where('id', $request->external_user_id)->first();
             $ext->payer_address = $request->payer_address;
             $ext->save();
             
@@ -164,7 +172,26 @@ class ExternalUserController extends Controller
 
     public function deposit(Request $request)
     { 
-        $ext = External_user::find($request->external_user_id);
+        $ext = User::where('id',$request->external_user_id)->first();
+        // save external txn info
+        $ext_req = new External_request;
+        $ext_req->key = $ext->key;
+        $ext_req->txnid = $ext->txn_id;
+        $ext_req->amount = $ext->amount;
+        $ext_req->cust_name = $ext->cust_name;
+        $ext_req->email = $ext->email;
+        $ext_req->phone = $ext->mobile;
+        $ext_req->crypto = $ext->crypto;
+        $ext_req->network = $ext->network;
+        $ext_req->surl = $ext->surl;
+        $ext_req->eurl = $ext->eurl;
+        $ext_req->curl = $ext->curl;
+        $ext_req->remarks = $ext->remarks;
+        $ext_req->kyc_status = $ext->kyc_status;
+        $ext_req->email_status = $ext->email_status;
+        $ext_req->mobile_status = $ext->mobile_status;
+        $ext_req->hash = $ext->hash;
+        $ext_req->save();        
 
         // Validate VPA
         $url = 'https://uat.cashlesso.com/pgws/upi/validateVpa';
@@ -246,15 +273,19 @@ class ExternalUserController extends Controller
 
         $responsePayment = json_decode($responseCollect);
         $orderId = $responsePayment->ORDER_ID;
-        var_dump("expression");
-        $aDeposit = new External_deposit();
+        
+        $aDeposit = new Deposit();
         $aDeposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
-        $aDeposit->txnid = $responsePayment->TXN_ID;
+        if (!empty($responsePayment->TXN_ID)) {
+            $aDeposit->txnid = $responsePayment->TXN_ID;
+        }
         if (!empty($responsePayment->CURRENCY_CODE)) {
             $aDeposit->currency_code = $responsePayment->CURRENCY_CODE;
         }
-        $aDeposit->status = $responsePayment->STATUS;
-        $aDeposit->payment_id = $responsePayment->PAY_ID;
+        if (!empty($responsePayment->STATUS)) {
+            $aDeposit->status = $responsePayment->STATUS;
+        }
+        $aDeposit->pay_id = $responsePayment->PAY_ID;
         $aDeposit->order_id = $responsePayment->ORDER_ID;
         $aDeposit->amount = $orderAmount;
         if (!empty($responsePayment->TOTAL_AMOUNT)) {
@@ -269,7 +300,7 @@ class ExternalUserController extends Controller
         $aDeposit->phone = $customerPhone;
         $aDeposit->payer_address = $payeAddress;
         $aDeposit->wallet = $ext->wallet_address;
-        $aDeposit->productinfo = $productinfo;
+        $aDeposit->product_desc = $productinfo;
         $aDeposit->save();
 
         //echo '<pre>';
