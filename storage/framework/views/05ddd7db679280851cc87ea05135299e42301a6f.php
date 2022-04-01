@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" />
 <link rel="shortcut icon" href="<?php echo e(asset('assets/img/fev.png')); ?>" type="image/x-icon">
-<title>Coinclifvoucher</title>
+<title>Securepay</title>
 <style>
 .mainbg {
     background: #f8f9fc

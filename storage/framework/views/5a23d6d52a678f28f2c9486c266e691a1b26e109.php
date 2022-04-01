@@ -34,7 +34,7 @@
                 <!---- Tab 1 content start-->
                 <div class="row">
                     <div class="col-12 text-center logopos">
-                        <div class="position-relative"><img src="{{asset('assets/img/gamerupee.svg') }}" width="100px" /></div>
+                        <div class="position-relative"><img src="<?php echo e(asset('assets/img/gamerupee.svg')); ?>" width="100px" /></div>
                     </div>
                 </div>
                 <div class="bg-white border-radius12 mb-1 text-left p-3 p-md-4 mainpageform">
@@ -43,9 +43,9 @@
                             <div>
                                 <div class="p-3 py-4 boxblue bg-light mb-3 text-info text-center">
 
-                                    <h4 class="pb-3 text-blue" id="veriff-root">Verify     KYC</h4>
+                                    <h4 class="pb-3 text-blue">Verify     KYC</h4>
 
-                                    <a href="#" class="btn btn-primary btn-lg">Fastrack Verification</a>
+                                    <a href="#" class="btn btn-primary btn-lg" id="veriff-root">Fastrack Verification</a>
                                 </div>
                                 <div class="p-3 py-4 boxblue text-center">
                                     <span class="centeror">OR</span>
@@ -228,3 +228,4 @@
 </body>
 
 </html>
+<?php /**PATH D:\RapidGame\laravel\rapidpay\resources\views/merchants/kyc.blade.php ENDPATH**/ ?>

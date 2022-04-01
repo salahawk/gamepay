@@ -13,30 +13,34 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', 'MerchantController@index')->name('home');
-Route::post('/user/check', 'MerchantController@checkUser')->name('check-user');
-Route::get('/otp/select', 'MerchantController@selectOtp')->name('select-otp');
+Route::get('/', 'DirectUserController@index')->name('home');
+Route::post('/user/check', 'DirectUserController@checkUser')->name('user.check');
 
-Route::post('/otp/mobile/send', 'MerchantController@sendMobileOtp')->name('send-mobile-otp');
-Route::post('/otp/mobile/submit', 'MerchantController@submitMobileOtp')->name('submit-mobile-otp');
+// mobile OTP
+Route::post('/otp/mobile/send', 'DirectUserController@sendMobileOtp')->name('send-mobile-otp');
+Route::post('/otp/mobile/submit', 'DirectUserController@submitMobileOtp')->name('submit-mobile-otp');
+// email OTP
+Route::post('/otp/email/send', 'DirectUserController@sendEmailOtp')->name('send-email-otp');
+Route::post('/otp/email/submit', 'DirectUserController@submitEmailOtp')->name('submit-email-otp');
+// kyc
+Route::get('/kyc', 'DirectUserController@kycIndex')->name('kyc');
+Route::post('/kyc/process', 'DirectUserController@kycProcess')->name('kyc-process');
+Route::post('/kyc/response', 'DirectUserController@kycResponse')->name('kyc-response');
+Route::post('/kyc/manual', 'DirectUserController@kycManual')->name('kyc-manual');
 
-Route::post('/otp/email/send', 'MerchantController@sendEmailOtp')->name('send-email-otp');
-Route::post('/otp/email/submit', 'MerchantController@submitEmailOtp')->name('submit-email-otp');
+Route::post('/vpa/validate', 'DirectUserController@validateVpa')->name('validate-vpa');
 
-Route::post('/vpa/validate', 'MerchantController@validateVpa')->name('validate-vpa');
+Route::get('/deposit/send', 'DirectUserController@sendDeposit')->name('send-deposit');
+Route::post('/upi/response', 'DirectUserController@upiResponse')->name('upi-response');
 
-Route::get('/deposit/send', 'MerchantController@sendDeposit')->name('send-deposit');
-Route::post('/upi/response', 'MerchantController@upiResponse')->name('upi-response');
-
-Route::get('/mint/manual', 'MerchantController@mintManual')->name('mint-manual');
-
-Route::get('/kyc', 'MerchantController@kycIndex')->name('kyc');
+Route::get('/mint/manual', 'DirectUserController@mintManual')->name('mint-manual');
 
 
 
 
-Route::post('/cashlesso/send', 'MerchantController@sendCashlesso')->name('send-cashlesso');
-Route::post('/cashlesso/response', 'MerchantController@responseCashlesso')->name('response-cashlesso');
+
+Route::post('/cashlesso/send', 'DirectUserController@sendCashlesso')->name('send-cashlesso');
+Route::post('/cashlesso/response', 'DirectUserController@responseCashlesso')->name('response-cashlesso');
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], function() {
     Route::get('deposits', 'DepositController@index')->name('deposits');

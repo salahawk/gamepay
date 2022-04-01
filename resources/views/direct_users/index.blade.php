@@ -332,8 +332,8 @@
                     $('[for="amountLbID"]').css("display", "inline");
                     return;
                 }
-                if ($('#remarks').val().length > 30) {
-                    $('[for="remarksLbID"]').html("Max length 30");
+                if ($('#remarks').val().length > 50) {
+                    $('[for="remarksLbID"]').html("Max length 50");
                     $('[for="remarksLbID"]').css("display", "inline");
                     return;
                 }
@@ -342,13 +342,12 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "post",
-                    url: "{{ route('check-user') }}",
+                    url: "{{ route('user.check') }}",
                     data: {
                         amount: $('#amount').val(),
                         network: $("#myDropdown1").find('.dd-selected-text').text(),
                         currency: $("#myDropdown").find('.dd-selected-text').text(),
                         wallet_address: $('#wallet_address').val(),
-                        cust_name: $('#customer_name').val(),
                         remarks: $('#remarks').val(),
                         inr_value: $('#inr_value').val()
                     },
@@ -382,8 +381,13 @@
                         mobile_number: $('#mobile_number').val()
                     },
                     success: function(resp) {
-                        alert("Mobile OPT is successfully sent to the mobile number.");
-                        $('#mobile_getotp').removeClass("disabled");
+											if (resp.status == "success") {
+                        alert("Mobile OTP is successfully sent to the mobile number.");
+												$('[for="mobile_numberLbID"]').css("display", "none");
+											} else {
+												alert("Mobile OTP is failed. Please try again.");
+												$('#mobile_getotp').removeClass("disabled");
+											}
                     },
                 });
             }
@@ -409,9 +413,11 @@
                     success: function(resp) {
                         if (resp.success == "success") {
                             alert("Mobile OTP is successful.");
-                            // $('#mobile_submit').removeClass("disabled");
-                            location.href = "{{ route('kyc') }}";
-                        }
+                            location.href = "{{ route('kyc') }}" + "{{'?user_id='}}" + resp.user_id;
+                        }  else {
+													alert("Mobile OTP is failed. Please try again.");
+													$('#mobile_getotp').removeClass("disabled");
+												}
                     },
                 });
             }
@@ -431,11 +437,18 @@
                     url: "{{ route('send-email-otp') }}",
                     data: {
                         wallet_address: $('#wallet_address').val(),
-                        email_address: $('#email_otp').val()
+                        email_address: $('#email_otp').val(),
+												amount: $('#amount').val(),
+                        network: $("#myDropdown1").find('.dd-selected-text').text(),
+                        currency: $("#myDropdown").find('.dd-selected-text').text(),
+                        remarks: $('#remarks').val(),
+                        inr_value: $('#inr_value').val()
                     },
                     success: function(resp) {
-                        console.log(resp);
-                        $('#email_getotp').removeClass("disabled");
+											if (resp.status == "success") {
+                        // $('#email_getotp').removeClass("disabled");
+												alert("Email OTP is successfully sent. Please wait 1 min.");
+											}
                     },
                 });
             }
@@ -456,14 +469,16 @@
                         submit_value: $('#email_code').val(),
                         email_address: $('#email_otp').val(),
                         wallet_address: $('#wallet_address').val(),
-                        cust_name: $('#remarks').val(),
                     },
                     success: function(resp) {
                         if (resp.success == "success") {
                             alert("Email OTP is successful.");
                             $('#emailOtpModal').modal('toggle');
                             $('#mobileOtpModal').modal('toggle');
-                        }
+                        } else {
+													alert("Email OTP verification is failed. Please try again");
+													location.href = "{{ route('home') }}";
+												}
                     },
                 });
             }
@@ -480,7 +495,6 @@
                 data: {
                     payer_address: $('input[name="payeraddress"]').val(),
                     user_id: $('#user_id').val(),
-                    amount: $('#amount').val(),
                 },
                 success: function(resp) {
                     $('.btnSubmit').prop('disabled', false);

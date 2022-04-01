@@ -7,22 +7,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 use App\Models\Deposit;
-use App\Models\User;
+use App\Models\Direct_user;
+use App\Models\Verification;
 use Twilio\Rest\Client;
 use Mail;
 
-class MerchantController extends Controller
+class DirectUserController extends Controller
 {
     public function index()
     {
-        // echo '<script>alert("ok");</script>';
-        // echo '<script>console.log("ok");</script>';
-        return view('merchants.index');
+        return view('direct_users.index');
     }
 
     public function checkUser(Request $request)
     {
-        $user = User::where(
+        $user = Direct_user::where(
             'wallet_address',
             $request->wallet_address
         )->first();
@@ -30,6 +29,14 @@ class MerchantController extends Controller
         if (empty($user) || $user->is_verified != 1) {
             return response()->json(['user_verified' => 'no']);
         } else {
+            $user->amount = $request->amount;
+            $user->crypto = $request->currency;
+            $user->network = $request->network;
+            $user->remarks = $request->remarks;
+            $user->amount = $request->amount;
+            $user->inr_value = $request->inr_value;
+            $user->save();
+
             return response()->json([
                 'user_verified' => 'yes',
                 'user_id' => $user->id,
@@ -41,9 +48,8 @@ class MerchantController extends Controller
     {
         $auth_token = $this->getAuthToken();
         if ($this->_validateVpa($auth_token, $request->payer_address)) {
-            $user = User::find($request->user_id);
+            $user = Direct_user::find($request->user_id);
             $user->payer_address = $request->payer_address;
-            $user->amount = $request->amount;
             $user->save();
             // return response()->json(['status' => 'success']);
             return redirect()->route('send-deposit', ['user_id' => $user->id, 'authToken' => $auth_token]);
@@ -52,18 +58,13 @@ class MerchantController extends Controller
         }
     }
 
-    public function selectOtp(Request $request)
-    {
-        return view('merchants.select-otp')->with('data', $request->data);
-    }
-
     public function sendMobileOtp(Request $request)
     {
         $random_code = random_int(100000, 999999);
 
-				$sample = User::where('wallet_address', $request->wallet_address)->first();
+				$sample = Direct_user::where('wallet_address', $request->wallet_address)->first();
 				if (empty($sample)) {
-					$aUser = new User();
+					$aUser = new Direct_user();
 					$aUser->mobile_number = $request->mobile_number;
 					$aUser->wallet_address = $request->wallet_address;
 					$aUser->otp_value = $random_code;
@@ -81,7 +82,7 @@ class MerchantController extends Controller
             $this->sendSMS($otp_data);
             return response()->json(['success' => 'success']);
         } else {
-            return view('error-500');
+            return response()->json(['success' => 'fail']);
         }
     }
 
@@ -100,19 +101,21 @@ class MerchantController extends Controller
     public function submitMobileOtp(Request $request)
     {
         $wallet_address = $request->wallet_address;
-        $aUser = User::where('wallet_address', $wallet_address)->first();
+        $aUser = Direct_user::where('wallet_address', $wallet_address)->first();
         if (empty($aUser)) {
             return response()->json(['success' => 'fail']);
         }
 
         if ($aUser->otp_value == $request->submit_value) {
 						if ($aUser->is_verified == 2) {
-							$aUser->is_verified = 1;
-							$aUser->cust_name = $request->cust_name;
+							$aUser->is_verified = 3;
+							$aUser->save();
+
+							return response()->json(['success' => 'success', 'user_id' => $aUser->id]);
+						}	else {
+							return response()->json(['success' => 'fail']);
 						}
-						else $aUser->is_verified = 2;
-						$aUser->save();
-            return response()->json(['success' => 'success']);
+						
         } else {
             return response()->json(['success' => 'fail']);
         }
@@ -125,13 +128,18 @@ class MerchantController extends Controller
 				$email = $request->email_address;
         $data = ['name' => 'Verification', 'code' => $random_code];
 
-				$sample = User::where('wallet_address', $wallet_address)->first();
+				$sample = Direct_User::where('wallet_address', $wallet_address)->first();
 
 				if (empty($sample)) {
-        	$aUser = new User();
+        	$aUser = new Direct_User();
 					$aUser->email = $email;
 					$aUser->otp_value = $random_code;
 					$aUser->wallet_address = $wallet_address;
+					$aUser->amount = $request->amount;
+					$aUser->crypto = $request->currency;
+					$aUser->network = $request->network;
+					$aUser->remarks = $request->remarks;
+					$aUser->inr_value = $request->inr_value;
 					$aUser->save();
 				} else {
 					$sample->otp_value = $random_code;
@@ -147,22 +155,20 @@ class MerchantController extends Controller
                 ->subject('GAMERE email confirming request');
             $message->from('JAX@gamepay.com', 'GAMERE');
         });
+
+				return response()->json(['status' => 'success']);
     }
 
     public function submitEmailOtp(Request $request)
     {
         $wallet_address = $request->wallet_address;
-        $aUser = User::where('wallet_address', $wallet_address)->first();
+        $aUser = Direct_User::where('wallet_address', $wallet_address)->first();
         if (empty($aUser)) {
             return response()->json(['success' => 'fail']);
         }
 
         if ($aUser->otp_value == $request->submit_value) {
-					if ($aUser->is_verified == 2) {
-						$aUser->is_verified = 1;
-						$aUser->cust_name = $request->cust_name;
-					}
-					else $aUser->is_verified = 2;
+					$aUser->is_verified = 2;
 					$aUser->save();
           return response()->json(['success' => 'success']);
         } else {
@@ -172,7 +178,7 @@ class MerchantController extends Controller
 
     public function sendDeposit(Request $request)
     {
-        $aUser = User::find($request->user_id);
+        $aUser = Direct_user::find($request->user_id);
 
         // Validate VPA
         $url = 'https://uat.cashlesso.com/pgws/upi/validateVpa';
@@ -248,12 +254,11 @@ class MerchantController extends Controller
 				));
 
 				$responseCollect = curl_exec($curlCollet);
-
         curl_close($curlCollet);
 
 				$responsePayment=json_decode($responseCollect);
-				$orderId=$responsePayment->ORDER_ID;
 				
+				$orderId=$responsePayment->ORDER_ID;
 				$aDeposit = new Deposit;
 				$aDeposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
 				if (!empty($responsePayment->TXN_ID)) {
@@ -262,10 +267,10 @@ class MerchantController extends Controller
 				if (!empty($responsePayment->CURRENCY_CODE)) {
 					$aDeposit->currency_code = $responsePayment->CURRENCY_CODE;
 				}
-        if (!empty($responsePayment->CURRENCY_CODE)) {
+        if (!empty($responsePayment->STATUS)) {
           $aDeposit->status = $responsePayment->STATUS;
         }
-				$aDeposit->payment_id	 = $responsePayment->PAY_ID;
+				$aDeposit->pay_id	 = $responsePayment->PAY_ID;
 				$aDeposit->order_id = $responsePayment->ORDER_ID;
 				$aDeposit->amount = $orderAmount;
 				if (!empty($responsePayment->TOTAL_AMOUNT)) {
@@ -273,14 +278,14 @@ class MerchantController extends Controller
 				}
 				$aDeposit->cust_name = $customerName;
 				$aDeposit->hash = $responsePayment->HASH;
-				if (!empty($responsePayment->TOTAL_AMOUNT)) {
+				if (!empty($responsePayment->ACQ_ID)) {
 					$aDeposit->acq_id = $responsePayment->ACQ_ID;
 				}
 				$aDeposit->email = $customerEmail;
 				$aDeposit->phone = $customerPhone;
 				$aDeposit->payer_address = $payeAddress;
 				$aDeposit->wallet = $aUser->wallet_address;
-				$aDeposit->productinfo = $productinfo;
+				$aDeposit->product_desc = $productinfo;
 				$aDeposit->save();
 
 				//echo '<pre>';
@@ -465,7 +470,49 @@ class MerchantController extends Controller
         }
     }
 
-    public function kycIndex() {
-        return view('merchants.kyc');
+    public function kycIndex(Request $request) {
+			if (empty($request->status))
+        return view('direct_users.kyc')->with('user_id', $request->user_id);
+			else
+				return view('direct_users.kyc')->with('user_id', $request->user_id)->with('status', $request->status);
     }
+
+		public function kycProcess(Request $request) {
+			$user = Direct_user::where('id', $request->user_id)->first();
+			$user->cust_name = $request->cust_name;
+			$user->kyc_type = "veriff";
+			$user->save();
+
+			$veriff = new Verification;
+			$veriff->user_id = $user->id;
+			$veriff->veriff_id = $request->veriff_id;
+			$veriff->veriff_url = $request->veriff_url;
+			$veriff->sessionToken = $request->sessionToken;
+			$veriff->is_verified = $request->is_verified;
+			$veriff->save();
+		}
+
+		public function kycResponse(Request $request) {
+			print_r("expression"); exit();
+		}
+
+		public function kycManual(Request $request) {
+			$front = $request->file('front');
+			$front_name = "f" . date("Y-m-d-H-i-s") . "." . $front->getClientOriginalExtension();  
+			$front_path = "uploads/kyc";
+			$front->move($front_path, $front_name);
+
+			$back = $request->file('back');
+			$back_name = "b" . date("Y-m-d-H-i-s") . "." . $back->getClientOriginalExtension();  
+			$back_path = "uploads/kyc";
+			$back->move($back_path, $back_name);
+
+			$user = Direct_user::where('id', $request->user_id)->first();
+			$user->kyc_type = "manual";
+			$user->front_img = $front_name;
+			$user->back_img = $back_name;
+			$user->save();
+
+			return redirect()->route('kyc', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approvment']);
+		}
 }
