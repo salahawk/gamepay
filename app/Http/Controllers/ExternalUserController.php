@@ -236,7 +236,7 @@ class ExternalUserController extends Controller
 
         $responsePayment = json_decode($responseCollect);
         $orderId = $responsePayment->ORDER_ID;
-
+        var_dump("expression");
         $aDeposit = new External_deposit();
         $aDeposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
         $aDeposit->txnid = $responsePayment->TXN_ID;

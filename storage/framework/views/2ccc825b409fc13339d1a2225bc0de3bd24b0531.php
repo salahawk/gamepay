@@ -4,18 +4,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>" />
     <title>Gamerupee</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <!-- P2P Additional CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/css/style.css')); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    {{-- <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" --}}
-    {{-- rel="stylesheet"> --}}
+    
+    
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
         integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
 
@@ -28,7 +28,7 @@
                 <!---- Tab 1 content start-->
                 <div class="row">
                     <div class="col-12 text-center logopos">
-                        <div class="position-relative"><img src="{{ asset('assets/img/gamerupee.svg') }}"
+                        <div class="position-relative"><img src="<?php echo e(asset('assets/img/gamerupee.svg')); ?>"
                                 width="100px" /></div>
                     </div>
                 </div>
@@ -44,14 +44,14 @@
                                 <option value="0" class="text-blue" data-description=""><span
                                         style="color:#ccc;">Currency</span></option>
                                 <option value="0" class="text-blue"
-                                    data-imagesrc="{{ asset('assets/img/Gamerupee.png') }}" data-description="">G
+                                    data-imagesrc="<?php echo e(asset('assets/img/Gamerupee.png')); ?>" data-description="">G
                                     RUPEE
                                 </option>
                                 <option value="1" class="text-blue"
-                                    data-imagesrc="{{ asset('assets/img/JR_blue_d.png') }}" data-description="">USDT
+                                    data-imagesrc="<?php echo e(asset('assets/img/JR_blue_d.png')); ?>" data-description="">USDT
                                 </option>
                                 <option value="2" class="text-blue"
-                                    data-imagesrc="{{ asset('assets/img/jusd_d.png') }}" data-description="">BTC
+                                    data-imagesrc="<?php echo e(asset('assets/img/jusd_d.png')); ?>" data-description="">BTC
                                 </option>
                             </select>
                             <label for="myDropdownLbID" style="color: #f00; display: none;">This field is
@@ -64,16 +64,16 @@
                             <select id="myDropdown1" style="width:100%">
                                 <option value="0" class="text-blue">Network</option>
                                 <option value="0" class="text-blue"
-                                    data-imagesrc="{{ asset('assets/img/binance.png') }}" data-description="">BSC
+                                    data-imagesrc="<?php echo e(asset('assets/img/binance.png')); ?>" data-description="">BSC
                                 </option>
                                 <option value="1" class="text-blue"
-                                    data-imagesrc="{{ asset('assets/img/awax.png') }}" data-description="">AWAX
+                                    data-imagesrc="<?php echo e(asset('assets/img/awax.png')); ?>" data-description="">AWAX
                                 </option>
                                 <option value="1" class="text-blue"
-                                    data-imagesrc="{{ asset('assets/img/ethereum.png') }}" data-description="">ETH
+                                    data-imagesrc="<?php echo e(asset('assets/img/ethereum.png')); ?>" data-description="">ETH
                                 </option>
                                 <option value="1" class="text-blue"
-                                    data-imagesrc="{{ asset('assets/img/polygon.png') }}" data-description="">POLYGON
+                                    data-imagesrc="<?php echo e(asset('assets/img/polygon.png')); ?>" data-description="">POLYGON
                                 </option>
                             </select>
                             <label for="myDropdown1LbID" style="color: #f00; display: none;">This field is
@@ -110,9 +110,7 @@
                             <a href="#" class="btn btn-primary border-radius6 w-100 disabled" id="confirm_pay">Continue
                                 to Pay</a>
                         </div>
-                        {{-- <div class="col-12 mb-2 pt-2">
-                            <div class="text-center"><img src="{{ asset('assets/img/upi.png') }}" /></div>
-                        </div> --}}
+                        
                     </div>
                 </div>
 
@@ -124,7 +122,7 @@
     <div class="container" style="padding-top: 10%; display: none">
         <div class="row justify-content-center align-items-center">
             <div class="col-lg-10">
-                <div class="middlepage1 shadow p-4 text-center"> <img src="{{ asset('assets/img/upi.png') }}"
+                <div class="middlepage1 shadow p-4 text-center"> <img src="<?php echo e(asset('assets/img/upi.png')); ?>"
                         class="img-fluid" />
                     <h3 class="text-center text-dark font-weight-bold">UPI Payment</h3>
                     <div class="row justify-content-center align-items-center">
@@ -268,7 +266,7 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
     </script>
-    <script src="{{ asset('assets/js/custom.select.js') }}"></script>
+    <script src="<?php echo e(asset('assets/js/custom.select.js')); ?>"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
     </script>
@@ -277,7 +275,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
     </script>
-    <script type="text/javascript" src="{{ asset('assets/js/dropdown.js') }}"></script>
+    <script type="text/javascript" src="<?php echo e(asset('assets/js/dropdown.js')); ?>"></script>
     <script>
         $('#myDropdown').ddslick({
             onSelected: function(selectedData) {
@@ -342,7 +340,7 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "post",
-                    url: "{{ route('check-user') }}",
+                    url: "<?php echo e(route('check-user')); ?>",
                     data: {
                         amount: $('#amount').val(),
                         network: $("#myDropdown1").find('.dd-selected-text').text(),
@@ -376,7 +374,7 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "POST",
-                    url: "{{ route('send-mobile-otp') }}",
+                    url: "<?php echo e(route('send-mobile-otp')); ?>",
                     data: {
                         wallet_address: $('#wallet_address').val(),
                         mobile_number: $('#mobile_number').val()
@@ -399,7 +397,7 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "POST",
-                    url: "{{ route('submit-mobile-otp') }}",
+                    url: "<?php echo e(route('submit-mobile-otp')); ?>",
                     data: {
                         submit_value: $('#mobile_code').val(),
                         mobile_number: $('#mobile_number').val(),
@@ -410,7 +408,7 @@
                         if (resp.success == "success") {
                             alert("Mobile OTP is successful.");
                             // $('#mobile_submit').removeClass("disabled");
-                            location.href = "{{ route('kyc') }}";
+                            location.href = "<?php echo e(route('kyc')); ?>";
                         }
                     },
                 });
@@ -428,7 +426,7 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "POST",
-                    url: "{{ route('send-email-otp') }}",
+                    url: "<?php echo e(route('send-email-otp')); ?>",
                     data: {
                         wallet_address: $('#wallet_address').val(),
                         email_address: $('#email_otp').val()
@@ -451,7 +449,7 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "POST",
-                    url: "{{ route('submit-email-otp') }}",
+                    url: "<?php echo e(route('submit-email-otp')); ?>",
                     data: {
                         submit_value: $('#email_code').val(),
                         email_address: $('#email_otp').val(),
@@ -476,7 +474,7 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
                 method: "post",
-                url: "{{ route('validate-vpa') }}",
+                url: "<?php echo e(route('validate-vpa')); ?>",
                 data: {
                     payer_address: $('input[name="payeraddress"]').val(),
                     user_id: $('#user_id').val(),
@@ -523,3 +521,4 @@
 </body>
 
 </html>
+<?php /**PATH D:\RapidGame\laravel\rapidpay\resources\views/merchants/index.blade.php ENDPATH**/ ?>
