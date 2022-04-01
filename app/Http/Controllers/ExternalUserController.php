@@ -93,11 +93,24 @@ class ExternalUserController extends Controller
             $salt;
 
         $hash_value = hash('sha256', $hash_string);
-// var_dump($hash_value);
+
         if ($hash != $hash_value) { 
             return view('external_user.error');
         }
         
+        // check user if existing by wallet and email
+        $user = External_user::where('address', $address)
+                            ->where('email', $email)
+                            ->where('email_status', 1)
+                            ->where('kyc_status', 1)
+                            ->where('mobile_status', 1)->first();
+        
+        if (!empty($user)) { // redirect to the verification
+          return redirect()->route('securepay.upi', [
+              'external_user_id' => $user->id,
+          ]);
+        }
+
         // insert DB
         $sample = new External_user();
         $sample->key = $key;
@@ -118,20 +131,17 @@ class ExternalUserController extends Controller
         $sample->curl = $curl;
         $sample->hash = $hash;
         $saved = $sample->save();
-        // return response success->upi, fail->error
-        
-        if ($saved) {
-            return redirect()->route('securepay.upi', [
-                'external_user_id' => $sample->id,
-            ]);
-        } else {
-            return view('external_user.error');
+
+        $user_id = $sample->id;
+        // redirect to the verification
+        if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
+          return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status'));
         }
     }
 
     public function getUpi(Request $request)
     {
-        return view('external_user.get-payer-address')
+        return view('external_users.get-payer-address')
                 ->with('external_user_id', $request->external_user_id);
     }
 

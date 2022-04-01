@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 use App\Models\Deposit;
-use App\Models\Direct_user;
+use App\Models\User;
 use App\Models\Verification;
 use Twilio\Rest\Client;
 use Mail;
@@ -21,12 +21,9 @@ class DirectUserController extends Controller
 
     public function checkUser(Request $request)
     {
-        $user = Direct_user::where(
-            'wallet_address',
-            $request->wallet_address
-        )->first();
+        $user = User::where("is_external", 0)->where('wallet_address', $request->wallet_address)->first();
 
-        if (empty($user) || $user->is_verified != 1) {
+        if (empty($user) || $user->email_status != "verified" || $user->mobile_status != "verified" || $user->kyc_status != "verified") {
             return response()->json(['user_verified' => 'no']);
         } else {
             $user->amount = $request->amount;
@@ -35,6 +32,7 @@ class DirectUserController extends Controller
             $user->remarks = $request->remarks;
             $user->amount = $request->amount;
             $user->inr_value = $request->inr_value;
+            $user->is_external = 0;
             $user->save();
 
             return response()->json([
@@ -48,7 +46,7 @@ class DirectUserController extends Controller
     {
         $auth_token = $this->getAuthToken();
         if ($this->_validateVpa($auth_token, $request->payer_address)) {
-            $user = Direct_user::find($request->user_id);
+            $user = User::find($request->user_id);
             $user->payer_address = $request->payer_address;
             $user->save();
             // return response()->json(['status' => 'success']);
@@ -62,16 +60,17 @@ class DirectUserController extends Controller
     {
         $random_code = random_int(100000, 999999);
 
-				$sample = Direct_user::where('wallet_address', $request->wallet_address)->first();
+				$sample = User::where('wallet_address', $request->wallet_address)->where('is_external', 0)->first();
 				if (empty($sample)) {
-					$aUser = new Direct_user();
-					$aUser->mobile_number = $request->mobile_number;
+					$aUser = new User();
+					$aUser->mobile = $request->mobile_number;
 					$aUser->wallet_address = $request->wallet_address;
 					$aUser->otp_value = $random_code;
+          $aUser->is_external = 0;
 					$saved = $aUser->save();
 				} else {
 					$sample->otp_value = $random_code;
-					$sample->mobile_number = $request->mobile_number;
+					$sample->mobile = $request->mobile_number;
 					$saved = $sample->save();
 				}
 
@@ -80,9 +79,9 @@ class DirectUserController extends Controller
             $otp_data['phone'] = $request->mobile_number;
             $otp_data['text'] = $text;
             $this->sendSMS($otp_data);
-            return response()->json(['success' => 'success']);
+            return response()->json(['status' => 'success']);
         } else {
-            return response()->json(['success' => 'fail']);
+            return response()->json(['status' => 'fail']);
         }
     }
 
@@ -101,21 +100,15 @@ class DirectUserController extends Controller
     public function submitMobileOtp(Request $request)
     {
         $wallet_address = $request->wallet_address;
-        $aUser = Direct_user::where('wallet_address', $wallet_address)->first();
+        $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
         if (empty($aUser)) {
             return response()->json(['success' => 'fail']);
         }
 
         if ($aUser->otp_value == $request->submit_value) {
-						if ($aUser->is_verified == 2) {
-							$aUser->is_verified = 3;
-							$aUser->save();
-
-							return response()->json(['success' => 'success', 'user_id' => $aUser->id]);
-						}	else {
-							return response()->json(['success' => 'fail']);
-						}
-						
+            $aUser->mobile_status = "verified";
+            $aUser->save();
+            return response()->json(['success' => 'success', 'user_id' => $aUser->id]);
         } else {
             return response()->json(['success' => 'fail']);
         }
@@ -128,10 +121,10 @@ class DirectUserController extends Controller
 				$email = $request->email_address;
         $data = ['name' => 'Verification', 'code' => $random_code];
 
-				$sample = Direct_User::where('wallet_address', $wallet_address)->first();
+				$sample = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
 
 				if (empty($sample)) {
-        	$aUser = new Direct_User();
+        	$aUser = new User();
 					$aUser->email = $email;
 					$aUser->otp_value = $random_code;
 					$aUser->wallet_address = $wallet_address;
@@ -140,6 +133,7 @@ class DirectUserController extends Controller
 					$aUser->network = $request->network;
 					$aUser->remarks = $request->remarks;
 					$aUser->inr_value = $request->inr_value;
+          $aUser->is_external = 0;
 					$aUser->save();
 				} else {
 					$sample->otp_value = $random_code;
@@ -162,13 +156,13 @@ class DirectUserController extends Controller
     public function submitEmailOtp(Request $request)
     {
         $wallet_address = $request->wallet_address;
-        $aUser = Direct_User::where('wallet_address', $wallet_address)->first();
+        $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
         if (empty($aUser)) {
             return response()->json(['success' => 'fail']);
         }
 
         if ($aUser->otp_value == $request->submit_value) {
-					$aUser->is_verified = 2;
+					$aUser->email_status = 'verified';
 					$aUser->save();
           return response()->json(['success' => 'success']);
         } else {
@@ -178,7 +172,7 @@ class DirectUserController extends Controller
 
     public function sendDeposit(Request $request)
     {
-        $aUser = Direct_user::find($request->user_id);
+        $aUser = User::find($request->user_id);
 
         // Validate VPA
         $url = 'https://uat.cashlesso.com/pgws/upi/validateVpa';
@@ -189,7 +183,7 @@ class DirectUserController extends Controller
         $orderCurrencyId = '356';
         $payeAddress = $aUser->payer_address;
         $customerEmail = $aUser->email;
-        $customerPhone = $aUser->mobile_number;
+        $customerPhone = $aUser->mobile;
         $productinfo = 'GAMERE';
         $customerName = $aUser->cust_name;
         $customerId = $orderId;
@@ -288,8 +282,6 @@ class DirectUserController extends Controller
 				$aDeposit->product_desc = $productinfo;
 				$aDeposit->save();
 
-				//echo '<pre>';
-				//print_r($responsePayment);
 				
 				if($responsePayment->RESPONSE_CODE==000 && $responsePayment->STATUS=='Sent to Bank'){
 					// $data['status']=$responsePayment->STATUS;
@@ -478,7 +470,7 @@ class DirectUserController extends Controller
     }
 
 		public function kycProcess(Request $request) {
-			$user = Direct_user::where('id', $request->user_id)->first();
+			$user = User::where('id', $request->user_id)->first();
 			$user->cust_name = $request->cust_name;
 			$user->kyc_type = "veriff";
 			$user->save();
@@ -507,7 +499,7 @@ class DirectUserController extends Controller
 			$back_path = "uploads/kyc";
 			$back->move($back_path, $back_name);
 
-			$user = Direct_user::where('id', $request->user_id)->first();
+			$user = User::where('id', $request->user_id)->first();
 			$user->kyc_type = "manual";
 			$user->front_img = $front_name;
 			$user->back_img = $back_name;
