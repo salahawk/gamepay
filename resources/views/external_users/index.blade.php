@@ -376,8 +376,7 @@
 
             if (email != "verified") $("#emailOtpModal").modal("show");
             else if (mobile != "verified") $("#mobileOtpModal").modal("show");
-            else if (kyc != "verified") location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + resp
-                .user_id;
+            else if (kyc != "verified") location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
         });
 
         $(document).on('click', '#mobile_getotp', function() {
