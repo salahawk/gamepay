@@ -36,7 +36,7 @@
                     <div class="row pt-5">
                         <div class="col-6">
                             <input type="number" class="form-control border-radius6" id="amount" aria-describedby="name"
-                                placeholder="Enter Amount" required value="{{$amount}}" readonly>
+                                placeholder="Enter Amount" required value="{{ $amount }}" readonly>
                             <label for="amountLbID" style="color: #f00; display: none;">This field is required.</label>
                         </div>
                         <div class="col-6">
@@ -81,7 +81,8 @@
                         </div>
                         <div class="col-12 mb-2">
                             <input type="text" class="form-control border-radius6" id="wallet_address"
-                                aria-describedby="name" placeholder="Enter Destination Address" value={{$address}} readonly>
+                                aria-describedby="name" placeholder="Enter Destination Address"
+                                value={{ $address }} readonly>
                             <label for="wallet_addressLbID" style="color: #f00; display: none;">This field is
                                 required.</label>
                             <p class="text-blue font14 text-center pt-1 pb-0 mb-0"><small>Ex:
@@ -89,7 +90,7 @@
                         </div>
                         <div class="col-12 mb-2">
                             <input type="text" class="form-control border-radius6" id="remarks" aria-describedby="name"
-                                placeholder="Remarks" value="{{$remarks}}" readonly>
+                                placeholder="Remarks" value="{{ $remarks }}" readonly>
                             <label for="remarksLbID" style="color: #f00; display: none;">This field is required.</label>
                         </div>
                         <div class="col-12 mb-2">
@@ -152,7 +153,8 @@
             </div>
         </div>
     </div>
-    <!--- Modal start---->
+
+    @if ($email_status != "verified")
     <div class="modal fade kycmodal" id="emailOtpModal" tabindex="-1" aria-labelledby="emailOtpModal"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -173,7 +175,7 @@
                                         <div class="form-group">
                                             <label for="exampleInputEmail1">Verify Your Email</label>
                                             <input type="email" class="form-control" id="email_otp"
-                                                aria-describedby="emailHelp">
+                                                aria-describedby="emailHelp" value="{{ $email }}" disabled>
                                             <label for="email_otpLbID" style="color: #f00; display: none;">Enter Valid
                                                 Email</label>
                                         </div>
@@ -207,6 +209,9 @@
             </div>
         </div>
     </div>
+    @endif
+
+    @if ($mobile_status != "verified")
     <div class="modal fade kycmodal" id="mobileOtpModal" tabindex="-1" aria-labelledby="mobileOtpModal"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -226,8 +231,8 @@
                                     <form>
                                         <div class="form-group">
                                             <label for="exampleInputEmail1">Verify Your Mobile Number</label>
-                                            <input type="number" class="form-control" id="mobile_number"
-                                                aria-describedby="mobile" placeholder="1234567890">
+                                            <input type="text" class="form-control" id="mobile_number" value="{{ $phone }}"
+                                                aria-describedby="mobile" disabled>
                                             <label for="mobile_numberLbID" style="color: #f00; display: none;">Enter
                                                 Valid Mobile Number</label>
                                         </div>
@@ -261,6 +266,7 @@
             </div>
         </div>
     </div>
+    @endif
     <!--- Modal end---->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
@@ -342,35 +348,36 @@
             //         $('[for="remarksLbID"]').css("display", "inline");
             //         return;
             //     }
-                // $.ajax({
-                //     headers: {
-                //         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                //     },
-                //     method: "post",
-                //     url: "{{ route('user.check') }}",
-                //     data: {
-                //         amount: $('#amount').val(),
-                //         network: $("#myDropdown1").find('.dd-selected-text').text(),
-                //         currency: $("#myDropdown").find('.dd-selected-text').text(),
-                //         wallet_address: $('#wallet_address').val(),
-                //         remarks: $('#remarks').val(),
-                //         inr_value: $('#inr_value').val()
-                //     },
-                //     success: function(resp) {
-                //         if (resp.user_verified == "no") {
-                //             $('#emailOtpModal').modal('show');
-                //         } else {
-                //             $('#user_id').val(resp.user_id);
-                //             $('.container:first').hide();
-                //             $('.container:eq(1)').show();
-                //         }
-                //     },
-                // });
+            // $.ajax({
+            //     headers: {
+            //         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            //     },
+            //     method: "post",
+            //     url: "{{ route('user.check') }}",
+            //     data: {
+            //         amount: $('#amount').val(),
+            //         network: $("#myDropdown1").find('.dd-selected-text').text(),
+            //         currency: $("#myDropdown").find('.dd-selected-text').text(),
+            //         wallet_address: $('#wallet_address').val(),
+            //         remarks: $('#remarks').val(),
+            //         inr_value: $('#inr_value').val()
+            //     },
+            //     success: function(resp) {
+            //         if (resp.user_verified == "no") {
+            //             $('#emailOtpModal').modal('show');
+            //         } else {
+            //             $('#user_id').val(resp.user_id);
+            //             $('.container:first').hide();
+            //             $('.container:eq(1)').show();
+            //         }
+            //     },
+            // });
             // }
 
             if (email != "verified") $("#emailOtpModal").modal("show");
             else if (mobile != "verified") $("#mobileOtpModal").modal("show");
-            else if (kyc != "verified") location.href = "{{ route('kyc') }}" + "{{'?user_id='}}" + resp.user_id;
+            else if (kyc != "verified") location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + resp
+                .user_id;
         });
 
         $(document).on('click', '#mobile_getotp', function() {
@@ -390,13 +397,13 @@
                         mobile_number: $('#mobile_number').val()
                     },
                     success: function(resp) {
-											if (resp.status == "success") {
-                        alert("Mobile OTP is successfully sent to the mobile number.");
-												$('[for="mobile_numberLbID"]').css("display", "none");
-											} else {
-												alert("Mobile OTP is failed. Please try again.");
-												$('#mobile_getotp').removeClass("disabled");
-											}
+                        if (resp.status == "success") {
+                            alert("Mobile OTP is successfully sent to the mobile number.");
+                            $('[for="mobile_numberLbID"]').css("display", "none");
+                        } else {
+                            alert("Mobile OTP is failed. Please try again.");
+                            $('#mobile_getotp').removeClass("disabled");
+                        }
                     },
                 });
             }
@@ -422,11 +429,16 @@
                     success: function(resp) {
                         if (resp.success == "success") {
                             alert("Mobile OTP is successful.");
-                            location.href = "{{ route('kyc') }}" + "{{'?user_id='}}" + resp.user_id;
-                        }  else {
-													alert("Mobile OTP is failed. Please try again.");
-													$('#mobile_getotp').removeClass("disabled");
-												}
+                            if (kyc != 'verified') {
+                              location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
+                            } else {
+                              $('.container:first').hide();
+                              $('.container:eq(1)').show();
+                            }
+                        } else {
+                            alert("Mobile OTP is failed. Please try again.");
+                            $('#mobile_getotp').removeClass("disabled");
+                        }
                     },
                 });
             }
@@ -447,17 +459,17 @@
                     data: {
                         wallet_address: $('#wallet_address').val(),
                         email_address: $('#email_otp').val(),
-												amount: $('#amount').val(),
+                        amount: $('#amount').val(),
                         network: $("#myDropdown1").find('.dd-selected-text').text(),
                         currency: $("#myDropdown").find('.dd-selected-text').text(),
                         remarks: $('#remarks').val(),
                         inr_value: $('#inr_value').val()
                     },
                     success: function(resp) {
-											if (resp.status == "success") {
-                        // $('#email_getotp').removeClass("disabled");
-												alert("Email OTP is successfully sent. Please wait 1 min.");
-											}
+                        if (resp.status == "success") {
+                            // $('#email_getotp').removeClass("disabled");
+                            alert("Email OTP is successfully sent. Please wait 1 min.");
+                        }
                     },
                 });
             }
@@ -483,11 +495,18 @@
                         if (resp.success == "success") {
                             alert("Email OTP is successful.");
                             $('#emailOtpModal').modal('toggle');
-                            $('#mobileOtpModal').modal('toggle');
+                            if (mobile != "verified") {
+                              $('#mobileOtpModal').modal('toggle');
+                            } else if (kyc != 'verified') {
+                              location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
+                            } else {
+                              $('.container:first').hide();
+                              $('.container:eq(1)').show();
+                            }
                         } else {
-													alert("Email OTP verification is failed. Please try again");
-													location.href = "{{ route('home') }}";
-												}
+                            alert("Email OTP verification is failed. Please try again");
+                            location.href = "{{ route('home') }}";
+                        }
                     },
                 });
             }
@@ -523,21 +542,21 @@
             $("input#inr_value").val($(this).val());
         })
 
-        $('#wallet_address').on('keypress', function (event) {
+        $('#wallet_address').on('keypress', function(event) {
             var regex = new RegExp("^[a-zA-Z0-9]+$");
             var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
             if (!regex.test(key)) {
-            event.preventDefault();
-            return false;
+                event.preventDefault();
+                return false;
             }
         });
 
-        $('#remarks').on('keypress', function (event) {
+        $('#remarks').on('keypress', function(event) {
             var regex = new RegExp("^[a-zA-Z0-9]+$");
             var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
             if (!regex.test(key)) {
-            event.preventDefault();
-            return false;
+                event.preventDefault();
+                return false;
             }
         });
 
