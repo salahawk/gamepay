@@ -59,8 +59,12 @@ class DirectUserController extends Controller
     public function sendMobileOtp(Request $request)
     {
         $random_code = random_int(100000, 999999);
+        if (!empty($request->user_id)) {
+          $sample = User::where('id', $request->user_id)->first();
+        } else {
+          $sample = User::where('wallet_address', $request->wallet_address)->where('is_external', 0)->first();
+        }
 
-				$sample = User::where('wallet_address', $request->wallet_address)->where('is_external', 0)->first();
 				if (empty($sample)) {
 					$aUser = new User();
 					$aUser->mobile = $request->mobile_number;
@@ -100,7 +104,12 @@ class DirectUserController extends Controller
     public function submitMobileOtp(Request $request)
     {
         $wallet_address = $request->wallet_address;
-        $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
+        if (!empty($request->user_id)) {
+          $aUser = User::where('id', $request->user_id)->first();
+        } else {
+          $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
+        }
+
         if (empty($aUser)) {
             return response()->json(['success' => 'fail']);
         }
@@ -117,13 +126,15 @@ class DirectUserController extends Controller
     public function sendEmailOtp(Request $request)
     {
         $random_code = random_int(100000, 999999);
-        $wallet_address = $request->wallet_address;
-				$email = $request->email_address;
+        $email = $request->email_address;
         $data = ['name' => 'Verification', 'code' => $random_code];
-
-				$sample = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
-
-				if (empty($sample)) {
+        if (!empty($request->user_id)) {
+          $aUser = User::where('id', $request->user_id)->first();
+        } else {
+				  $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
+          $wallet_address = $request->wallet_address;
+        }
+				if (empty($aUser)) {
         	$aUser = new User();
 					$aUser->email = $email;
 					$aUser->otp_value = $random_code;
@@ -136,9 +147,9 @@ class DirectUserController extends Controller
           $aUser->is_external = 0;
 					$aUser->save();
 				} else {
-					$sample->otp_value = $random_code;
-					$sample->email = $email;
-					$sample->save();
+					$aUser->otp_value = $random_code;
+					$aUser->email = $email;
+					$aUser->save();
 				}
 
         Mail::send('merchants.email-otp', $data, function ($message) use (
@@ -155,8 +166,13 @@ class DirectUserController extends Controller
 
     public function submitEmailOtp(Request $request)
     {
-        $wallet_address = $request->wallet_address;
-        $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
+        
+        if (!empty($request->user_id)) {
+          $aUser = User::where('id', $request->user_id)->first();
+        } else {
+          $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
+          $wallet_address = $request->wallet_address;
+        }
         if (empty($aUser)) {
             return response()->json(['success' => 'fail']);
         }

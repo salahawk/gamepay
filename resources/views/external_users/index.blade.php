@@ -394,7 +394,8 @@
                     url: "{{ route('send-mobile-otp') }}",
                     data: {
                         wallet_address: $('#wallet_address').val(),
-                        mobile_number: $('#mobile_number').val()
+                        mobile_number: $('#mobile_number').val(),
+                        user_id: "{{ $user_id }}"
                     },
                     success: function(resp) {
                         if (resp.status == "success") {
@@ -424,7 +425,7 @@
                         submit_value: $('#mobile_code').val(),
                         mobile_number: $('#mobile_number').val(),
                         wallet_address: $('#wallet_address').val(),
-                        cust_name: $('#remarks').val(),
+                        user_id: "{{ $user_id }}"
                     },
                     success: function(resp) {
                         if (resp.success == "success") {
@@ -457,13 +458,8 @@
                     method: "POST",
                     url: "{{ route('send-email-otp') }}",
                     data: {
-                        wallet_address: $('#wallet_address').val(),
-                        email_address: $('#email_otp').val(),
-                        amount: $('#amount').val(),
-                        network: $("#myDropdown1").find('.dd-selected-text').text(),
-                        currency: $("#myDropdown").find('.dd-selected-text').text(),
-                        remarks: $('#remarks').val(),
-                        inr_value: $('#inr_value').val()
+                      email_address: $('#email_otp').val(),
+                        user_id: "{{ $user_id }}"
                     },
                     success: function(resp) {
                         if (resp.status == "success") {
@@ -490,6 +486,7 @@
                         submit_value: $('#email_code').val(),
                         email_address: $('#email_otp').val(),
                         wallet_address: $('#wallet_address').val(),
+                        user_id: "{{ $user_id }}"
                     },
                     success: function(resp) {
                         if (resp.success == "success") {
@@ -522,7 +519,7 @@
                 url: "{{ route('validate-vpa') }}",
                 data: {
                     payer_address: $('input[name="payeraddress"]').val(),
-                    user_id: $('#user_id').val(),
+                    user_id: "{{ $user_id }}"
                 },
                 success: function(resp) {
                     $('.btnSubmit').prop('disabled', false);
