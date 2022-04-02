@@ -170,8 +170,8 @@ class DirectUserController extends Controller
         if (!empty($request->user_id)) {
           $aUser = User::where('id', $request->user_id)->first();
         } else {
-          $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
           $wallet_address = $request->wallet_address;
+          $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
         }
         if (empty($aUser)) {
             return response()->json(['success' => 'fail']);
