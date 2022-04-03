@@ -477,7 +477,7 @@
                         wallet_address: $('#wallet_address').val(),
                     },
                     success: function(resp) {
-                        if (resp.success == "success") {
+                        if (resp.status == "success") {
                             alert("Email OTP is successful.");
                             $('#emailOtpModal').modal('toggle');
                             $('#mobileOtpModal').modal('toggle');
