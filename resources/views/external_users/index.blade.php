@@ -314,7 +314,8 @@
         let mobile = "{{ $mobile_status }}";
         let kyc = "{{ $kyc_status }}";
 
-
+        $('#myDropdown').find('.dd-selected-text').text("{{ $crypto }}");
+        $('#myDropdown1').find('.dd-selected-text').text("{{ $network }}");
 
         $(document).on('click', '#confirm_pay', function() {
             // $('[for="amountLbID"]').css("display", "none");
