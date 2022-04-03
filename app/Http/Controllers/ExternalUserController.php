@@ -138,7 +138,9 @@ class ExternalUserController extends Controller
 
         $user_id = $sample->id;
         // redirect to the verification
-        if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
+        if ($email_status == 'verified' && $mobile_status =="verified" && $kyc_status != 'verified') {
+          return redirect()->route('kyc', ['user_id' => $user_id]);
+        } else if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
           return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email'));
         } else {
             return redirect()->route('securepay.upi', [

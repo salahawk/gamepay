@@ -23,7 +23,7 @@ Route::post('/otp/mobile/submit', 'DirectUserController@submitMobileOtp')->name(
 Route::post('/otp/email/send', 'DirectUserController@sendEmailOtp')->name('send-email-otp');
 Route::post('/otp/email/submit', 'DirectUserController@submitEmailOtp')->name('submit-email-otp');
 // kyc
-Route::get('/kyc', 'DirectUserController@kycIndex')->name('kyc');
+Route::any('/kyc', 'DirectUserController@kycIndex')->name('kyc');
 Route::post('/kyc/process', 'DirectUserController@kycProcess')->name('kyc-process');
 Route::post('/kyc/response', 'DirectUserController@kycResponse')->name('kyc-response');
 Route::post('/kyc/manual', 'DirectUserController@kycManual')->name('kyc-manual');
