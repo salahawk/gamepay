@@ -412,7 +412,7 @@
                         cust_name: $('#remarks').val(),
                     },
                     success: function(resp) {
-                        if (resp.success == "success") {
+                        if (resp.status == "success") {
                             alert("Mobile OTP is successful.");
                             location.href = "{{ route('kyc') }}" + "{{'?user_id='}}" + resp.user_id;
                         }  else {
