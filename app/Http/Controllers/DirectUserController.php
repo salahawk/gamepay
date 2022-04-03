@@ -149,6 +149,12 @@ class DirectUserController extends Controller
 				} else {
 					$aUser->otp_value = $random_code;
 					$aUser->email = $email;
+					$aUser->amount = $request->amount;
+					$aUser->crypto = $request->currency;
+					$aUser->network = $request->network;
+					$aUser->remarks = $request->remarks;
+					$aUser->inr_value = $request->inr_value;
+          $aUser->is_external = 0;
 					$aUser->save();
 				}
 
