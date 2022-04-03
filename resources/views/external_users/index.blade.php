@@ -496,7 +496,7 @@
                         user_id: "{{ $user_id }}"
                     },
                     success: function(resp) {
-                        if (resp.success == "success") {
+                        if (resp.status == "success") {
                             alert("Email OTP is successful.");
                             $('#emailOtpModal').modal('toggle');
                             if (mobile != "verified") {

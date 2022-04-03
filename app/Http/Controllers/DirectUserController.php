@@ -174,15 +174,15 @@ class DirectUserController extends Controller
           $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
         }
         if (empty($aUser)) {
-            return response()->json(['success' => 'fail']);
+            return response()->json(['status' => 'fail']);
         }
 
         if ($aUser->otp_value == $request->submit_value) {
 					$aUser->email_status = 'verified';
 					$aUser->save();
-          return response()->json(['success' => 'success']);
+          return response()->json(['status' => 'success']);
         } else {
-            return response()->json(['success' => 'fail']);
+            return response()->json(['status' => 'fail']);
         }
     }
 
