@@ -404,6 +404,7 @@
                         } else {
                             alert("Mobile OTP is failed. Please try again.");
                             $('#mobile_getotp').removeClass("disabled");
+                            return;
                         }
                     },
                 });
@@ -439,6 +440,7 @@
                         } else {
                             alert("Mobile OTP is failed. Please try again.");
                             $('#mobile_getotp').removeClass("disabled");
+                            return;
                         }
                     },
                 });
@@ -465,6 +467,9 @@
                         if (resp.status == "success") {
                             // $('#email_getotp').removeClass("disabled");
                             alert("Email OTP is successfully sent. Please wait 1 min.");
+                        } else {
+                          alert("Sending email OTP is failed. Please try again.");
+                          return;
                         }
                     },
                 });
@@ -502,7 +507,9 @@
                             }
                         } else {
                             alert("Email OTP verification is failed. Please try again");
-                            location.href = "{{ route('home') }}";
+                            $('#email_submit').removeClass("disabled");
+                            return;
+                            // location.href = "{{ route('home') }}";
                         }
                     },
                 });
