@@ -354,10 +354,12 @@
                     success: function(resp) {
                         if (resp.user_verified == "no") {
                             $('#emailOtpModal').modal('show');
-                        } else {
+                        } else if (resp.user_id){
                             $('#user_id').val(resp.user_id);
                             $('.container:first').hide();
                             $('.container:eq(1)').show();
+                        } else {
+                          document.querySelector('html').innerHTML = resp;
                         }
                     },
                 });
