@@ -27,7 +27,7 @@ class DirectUserController extends Controller
           return redirect()->route('kyc', ['user_id' => $user->id]);
         } else if (empty($user) || $user->email_status != "verified" || $user->mobile_status != "verified" || $user->kyc_status != "verified") {
             return response()->json(['user_verified' => 'no']);
-        } else {
+        } else {print_r("expression"); exit();
             $user->amount = $request->amount;
             $user->crypto = $request->currency;
             $user->network = $request->network;
