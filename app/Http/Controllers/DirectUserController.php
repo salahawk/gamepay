@@ -111,15 +111,15 @@ class DirectUserController extends Controller
         }
 
         if (empty($aUser)) {
-            return response()->json(['success' => 'fail']);
+            return response()->json(['status' => 'fail']);
         }
 
         if ($aUser->otp_value == $request->submit_value) {
             $aUser->mobile_status = "verified";
             $aUser->save();
-            return response()->json(['success' => 'success', 'user_id' => $aUser->id]);
+            return response()->json(['status' => 'success', 'user_id' => $aUser->id]);
         } else {
-            return response()->json(['success' => 'fail']);
+            return response()->json(['status' => 'fail']);
         }
     }
 

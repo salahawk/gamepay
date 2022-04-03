@@ -429,17 +429,19 @@
                         user_id: "{{ $user_id }}"
                     },
                     success: function(resp) {
-                        if (resp.success == "success") {
+                        if (resp.status == "success") {
                             alert("Mobile OTP is successful.");
                             if (kyc != 'verified') {
                               location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
                             } else {
                               $('.container:first').hide();
                               $('.container:eq(1)').show();
+                              $('#mobileOtpModal').modal('toggle');
                             }
                         } else {
                             alert("Mobile OTP is failed. Please try again.");
                             $('#mobile_getotp').removeClass("disabled");
+                            $('#mobile_submit').removeClass("disabled");
                             return;
                         }
                     },

@@ -113,7 +113,7 @@ class ExternalUserController extends Controller
               'external_user_id' => $user->id,
           ]);
         }
-
+        
         // insert DB
         $sample = new User();
         $sample->key = $key;
