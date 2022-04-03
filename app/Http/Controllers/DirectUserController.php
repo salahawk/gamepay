@@ -24,7 +24,7 @@ class DirectUserController extends Controller
         $user = User::where("is_external", 0)->where('wallet_address', $request->wallet_address)->first();
 
         if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
-          return redirect()->route('kyc', ['user_id' => $user_id]);
+          return redirect()->route('kyc', ['user_id' => $user->id]);
         } else if (empty($user) || $user->email_status != "verified" || $user->mobile_status != "verified" || $user->kyc_status != "verified") {
             return response()->json(['user_verified' => 'no']);
         } else {
