@@ -530,14 +530,15 @@ class DirectUserController extends Controller
         $front->move($front_path, $front_name);
         $back_name = "b" . date("Y-m-d-H-i-s") . "." . $back->getClientOriginalExtension();  
         $back->move($back_path, $back_name);
-        
+
         $user = User::where('id', $request->user_id)->first();
         $user->kyc_type = "manual";
         $user->front_img = $front_name;
         $user->back_img = $back_name;
         $user->save();
+
+        return redirect()->route('kyc', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approval']);
       }
 
-			return redirect()->route('kyc', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approval']);
 		}
 }
