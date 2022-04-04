@@ -289,7 +289,9 @@ class ExternalUserController extends Controller
         }
         $aDeposit->pay_id = $responsePayment->PAY_ID;
         $aDeposit->order_id = $responsePayment->ORDER_ID;
-        $aDeposit->amount = $orderAmount;
+        if (!empty($responsePayment->TOTAL_AMOUNT)) {
+          $aDeposit->amount = $orderAmount;
+        }
         if (!empty($responsePayment->TOTAL_AMOUNT)) {
             $aDeposit->total_amount = $responsePayment->TOTAL_AMOUNT;
         }
