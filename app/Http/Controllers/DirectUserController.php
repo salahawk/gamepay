@@ -515,22 +515,29 @@ class DirectUserController extends Controller
 		}
 
 		public function kycManual(Request $request) {
-			$front = $request->file('front');
-			$front_name = "f" . date("Y-m-d-H-i-s") . "." . $front->getClientOriginalExtension();  
-			$front_path = "uploads/kyc";
-			$front->move($front_path, $front_name);
-
-			$back = $request->file('back');
-			$back_name = "b" . date("Y-m-d-H-i-s") . "." . $back->getClientOriginalExtension();  
+      $front_path = "uploads/kyc";
 			$back_path = "uploads/kyc";
-			$back->move($back_path, $back_name);
+      $allowedfileExtension=['png','jpg','jpeg'];
 
-			$user = User::where('id', $request->user_id)->first();
-			$user->kyc_type = "manual";
-			$user->front_img = $front_name;
-			$user->back_img = $back_name;
-			$user->save();
+			$front = $request->file('front');
+			$back = $request->file('back');
 
-			return redirect()->route('kyc', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approvment']);
+      $front_check = in_array(strtolower($front->getClientOriginalExtension()), $allowedfileExtension);
+      $back_check = in_array(strtolower($back->getClientOriginalExtension()), $allowedfileExtension);
+
+      if ($front_check && $back_check) {
+        $front_name = "f" . date("Y-m-d-H-i-s") . "." . $front->getClientOriginalExtension();  
+        $front->move($front_path, $front_name);
+        $back_name = "b" . date("Y-m-d-H-i-s") . "." . $back->getClientOriginalExtension();  
+        $back->move($back_path, $back_name);
+        
+        $user = User::where('id', $request->user_id)->first();
+        $user->kyc_type = "manual";
+        $user->front_img = $front_name;
+        $user->back_img = $back_name;
+        $user->save();
+      }
+
+			return redirect()->route('kyc', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approval']);
 		}
 }
