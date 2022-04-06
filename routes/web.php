@@ -12,8 +12,14 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+// 
+// Authentication
+Route::get('/user', 'AuthController@index')->name('index');
+Route::post('/user/signup', 'AuthController@signup')->name('signup');
+Route::post('/user/login', 'AuthController@login')->name('login');
+Route::get('/user/logout', 'AuthController@logout')->name('logout');
+Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify'); 
 
-Route::get('/', 'DirectUserController@index')->name('home');
 Route::post('/user/check', 'DirectUserController@checkUser')->name('user.check');
 
 // mobile OTP
@@ -35,12 +41,20 @@ Route::post('/upi/response', 'DirectUserController@upiResponse')->name('upi-resp
 
 Route::get('/mint/manual', 'DirectUserController@mintManual')->name('mint-manual');
 
+// external transaction
+Route::get('/securepay/test', 'ExternalUserController@test')->name('securepay.test');
+Route::post('/api/securepay/process', 'ExternalUserController@index')->name('securepay.process');
+Route::post('/api/securepay/validate', 'ExternalUserController@validateVpa')->name('securepay.validate');
+Route::get('/api/securepay/deposit', 'ExternalUserController@deposit')->name('securepay.deposit');
+Route::get('/api/securepay/upi', 'ExternalUserController@getUpi')->name('securepay.upi');
+
+////////////////////   pages   /////////////////////////////////
+Route::get('/exchange', 'DirectUserController@index')->name('exchange');
+Route::get('/portfolio', 'DirectUserController@portfolio')->name('portfolio');
 
 
-
-
-Route::post('/cashlesso/send', 'DirectUserController@sendCashlesso')->name('send-cashlesso');
-Route::post('/cashlesso/response', 'DirectUserController@responseCashlesso')->name('response-cashlesso');
+// Route::post('/cashlesso/send', 'DirectUserController@sendCashlesso')->name('send-cashlesso');
+// Route::post('/cashlesso/response', 'DirectUserController@responseCashlesso')->name('response-cashlesso');
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], function() {
     Route::get('deposits', 'DepositController@index')->name('deposits');
@@ -56,9 +70,5 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
     Route::get('activation/updateData/{id}', 'DepositController@activationUpdateData')->name('activation.updateData');
 });
 
-Route::get('/securepay/test', 'ExternalUserController@test')->name('securepay.test');
-Route::post('/api/securepay/process', 'ExternalUserController@index')->name('securepay.process');
-Route::post('/api/securepay/validate', 'ExternalUserController@validateVpa')->name('securepay.validate');
-Route::get('/api/securepay/deposit', 'ExternalUserController@deposit')->name('securepay.deposit');
-Route::get('/api/securepay/upi', 'ExternalUserController@getUpi')->name('securepay.upi');
+
 

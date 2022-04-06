@@ -11,6 +11,8 @@ use App\Models\User;
 use App\Models\Verification;
 use Twilio\Rest\Client;
 use Mail;
+use Auth;
+use Illuminate\Support\Facades\Session;
 
 class DirectUserController extends Controller
 {
@@ -538,7 +540,14 @@ class DirectUserController extends Controller
         $user->save();
 
         return redirect()->route('kyc', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approval']);
+      } else {
+        return response()->json(['status' => 'fail']);
       }
-
 		}
+
+    public function portfolio(Request $request) {
+      $total = 7000.34;
+      $deposits = Deposit::where('email', Auth::user()->email)->get();
+      return view('portfolios.index')->with('deposits', $deposits)->with('total', $total);
+    }
 }
