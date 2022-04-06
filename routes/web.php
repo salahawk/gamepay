@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 // 
 // Authentication
-Route::get('/user', 'AuthController@index')->name('index');
+Route::get('/', 'AuthController@index')->name('index');
 Route::post('/user/signup', 'AuthController@signup')->name('signup');
 Route::post('/user/login', 'AuthController@login')->name('login');
 Route::get('/user/logout', 'AuthController@logout')->name('logout');

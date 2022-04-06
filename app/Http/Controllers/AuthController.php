@@ -11,6 +11,7 @@ use Hash;
 use Illuminate\Support\Str;
 use Mail;
 use Illuminate\Support\Facades\Session;
+use Notification;
 
 class AuthController extends Controller
 {
@@ -48,7 +49,7 @@ class AuthController extends Controller
             $message->from('JAX@gamepay.com', 'GAMERE');
         });
 
-        return redirect()->route('index')->withSuccess('Great! You have Successfully registered');
+        return redirect()->route('index')->with('message','Registration successful! Please verify email to continue.');
       }
       return redirect()->view('404');
     }
@@ -83,18 +84,17 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             Session::put('user_id', Auth::user()->id);
 
-            return redirect()->intended('exchange');
-                        // ->withSuccess('You have Successfully loggedin');
+            return redirect()->intended('exchange')->with('message', 'You have Successfully loggedin');
         }
   
-        return redirect()->route('index');//->withSuccess('Oppes! You have entered invalid credentials');
+        return redirect()->route('index')->with('warning', 'Oppes! You have entered invalid credentials');
     }
 
     public function logout(Request $request) {
       Session::flush();
       Auth::logout();
 
-      return redirect()->route('login');
+      return redirect()->route('index');
     }
 
 
