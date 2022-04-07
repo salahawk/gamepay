@@ -23,14 +23,16 @@ class DirectUserController extends Controller
 
     public function checkUser(Request $request)
     {
-        $user = User::where("is_external", 0)->where('wallet_address', $request->wallet_address)->first();
+        $user = User::where("id", Auth::user()->id)->first();
         
         if (empty($user)) {
           return response()->json(['user_verified' => 'no']);
         } else if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
           return redirect()->route('kyc', ['user_id' => $user->id]);
+        } else if ($user->email_status == "verified" && $user->mobile_status != "verified" && $user->kyc_status != "verified") {
+          return response()->json(['user_verified' => 'only_email']);
         } else if ($user->email_status != "verified" || $user->mobile_status != "verified" || $user->kyc_status != "verified") {
-            return response()->json(['user_verified' => 'no']);
+          return response()->json(['user_verified' => 'no']);
         } else {
             $user->amount = $request->amount;
             $user->crypto = $request->currency;

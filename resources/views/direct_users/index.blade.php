@@ -360,7 +360,9 @@
                         success: function(resp) {
                             if (resp.user_verified == "no") {
                                 $('#emailOtpModal').modal('show');
-                            } else if (resp.user_id) {
+                            } else if (resp.user_verified == "only_email") {
+															$('#mobileOtpModal').modal('show');
+														}	else if (resp.user_id) {
                                 $('#user_id').val(resp.user_id);
                                 $('.container:first').hide();
                                 $('.container:eq(1)').show();
