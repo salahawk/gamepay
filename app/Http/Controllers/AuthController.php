@@ -70,7 +70,7 @@ class AuthController extends Controller
             }
         }
   
-      return redirect()->route('index');//->with('message', $message);
+      return redirect()->route('index')->with('message', $message);
     }
 
     public function login(Request $request)

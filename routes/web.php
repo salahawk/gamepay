@@ -20,7 +20,7 @@ Route::post('/user/login', 'AuthController@login')->name('login');
 Route::get('/user/logout', 'AuthController@logout')->name('logout');
 Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify'); 
 
-Route::post('/user/check', 'DirectUserController@checkUser')->name('user.check');
+Route::get('/user/check', 'DirectUserController@checkUser')->name('user-check');
 
 // mobile OTP
 Route::post('/otp/mobile/send', 'DirectUserController@sendMobileOtp')->name('send-mobile-otp');
