@@ -126,6 +126,7 @@
         });
         veriff.setParams({
             person: {
+                givenName: ' ',
                 lastName: ' '
             },
             vendorData: ' '
