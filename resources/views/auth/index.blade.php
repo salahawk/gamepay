@@ -83,7 +83,7 @@
                         <div class="home-text-center p-50px-r md-p-0px-r">
 
                             <h1 class="font-alt">Trade Bitcoin and other cryptocurrencies</h1>
-                            <p>coinsplashes has made investing simple for millions around the world.</p>
+                            <p>coinpaise has made investing simple for millions around the world.</p>
                             <div class="subscribe-box">
                                 <a class="m-btn m-btn-theme2nd" href="#">Get started </a>
                                 <img src="{{ asset('assets/img/banner.png') }}" class="mt-3 mt-md-5" />
@@ -97,15 +97,15 @@
                             <!---- Login and register starts----->
                             <ul class="nav nav-pills nav-fill navtop">
                                 <li class="nav-item">
-                                    <a class="nav-link active" href="#menu1" data-toggle="tab">Sign up</a>
+                                    <a class="nav-link @if (!Session::has('message')) active show @endif" href="#menu1" data-toggle="tab">Sign up</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#menu2" data-toggle="tab">Log in</a>
+                                    <a class="nav-link @if (Session::has('message')) active show @endif" href="#menu2" data-toggle="tab">Log in</a>
                                 </li>
 
                             </ul>
                             <div class="tab-content float-right">
-                                <div class="tab-pane active" role="tabpanel" id="menu1">
+                                <div class="tab-pane @if (!Session::has('message')) active show @endif" role="tabpanel" id="menu1">
                                     <div class="pt-3">
                                         <form class="contactform pt-3" method="post" action="{{ route('signup') }}">
                                             @csrf
@@ -167,7 +167,7 @@
 
                                     </div>
                                 </div>
-                                <div class="tab-pane" role="tabpanel" id="menu2">
+                                <div class="tab-pane @if (Session::has('message')) active show @endif" role="tabpanel" id="menu2">
                                     <div class="pt-3">
                                         <form class="contactform pt-3" method="post" action="{{ route('login') }}">
                                             <div class="row">
