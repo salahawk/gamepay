@@ -11,7 +11,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Coinpaise</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    @notifyCss
     <link rel="apple-touch-icon" href="{{ asset('assets/img/fev.png') }}">
     <link rel="shortcut icon" href="{{ asset('assets/img/fev.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
@@ -27,8 +26,6 @@
 </head>
 
 <body>
-    @include('notify::messages')
-    <x:notify-messages />
     <!-- Left Panel -->
     @include('layouts.leftpanel')
     <!-- /#left-panel -->
