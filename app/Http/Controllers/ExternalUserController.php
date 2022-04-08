@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 use App\Models\User;
 use App\Models\Deposit;
-use App\Models\External_request;
+use App\Models\External;
 
 class ExternalUserController extends Controller
 {
@@ -54,7 +54,7 @@ class ExternalUserController extends Controller
             empty($eurl) ||
             empty($curl) ||
             empty($hash)
-        ) {var_dump("empty");
+        ) {var_dump("one of the values is empty");
             return view('external_user.error');
         }
 
@@ -95,17 +95,23 @@ class ExternalUserController extends Controller
 
         $hash_value = hash('sha256', $hash_string);
 
-        if ($hash != $hash_value) { var_dump("hash error");
+        if ($hash != $hash_value) { var_dump("hash value error");
             return view('external_user.error');
         }
         
         // check user if existing by wallet and email
-        $user = User::where('wallet_address', $address)
+        // $user = User::where('wallet_address', $address)
+        //                     ->where('email', $email)
+        //                     ->where('email_status', 'verified')
+        //                     ->where('kyc_status', 'verified')
+        //                     ->where('mobile_status', 'verified')
+        //                     ->where('is_external', 1)
+        //                     ->first();
+        $user = External::where('address', $address)
                             ->where('email', $email)
                             ->where('email_status', 'verified')
                             ->where('kyc_status', 'verified')
                             ->where('mobile_status', 'verified')
-                            ->where('is_external', 1)
                             ->first();
         
         if (!empty($user)) { // redirect to the verification
@@ -115,16 +121,16 @@ class ExternalUserController extends Controller
         }
         
         // insert DB
-        $sample = new User();
+        $sample = new External();
         $sample->key = $key;
-        $sample->txn_id = $txn_id;
+        $sample->txnid = $txn_id;
         $sample->amount = $amount;
         $sample->cust_name = $customer_name;
         $sample->email = $email;
-        $sample->mobile = $phone;
+        $sample->phone = $phone;
         $sample->crypto = $crypto;
         $sample->network = $network;
-        $sample->wallet_address = $address;
+        $sample->address = $address;
         $sample->remarks = $remarks;
         $sample->kyc_status = $kyc_status;
         $sample->email_status = $email_status;
@@ -133,13 +139,12 @@ class ExternalUserController extends Controller
         $sample->eurl = $eurl;
         $sample->curl = $curl;
         $sample->hash = $hash;
-        $sample->is_external = 1;
         $saved = $sample->save();
 
         $user_id = $sample->id;
         // redirect to the verification
         if ($email_status == 'verified' && $mobile_status =="verified" && $kyc_status != 'verified') {
-          return redirect()->route('kyc', ['user_id' => $user_id]);
+          return redirect()->route('securepay.kyc', ['user_id' => $user_id]);
         } else if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
           return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email'));
         } else {
@@ -159,7 +164,7 @@ class ExternalUserController extends Controller
     {
         $auth_token = $this->getAuthToken(); 
         if ($this->_validateVpa($auth_token, $request->payer_address)) {
-            $ext = User::where('id', $request->external_user_id)->first();
+            $ext = External::where('id', $request->external_user_id)->first();
             $ext->payer_address = $request->payer_address;
             $ext->save();
             
@@ -174,26 +179,25 @@ class ExternalUserController extends Controller
 
     public function deposit(Request $request)
     { 
-        $ext = User::where('id',$request->external_user_id)->first();
+        $ext = External::where('id',$request->external_user_id)->first();
         // save external txn info
-        $ext_req = new External_request;
-        $ext_req->key = $ext->key;
-        $ext_req->txnid = $ext->txn_id;
-        $ext_req->amount = $ext->amount;
-        $ext_req->cust_name = $ext->cust_name;
-        $ext_req->email = $ext->email;
-        $ext_req->phone = $ext->mobile;
-        $ext_req->crypto = $ext->crypto;
-        $ext_req->network = $ext->network;
-        $ext_req->surl = $ext->surl;
-        $ext_req->eurl = $ext->eurl;
-        $ext_req->curl = $ext->curl;
-        $ext_req->remarks = $ext->remarks;
-        $ext_req->kyc_status = $ext->kyc_status;
-        $ext_req->email_status = $ext->email_status;
-        $ext_req->mobile_status = $ext->mobile_status;
-        $ext_req->hash = $ext->hash;
-        $ext_req->save();        
+        $ext->key = $ext->key;
+        $ext->txnid = $ext->txn_id;
+        $ext->amount = $ext->amount;
+        $ext->cust_name = $ext->cust_name;
+        $ext->email = $ext->email;
+        $ext->phone = $ext->mobile;
+        $ext->crypto = $ext->crypto;
+        $ext->network = $ext->network;
+        $ext->surl = $ext->surl;
+        $ext->eurl = $ext->eurl;
+        $ext->curl = $ext->curl;
+        $ext->remarks = $ext->remarks;
+        $ext->kyc_status = $ext->kyc_status;
+        $ext->email_status = $ext->email_status;
+        $ext->mobile_status = $ext->mobile_status;
+        $ext->hash = $ext->hash;
+        $ext->save();        
 
         // Validate VPA
         $url = 'https://uat.cashlesso.com/pgws/upi/validateVpa';
@@ -277,6 +281,8 @@ class ExternalUserController extends Controller
         $orderId = $responsePayment->ORDER_ID;
         
         $aDeposit = new Deposit();
+        $aDeposit->user_id = $ext->id;
+        $aDeposit->is_external = 1;
         $aDeposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
         if (!empty($responsePayment->TXN_ID)) {
             $aDeposit->txnid = $responsePayment->TXN_ID;
@@ -289,15 +295,13 @@ class ExternalUserController extends Controller
         }
         $aDeposit->pay_id = $responsePayment->PAY_ID;
         $aDeposit->order_id = $responsePayment->ORDER_ID;
-        if (!empty($responsePayment->TOTAL_AMOUNT)) {
-          $aDeposit->amount = $orderAmount;
-        }
+        $aDeposit->amount = $orderAmount;
         if (!empty($responsePayment->TOTAL_AMOUNT)) {
             $aDeposit->total_amount = $responsePayment->TOTAL_AMOUNT;
         }
         $aDeposit->cust_name = $customerName;
         $aDeposit->hash = $responsePayment->HASH;
-        if (!empty($responsePayment->TOTAL_AMOUNT)) {
+        if (!empty($responsePayment->ACQ_ID)) {
             $aDeposit->acq_id = $responsePayment->ACQ_ID;
         }
         $aDeposit->email = $customerEmail;
@@ -448,7 +452,7 @@ class ExternalUserController extends Controller
 
         curl_close($curl);
         $json = json_decode($response);
-
+        
         $authToken = $json->AUTHENTICATION_TOKEN;
         return $authToken;
     }
@@ -506,13 +510,59 @@ class ExternalUserController extends Controller
         }
     }
 
-    public function kycIndex()
-    {
-        return view('merchants.kyc');
+    public function kycIndex(Request $request) {
+        if (empty($request->status))
+            return view('external_users.kyc')->with('user_id', $request->user_id);
+        else
+            return view('external_users.kyc')->with('user_id', $request->user_id)->with('status', $request->status);
     }
 
-    public function test()
-    {
-        return view('external_user.test');
+    public function kycProcess(Request $request) {
+        $user = External::where('id', $request->user_id)->first();
+        $user->cust_name = $request->cust_name;
+        $user->kyc_type = "veriff";
+        $user->save();
+
+        $veriff = new Verification;
+        $veriff->is_external = 1;
+        $veriff->user_id = $user->id;
+        $veriff->veriff_id = $request->veriff_id;
+        $veriff->veriff_url = $request->veriff_url;
+        $veriff->sessionToken = $request->sessionToken;
+        $veriff->is_verified = $request->is_verified;
+        $veriff->save();
+    }
+
+    public function kycResponse(Request $request) {
+        print_r("expression"); exit();
+    }
+
+    public function kycManual(Request $request) {
+      $front_path = "uploads/kyc";
+      $back_path = "uploads/kyc";
+      $allowedfileExtension=['png','jpg','jpeg'];
+
+      $front = $request->file('front');
+      $back = $request->file('back');
+
+      $front_check = in_array(strtolower($front->getClientOriginalExtension()), $allowedfileExtension);
+      $back_check = in_array(strtolower($back->getClientOriginalExtension()), $allowedfileExtension);
+
+      if ($front_check && $back_check) {
+          $front_name = "xf" . date("Y-m-d-H-i-s") . "." . $front->getClientOriginalExtension();  
+          $front->move($front_path, $front_name);
+          $back_name = "xb" . date("Y-m-d-H-i-s") . "." . $back->getClientOriginalExtension();  
+          $back->move($back_path, $back_name);
+
+          $user = External::where('id', $request->user_id)->first();
+          $user->kyc_type = "manual";
+          $user->front_img = $front_name;
+          $user->back_img = $back_name;
+          $user->save();
+
+          return redirect()->route('securepay.kyc', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approval']);
+      } else {
+          return response()->json(['status' => 'fail']);
+      }
     }
 }

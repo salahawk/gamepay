@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-
+									<div class="container">
                     <div class="row justify-content-md-center">
                         <div class="col-12 col-md-6">
                             <!---- Tab 1 content start-->
@@ -118,158 +118,158 @@
                             <!---- Tab 1 content ends-->
                         </div>
                     </div>
+									</div>
 
+									<div class="container" style="padding-top: 5%; display: none">
+											<div class="row justify-content-center align-items-center">
+													<div class="col-lg-10">
+															<div class="middlepage1 shadow p-4 text-center" style="box-shadow: 0 0 0!important;"> <img
+																			src="{{ asset('assets/img/upi.png') }}" class="img-fluid" />
+																	<h3 class="text-center text-dark font-weight-bold">UPI Payment</h3>
+																	<div class="row justify-content-center align-items-center">
+																			<div class="col-12 col-md-6">
+																					<form>
+																							<div>
+																									<p class="text-dark">Please Enter Your UPI ID</p>
+																									<div class="row pb-3">
+																											<div class="col-12">
+																													<input type="hidden" id="user_id">
+																													<input class="form-control form-control-lg text-center"
+																															name="payeraddress" type="text"
+																															placeholder="Eg: Yourphonenumber@apl" required>
+																											</div>
+																									</div>
+																							</div>
+																							<div class="form-group mb-0 pb-0">
+																									<input type="button" class="btnSubmit btn btn-info"
+																											value="Verify & Proceed" />
+																							</div>
+																							<div class="form-group mb-0 pb-0">
+																									<div class="loader m-auto" id="loader-4"> <span></span> <span></span>
+																											<span></span>
+																									</div>
+																							</div>
+																					</form>
+																			</div>
+																	</div>
+															</div>
+													</div>
+											</div>
+									</div>
+									<!--- Modal start---->
+									<div class="modal fade kycmodal" id="emailOtpModal" tabindex="-1" aria-labelledby="emailOtpModal"
+											aria-hidden="true">
+											<div class="modal-dialog modal-dialog-centered">
+													<div class="modal-content">
+															<div class="modal-header">
+																	<h5 class="modal-title" id="exampleModalLabel">Email Verification</h5>
+																	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																			<span aria-hidden="true">&times;</span>
+																	</button>
+															</div>
+															<div class="modal-body">
+																	<div>
+																			<!--- Email Section start--->
+																			<div class="row">
+																					<div class="col-12">
+																							<div>
+																									<form>
+																											<div class="form-group">
+																													<label for="exampleInputEmail1">Verify Your Email</label>
+																													<input type="email" class="form-control" id="email_otp"
+																															aria-describedby="emailHelp">
+																													<label for="email_otpLbID"
+																															style="color: #f00; display: none;">Enter Valid
+																															Email</label>
+																											</div>
+																											<a href="#" class="btn btn-primary" id="email_getotp">Get Code</a>
+																									</form>
+																							</div>
+																					</div>
+																			</div>
+																			<div class="row">
+																					<div class="col-12">
+																							<div>
+																									<form>
 
-                    <div class="container" style="padding-top: 10%; display: none">
-                        <div class="row justify-content-center align-items-center">
-                            <div class="col-lg-10">
-                                <div class="middlepage1 shadow p-4 text-center"> <img
-                                        src="{{ asset('assets/img/upi.png') }}" class="img-fluid" />
-                                    <h3 class="text-center text-dark font-weight-bold">UPI Payment</h3>
-                                    <div class="row justify-content-center align-items-center">
-                                        <div class="col-12 col-md-6">
-                                            <form>
-                                                <div>
-                                                    <p class="text-dark">Please Enter Your UPI ID</p>
-                                                    <div class="row pb-3">
-                                                        <div class="col-12">
-                                                            <input type="hidden" id="user_id">
-                                                            <input class="form-control form-control-lg text-center"
-                                                                name="payeraddress" type="text"
-                                                                placeholder="Eg: Yourphonenumber@apl" required>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group mb-0 pb-0">
-                                                    <input type="button" class="btnSubmit btn btn-info"
-                                                        value="Verify & Proceed" />
-                                                </div>
-                                                <div class="form-group mb-0 pb-0">
-                                                    <div class="loader m-auto" id="loader-4"> <span></span> <span></span>
-                                                        <span></span>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--- Modal start---->
-                    <div class="modal fade kycmodal" id="emailOtpModal" tabindex="-1" aria-labelledby="emailOtpModal"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Email Verification</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div>
-                                        <!--- Email Section start--->
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div>
-                                                    <form>
-                                                        <div class="form-group">
-                                                            <label for="exampleInputEmail1">Verify Your Email</label>
-                                                            <input type="email" class="form-control" id="email_otp"
-                                                                aria-describedby="emailHelp">
-                                                            <label for="email_otpLbID"
-                                                                style="color: #f00; display: none;">Enter Valid
-                                                                Email</label>
-                                                        </div>
-                                                        <a href="#" class="btn btn-primary" id="email_getotp">Get Code</a>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div>
-                                                    <form>
+																											<div class="form-group">
+																													<label for="exampleInputEmail1">Enter Email OTP</label>
+																													<input type="number" class="form-control" id="email_code"
+																															aria-describedby="mobile">
+																													<label for="email_codeLbID"
+																															style="color: #f00; display: none;">OTP
+																															Wrong</label>
+																											</div>
 
-                                                        <div class="form-group">
-                                                            <label for="exampleInputEmail1">Enter Email OTP</label>
-                                                            <input type="number" class="form-control" id="email_code"
-                                                                aria-describedby="mobile">
-                                                            <label for="email_codeLbID"
-                                                                style="color: #f00; display: none;">OTP
-                                                                Wrong</label>
-                                                        </div>
+																											<a href="#" class="btn btn-primary" id="email_submit">Submit</a>
+																									</form>
+																							</div>
+																					</div>
+																			</div>
+																			<!--- Email Section end--->
+																	</div>
+															</div>
 
-                                                        <a href="#" class="btn btn-primary" id="email_submit">Submit</a>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--- Email Section end--->
-                                    </div>
-                                </div>
+													</div>
+											</div>
+									</div>
+									<div class="modal fade kycmodal" id="mobileOtpModal" tabindex="-1" aria-labelledby="mobileOtpModal"
+											aria-hidden="true">
+											<div class="modal-dialog modal-dialog-centered">
+													<div class="modal-content">
+															<div class="modal-header">
+																	<h5 class="modal-title" id="mobileOtpModalLabel">Mobile Verification</h5>
+																	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																			<span aria-hidden="true">&times;</span>
+																	</button>
+															</div>
+															<div class="modal-body">
+																	<div>
+																			<!--- Mobile Section start--->
+																			<div class="row">
+																					<div class="col-12">
+																							<div>
+																									<form>
+																											<div class="form-group">
+																													<label for="exampleInputEmail1">Verify Your Mobile
+																															Number</label>
+																													<input type="number" class="form-control" id="mobile_number"
+																															aria-describedby="mobile" placeholder="1234567890">
+																													<label for="mobile_numberLbID"
+																															style="color: #f00; display: none;">Enter
+																															Valid Mobile Number</label>
+																											</div>
+																											<a href="#" class="btn btn-primary" id="mobile_getotp">Get Code</a>
+																									</form>
+																							</div>
+																					</div>
+																			</div>
+																			<div class="row">
+																					<div class="col-12">
+																							<div>
+																									<form>
 
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal fade kycmodal" id="mobileOtpModal" tabindex="-1" aria-labelledby="mobileOtpModal"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="mobileOtpModalLabel">Mobile Verification</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div>
-                                        <!--- Mobile Section start--->
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div>
-                                                    <form>
-                                                        <div class="form-group">
-                                                            <label for="exampleInputEmail1">Verify Your Mobile
-                                                                Number</label>
-                                                            <input type="number" class="form-control" id="mobile_number"
-                                                                aria-describedby="mobile" placeholder="1234567890">
-                                                            <label for="mobile_numberLbID"
-                                                                style="color: #f00; display: none;">Enter
-                                                                Valid Mobile Number</label>
-                                                        </div>
-                                                        <a href="#" class="btn btn-primary" id="mobile_getotp">Get Code</a>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div>
-                                                    <form>
+																											<div class="form-group">
+																													<label for="exampleInputEmail1">Enter Mobile OTP</label>
+																													<input type="number" class="form-control" id="mobile_code"
+																															aria-describedby="mobile">
+																													<label for="mobile_codeLbID"
+																															style="color: #f00; display: none;">OTP
+																															Wrong</label>
+																											</div>
 
-                                                        <div class="form-group">
-                                                            <label for="exampleInputEmail1">Enter Mobile OTP</label>
-                                                            <input type="number" class="form-control" id="mobile_code"
-                                                                aria-describedby="mobile">
-                                                            <label for="mobile_codeLbID"
-                                                                style="color: #f00; display: none;">OTP
-                                                                Wrong</label>
-                                                        </div>
+																											<a href="#" class="btn btn-primary" id="mobile_submit">Submit</a>
+																									</form>
+																							</div>
+																					</div>
+																			</div>
+																			<!--- Mobile Section end--->
+																	</div>
+															</div>
 
-                                                        <a href="#" class="btn btn-primary" id="mobile_submit">Submit</a>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--- Mobile Section end--->
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
+													</div>
+											</div>
+									</div>
                 </div>
             </div>
         </div>

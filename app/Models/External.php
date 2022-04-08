@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class External_request extends Model
+class External extends Model
 {
 	public $timestamps = true;
 

@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-
-use App\Models\Deposit;
-use App\Models\User;
-use App\Models\Verification;
 use Twilio\Rest\Client;
 use Mail;
 use Auth;
 use Illuminate\Support\Facades\Session;
+
+use App\Models\Deposit;
+use App\Models\User;
+use App\Models\Verification;
+
 
 class DirectUserController extends Controller
 {
@@ -26,7 +27,7 @@ class DirectUserController extends Controller
         $user = User::where("id", Auth::user()->id)->first();
         
         if (empty($user)) {
-          return response()->json(['user_verified' => 'no']);
+          return redirect()->route('index');
         } else if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
           return redirect()->route('kyc', ['user_id' => $user->id]);
         } else if ($user->email_status == "verified" && $user->mobile_status != "verified" && $user->kyc_status != "verified") {
@@ -34,14 +35,17 @@ class DirectUserController extends Controller
         } else if ($user->email_status != "verified" || $user->mobile_status != "verified" || $user->kyc_status != "verified") {
           return response()->json(['user_verified' => 'no']);
         } else {
-            $user->amount = $request->amount;
-            $user->crypto = $request->currency;
-            $user->network = $request->network;
-            $user->remarks = $request->remarks;
-            $user->amount = $request->amount;
-            $user->inr_value = $request->inr_value;
-            $user->is_external = 0;
-            $user->save();
+          $deposit = new Deposit;
+          $deposit->user_id = $user->id;
+          $deposit->amount = $request->amount;
+          $deposit->crypto = $request->currency;
+          $deposit->network = $request->network;
+          $deposit->remarks = $request->remarks;
+          $deposit->amount = $request->amount;
+          $deposit->inr_value = $request->inr_value;
+          $deposit->is_external = 0;
+          $deposit->cust_name = $user->first_name;
+          $deposit->save();
 
             return response()->json([
                 'user_verified' => 'yes',
@@ -54,9 +58,9 @@ class DirectUserController extends Controller
     {
         $auth_token = $this->getAuthToken();
         if ($this->_validateVpa($auth_token, $request->payer_address)) {
-            $user = User::find($request->user_id);
-            $user->payer_address = $request->payer_address;
-            $user->save();
+            $deposit = Deposit::where('user_id', $request->user_id)->where('is_external', 0)->first();
+            $deposit->payer_address = $request->payer_address;
+            $deposit->save();
             // return response()->json(['status' => 'success']);
             return redirect()->route('send-deposit', ['user_id' => $user->id, 'authToken' => $auth_token]);
         } else {
@@ -70,7 +74,7 @@ class DirectUserController extends Controller
         if (!empty($request->user_id)) {
           $sample = User::where('id', $request->user_id)->first();
         } else {
-          $sample = User::where('wallet_address', $request->wallet_address)->where('is_external', 0)->first();
+          $sample = User::where('id', Auth::user()->id)->first();
         }
 
 				if (empty($sample)) {
@@ -115,7 +119,8 @@ class DirectUserController extends Controller
         if (!empty($request->user_id)) {
           $aUser = User::where('id', $request->user_id)->first();
         } else {
-          $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
+          // $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
+          $aUser = User::where('id', Auth::user()->id)->first();
         }
 
         if (empty($aUser)) {
@@ -155,15 +160,15 @@ class DirectUserController extends Controller
           $aUser->is_external = 0;
 					$aUser->save();
 				} else {
-					$aUser->otp_value = $random_code;
-					$aUser->email = $email;
-					$aUser->amount = $request->amount;
-					$aUser->crypto = $request->currency;
-					$aUser->network = $request->network;
-					$aUser->remarks = $request->remarks;
-					$aUser->inr_value = $request->inr_value;
-          $aUser->is_external = 0;
-					$aUser->save();
+					// $aUser->otp_value = $random_code;
+					// $aUser->email = $email;
+					// $aUser->amount = $request->amount;
+					// $aUser->crypto = $request->currency;
+					// $aUser->network = $request->network;
+					// $aUser->remarks = $request->remarks;
+					// $aUser->inr_value = $request->inr_value;
+          // $aUser->is_external = 0;
+					// $aUser->save();
 				}
 
         Mail::send('merchants.email-otp', $data, function ($message) use (
@@ -180,7 +185,6 @@ class DirectUserController extends Controller
 
     public function submitEmailOtp(Request $request)
     {
-        
         if (!empty($request->user_id)) {
           $aUser = User::where('id', $request->user_id)->first();
         } else {
@@ -202,20 +206,20 @@ class DirectUserController extends Controller
 
     public function sendDeposit(Request $request)
     {
-        $aUser = User::find($request->user_id);
+        $deposit = Deposit::where('user_id', $request->user_id)->where('is_external', 0)->first();
 
         // Validate VPA
         $url = 'https://uat.cashlesso.com/pgws/upi/validateVpa';
 
         $pay_id = env('PAY_ID');
-        $orderAmount = $aUser->amount;
-        $orderId = $aUser->cust_name . random_int(1000, 9999);
+        $orderAmount = $deposit->amount;
+        $orderId = $deposit->cust_name . random_int(1000, 9999);
         $orderCurrencyId = '356';
-        $payeAddress = $aUser->payer_address;
-        $customerEmail = $aUser->email;
-        $customerPhone = $aUser->mobile;
+        $payeAddress = $deposit->payer_address;
+        $customerEmail = $deposit->email;
+        $customerPhone = $deposit->mobile;
         $productinfo = 'GAMERE';
-        $customerName = $aUser->cust_name;
+        $customerName = $deposit->cust_name;
         $customerId = $orderId;
 
         $gwUrl = 'https://uat.cashlesso.com/pgws/upi/initiateCollect';
@@ -283,34 +287,35 @@ class DirectUserController extends Controller
 				$responsePayment=json_decode($responseCollect);
 				
 				$orderId=$responsePayment->ORDER_ID;
-				$aDeposit = new Deposit;
-				$aDeposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
+        
+
+				$deposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
 				if (!empty($responsePayment->TXN_ID)) {
-          $aDeposit->txnid = $responsePayment->TXN_ID;
+          $deposit->txnid = $responsePayment->TXN_ID;
         }
 				if (!empty($responsePayment->CURRENCY_CODE)) {
-					$aDeposit->currency_code = $responsePayment->CURRENCY_CODE;
+					$deposit->currency_code = $responsePayment->CURRENCY_CODE;
 				}
         if (!empty($responsePayment->STATUS)) {
-          $aDeposit->status = $responsePayment->STATUS;
+          $deposit->status = $responsePayment->STATUS;
         }
-				$aDeposit->pay_id	 = $responsePayment->PAY_ID;
-				$aDeposit->order_id = $responsePayment->ORDER_ID;
-				$aDeposit->amount = $orderAmount;
+				$deposit->pay_id	 = $responsePayment->PAY_ID;
+				$deposit->order_id = $responsePayment->ORDER_ID;
+				$deposit->amount = $orderAmount;
 				if (!empty($responsePayment->TOTAL_AMOUNT)) {
-					$aDeposit->total_amount = $responsePayment->TOTAL_AMOUNT;
+					$deposit->total_amount = $responsePayment->TOTAL_AMOUNT;
 				}
-				$aDeposit->cust_name = $customerName;
-				$aDeposit->hash = $responsePayment->HASH;
+				$deposit->cust_name = $customerName;
+				$deposit->hash = $responsePayment->HASH;
 				if (!empty($responsePayment->ACQ_ID)) {
-					$aDeposit->acq_id = $responsePayment->ACQ_ID;
+					$deposit->acq_id = $responsePayment->ACQ_ID;
 				}
-				$aDeposit->email = $customerEmail;
-				$aDeposit->phone = $customerPhone;
-				$aDeposit->payer_address = $payeAddress;
-				$aDeposit->wallet = $aUser->wallet_address;
-				$aDeposit->product_desc = $productinfo;
-				$aDeposit->save();
+				$deposit->email = $customerEmail;
+				$deposit->phone = $customerPhone;
+				$deposit->payer_address = $payeAddress;
+				$deposit->wallet = $aUser->wallet_address;
+				$deposit->product_desc = $productinfo;
+				$deposit->save();
 
 				
 				if($responsePayment->RESPONSE_CODE==000 && $responsePayment->STATUS=='Sent to Bank'){
@@ -501,7 +506,6 @@ class DirectUserController extends Controller
 
 		public function kycProcess(Request $request) {
 			$user = User::where('id', $request->user_id)->first();
-			$user->cust_name = $request->cust_name;
 			$user->kyc_type = "veriff";
 			$user->save();
 
@@ -511,6 +515,8 @@ class DirectUserController extends Controller
 			$veriff->veriff_url = $request->veriff_url;
 			$veriff->sessionToken = $request->sessionToken;
 			$veriff->is_verified = $request->is_verified;
+			$veriff->is_external = 0;
+
 			$veriff->save();
 		}
 
