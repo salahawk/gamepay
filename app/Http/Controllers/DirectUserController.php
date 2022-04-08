@@ -555,7 +555,7 @@ class DirectUserController extends Controller
 
     public function portfolio(Request $request) {
       $total = 7000.34;
-      $deposits = Deposit::where('email', Auth::user()->email)->get();
+      $deposits = Deposit::where('user_id', Auth::user()->id)->where('is_external', 0)->get();
       return view('portfolios.index')->with('deposits', $deposits)->with('total', $total);
     }
 }
