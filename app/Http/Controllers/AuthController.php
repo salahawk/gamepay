@@ -95,4 +95,20 @@ class AuthController extends Controller
 
       return redirect()->route('index');
     }
+
+    public function privacy() {
+        return view('infos.privacy');
+    }
+
+    public function terms() {
+        return view('infos.terms');
+    }
+
+    public function contact() {
+        return view('infos.contact');
+    }
+
+    public function refundPolicy() {
+        return view('infos.refund-policy');
+    }
 }

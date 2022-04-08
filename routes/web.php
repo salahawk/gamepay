@@ -45,6 +45,10 @@ Route::get('/mint/manual', 'DirectUserController@mintManual')->name('mint-manual
 
 
 ////////////////////   pages   /////////////////////////////////
+Route::get('/privacy', 'AuthController@privacy')->name('privacy');
+Route::get('/terms', 'AuthController@terms')->name('terms');
+Route::get('/contact', 'AuthController@contact')->name('contact');
+Route::get('/refund-policy', 'AuthController@refundPolicy')->name('refund-policy');
 Route::get('/exchange', 'DirectUserController@index')->name('exchange');
 Route::get('/portfolio', 'DirectUserController@portfolio')->name('portfolio');
 

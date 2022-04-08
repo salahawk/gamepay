@@ -326,10 +326,10 @@
                     <div class="col-6 col-md-4 col-lg-4 sm-m-15px-tb">
                         <h4 class="font-alt">Company</h4>
                         <ul class="fot-link">
-                            <li><a href="policy.html">Privacy Policy</a></li>
-                            <li><a href="terms.html">Terms and Conditions</a></li>
-                            <li><a href="refund.html">Refund Policy </a></li>
-                            <li><a href="contact.html">Contact us</a></li>
+                            <li><a href="{{ route('privacy')}}">Privacy Policy</a></li>
+                            <li><a href="{{ route('terms')}}">Terms and Conditions</a></li>
+                            <li><a href="{{ route('refund-policy')}}">Refund Policy </a></li>
+                            <li><a href="{{ route('contact')}}">Contact us</a></li>
                         </ul>
                     </div>
                     <!-- col -->

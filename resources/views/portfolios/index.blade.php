@@ -10,10 +10,11 @@
                             <div class="col-8 col-md-6">
                                 <h4 class="pb-3 text-info">Portfolio</h4>
                                 <p class="text-muted mb-0 pb-0">Current Portfolio Value</p>
-                                <h3 class="text-info pb-2 font-weight-bold">₹ {!! $total !!}</h3>
+                                <h3 class="text-info pb-2 font-weight-bold"><img src="{{asset('assets/img/Gamerupee.png')}}" alt=""
+                                    class="img-fluid"> {!! $total !!}</h3>
                             </div>
-                            <div class="col-4 col-md-6 d-flex justify-content-end"> <img src="images/img1.png" alt=""
-                                    class="img-fluid"> </div>
+                            {{-- <div class="col-4 col-md-6 d-flex justify-content-end"> <img src="{{asset('assets/img/img1.png')}}" alt=""
+                                    class="img-fluid"> </div> --}}
                         </div>
                     </div>
                 </div>
