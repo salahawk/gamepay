@@ -316,63 +316,6 @@
         let kyc = "{{ $kyc_status }}";
 
         $(document).on('click', '#confirm_pay', function() {
-            // $('[for="amountLbID"]').css("display", "none");
-            // $('[for="myDropdown1LbID"]').css("display", "none");
-            // $('[for="myDropdownLbID"]').css("display", "none");
-            // $('[for="wallet_addressLbID"]').css("display", "none");
-            // $('[for="remarksLbID"]').css("display", "none");
-            // if ($('#amount').val() == '' || $("#myDropdown1").find('.dd-selected-text').html() == 'Network' || $("#myDropdown").find('.dd-selected-text').html() == 'Currency' || $('#wallet_address').val() == '' || $('#remarks').val() == '' || $('#inr_value').val() == '') {
-            //     if ($('#amount').val() == '') {
-            //         $('[for="amountLbID"]').html("This field is required.");
-            //         $('[for="amountLbID"]').css("display", "inline");
-            //     }
-            //     if ($("#myDropdown1").find('.dd-selected-text').html() == 'Network')
-            //         $('[for="myDropdown1LbID"]').css("display", "inline");
-            //     if ($("#myDropdown").find('.dd-selected-text').html() == 'Currency')
-            //         $('[for="myDropdownLbID"]').css("display", "inline");
-            //     if ($('#wallet_address').val() == '')
-            //         $('[for="wallet_addressLbID"]').css("display", "inline");
-            //     if ($('#remarks').val() == '') {
-            //         $('[for="remarksLbID"]').html("This field is required.");
-            //         $('[for="remarksLbID"]').css("display", "inline");
-            //     }
-            // } else {
-            //     if (parseInt($('#amount').val()) < 500 || parseInt($('#amount').val()) > 50000) {
-            //         $('[for="amountLbID"]').html("Min 500 to Max 50,000");
-            //         $('[for="amountLbID"]').css("display", "inline");
-            //         return;
-            //     }
-            //     if ($('#remarks').val().length > 50) {
-            //         $('[for="remarksLbID"]').html("Max length 50");
-            //         $('[for="remarksLbID"]').css("display", "inline");
-            //         return;
-            //     }
-            // $.ajax({
-            //     headers: {
-            //         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            //     },
-            //     method: "post",
-            //     url: "{{ route('user.check') }}",
-            //     data: {
-            //         amount: $('#amount').val(),
-            //         network: $("#myDropdown1").find('.dd-selected-text').text(),
-            //         currency: $("#myDropdown").find('.dd-selected-text').text(),
-            //         wallet_address: $('#wallet_address').val(),
-            //         remarks: $('#remarks').val(),
-            //         inr_value: $('#inr_value').val()
-            //     },
-            //     success: function(resp) {
-            //         if (resp.user_verified == "no") {
-            //             $('#emailOtpModal').modal('show');
-            //         } else {
-            //             $('#user_id').val(resp.user_id);
-            //             $('.container:first').hide();
-            //             $('.container:eq(1)').show();
-            //         }
-            //     },
-            // });
-            // }
-
             if (email != "verified") $("#emailOtpModal").modal("show");
             else if (mobile != "verified") $("#mobileOtpModal").modal("show");
             else if (kyc != "verified") location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + "{{ $user_id }}";
