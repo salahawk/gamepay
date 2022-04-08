@@ -137,14 +137,14 @@
                                                 <div class="col-md-12 pb-3">
                                                     <div class="form-group">
                                                         <input type="tel" placeholder="Mobile" name="mobile"
-                                                            class="validate form-control" required="" maxlength="12" />
+                                                            class="validate form-control" required="" maxlength="12" minlength="10">
                                                         <span class="input-focus-effect"></span>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12 pb-3">
                                                     <div class="form-group">
                                                         <input type="password" placeholder="Password" name="password"
-                                                            class="validate form-control" required="">
+                                                            class="validate form-control" required="" pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number.">
                                                         <span class="input-focus-effect"></span>
                                                     </div>
                                                 </div>
@@ -181,7 +181,7 @@
                                                 </div>
                                                 <div class="col-md-12  pb-3">
                                                     <div class="form-group">
-                                                        <input type="passsword" placeholder="Password" name="password"
+                                                        <input type="password" placeholder="Password" name="password"
                                                             class="validate form-control" required="">
                                                         <span class="input-focus-effect"></span>
                                                     </div>
