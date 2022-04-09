@@ -51,6 +51,8 @@ Route::get('/contact', 'AuthController@contact')->name('contact');
 Route::get('/refund-policy', 'AuthController@refundPolicy')->name('refund-policy');
 Route::get('/exchange', 'DirectUserController@index')->name('exchange');
 Route::get('/portfolio', 'DirectUserController@portfolio')->name('portfolio');
+Route::get('/profile', 'DirectUserController@profile')->name('profile');
+Route::get('/profile/edit', 'DirectUserController@profileEdit')->name('profile.edit');
 
 
 // Route::post('/cashlesso/send', 'DirectUserController@sendCashlesso')->name('send-cashlesso');

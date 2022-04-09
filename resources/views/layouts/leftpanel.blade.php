@@ -6,7 +6,7 @@
               <!-- /.menu-title -->
               <li class="py-3 border-bottom active"> <a href="{{route('exchange')}}"> <i
                           class="menu-icon ti-exchange-vertical"></i>Exchange</a> </li>
-              <li class="py-3 border-bottom"> <a href="dashboard.html"> <i class="menu-icon ti-user"></i>My
+              <li class="py-3 border-bottom"> <a href="{{ route('profile') }}"> <i class="menu-icon ti-user"></i>My
                       Profile</a> </li>
               <li class="py-3 border-bottom"> <a href="{{route('portfolio')}}"> <i
                           class="menu-icon ti-stats-up"></i>Portfolio</a> </li>

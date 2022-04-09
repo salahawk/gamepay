@@ -558,4 +558,12 @@ class DirectUserController extends Controller
       $deposits = Deposit::where('user_id', Auth::user()->id)->where('is_external', 0)->get();
       return view('portfolios.index')->with('deposits', $deposits)->with('total', $total);
     }
+
+    public function profile(Request $reqeust) {
+      return view('direct_users.profile')->with('user', Auth::user());
+    }
+
+    public function profileEdit(Request $reqeust) {
+      return view('direct_users.profile-edit')->with('user', Auth::user());
+    }
 }
