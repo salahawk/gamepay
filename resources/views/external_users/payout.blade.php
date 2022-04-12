@@ -357,7 +357,7 @@
                 }
             });
 
-            $(document).on('click', '#confirm_pay', function() {alert("OK");
+            $(document).on('click', '#confirm_pay', function() {
                 $('[for="amountLbID"]').css("display", "none");
                 $('[for="myDropdown1LbID"]').css("display", "none");
                 $('[for="myDropdownLbID"]').css("display", "none");
@@ -378,7 +378,6 @@
                         $('[for="remarksLbID"]').html("This field is required.");
                         $('[for="remarksLbID"]').css("display", "inline");
                     }
-                    alert("here confirm");
                 } else {
                     if (parseInt($('#amount').val()) < 500 || parseInt($('#amount').val()) > 50000) {
                         $('[for="amountLbID"]').html("Min 500 to Max 50,000");
@@ -390,7 +389,6 @@
                     //     $('[for="remarksLbID"]').css("display", "inline");
                     //     return;
                     // }
-                      alert("OK");
                     // show modal confirmation
                     $('#confirmModal').modal('show');
                 }
