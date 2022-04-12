@@ -566,9 +566,17 @@ class ExternalUserController extends Controller
       }
     }
 
+    public function payout(Request $request) {
+        $user = External::where('email', $request->EMAIL)->first();
+        if (empty($user)) {
+            return response()->json(['status'=>'Email not found']);
+        } else 
+            return view('external_users.payout')->with('user', $user);
+    }
+
     public function processPayout(Request $request) {
         // $user = Auth::user();
-        $user = External::where('email', $request->EMAIL)->first();
+        $user = External::where('id', $request->user_id)->first();
         $payer_address = "9213116078@yesb";
   
         if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add

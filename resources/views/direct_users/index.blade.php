@@ -281,7 +281,7 @@
 				<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
 				<script src="{{ asset('assets/js/custom.select.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/dropdown.js') }}"></script>
-        <script>
+      <script>
 				$(document).ready(function(){
             $('#myDropdown').ddslick({
                 onSelected: function(selectedData) {
@@ -554,5 +554,5 @@
             document.addEventListener('contextmenu', event => event.preventDefault());
 
 					});
-        </script>
+      </script>
     @endsection
