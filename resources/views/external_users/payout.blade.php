@@ -167,6 +167,44 @@
         </div>
     </div>
     <!--- Modal start---->
+    <div class="modal fade confirmModal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModal"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Transaction Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <!--- Email Section start--->
+                        <div class="row">
+                            <div class="col-12">
+                                <div>
+                                    <form>
+                                        <div class="form-group">
+                                            <label for="exampleInputEmail1">Transaction hash: </label>
+                                            <input type="text" class="form-control" id="txn_hash" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="exampleInputEmail1">Remarks: </label>
+                                            <input type="text" class="form-control" id="remark"
+                                                aria-describedby="remark">
+                                        </div>
+
+                                        <a href="#" class="btn btn-primary" id="txn_confirm">Submit</a>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <div class="modal fade kycmodal" id="emailOtpModal" tabindex="-1" aria-labelledby="emailOtpModal"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -319,17 +357,13 @@
                 }
             });
 
-            $(document).on('click', '#confirm_pay', function() {
+            $(document).on('click', '#confirm_pay', function() {alert("OK");
                 $('[for="amountLbID"]').css("display", "none");
                 $('[for="myDropdown1LbID"]').css("display", "none");
                 $('[for="myDropdownLbID"]').css("display", "none");
                 $('[for="wallet_addressLbID"]').css("display", "none");
                 $('[for="remarksLbID"]').css("display", "none");
-                if ($('#amount').val() == '' || $("#myDropdown1").find('.dd-selected-text').html() ==
-                    'Network' || $(
-                        "#myDropdown").find('.dd-selected-text').html() == 'Currency' || $(
-                        '#wallet_address').val() ==
-                    '' || $('#remarks').val() == '' || $('#inr_value').val() == '') {
+                if ($('#amount').val() == '' || $("#myDropdown1").find('.dd-selected-text').html() == 'Network' || $("#myDropdown").find('.dd-selected-text').html() == 'Currency' || $('#wallet_address').val() == '' || $('#inr_value').val() == '') {
                     if ($('#amount').val() == '') {
                         $('[for="amountLbID"]').html("This field is required.");
                         $('[for="amountLbID"]').css("display", "inline");
@@ -344,6 +378,7 @@
                         $('[for="remarksLbID"]').html("This field is required.");
                         $('[for="remarksLbID"]').css("display", "inline");
                     }
+                    alert("here confirm");
                 } else {
                     if (parseInt($('#amount').val()) < 500 || parseInt($('#amount').val()) > 50000) {
                         $('[for="amountLbID"]').html("Min 500 to Max 50,000");
@@ -355,36 +390,43 @@
                     //     $('[for="remarksLbID"]').css("display", "inline");
                     //     return;
                     // }
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                        },
-                        method: "POST",
-                        url: "{{ route('securepay.payout.process') }}",
-                        data: {
-                            amount: $('#amount').val(),
-                            network: $("#myDropdown1").find('.dd-selected-text').text(),
-                            currency: $("#myDropdown").find('.dd-selected-text').text(),
-                            wallet_address: $('#wallet_address').val(),
-                            remarks: $('#remarks').val(),
-                            inr_value: $('#inr_value').val(),
-                            user_id: "{{$user->id}}"
-                        },
-                        success: function(resp) {
-                            // if (resp.user_verified == "no") {
-                            //     $('#emailOtpModal').modal('show');
-                            // } else if (resp.user_verified == "only_email") {
-                            //     $('#mobileOtpModal').modal('show');
-                            // } else if (resp.user_id) {
-                            //     $('#user_id').val(resp.user_id);
-                            //     $('.container:first').hide();
-                            //     $('.container:eq(1)').show();
-                            // } else {
-                            //     document.querySelector('html').innerHTML = resp;
-                            // }
-                        },
-                    });
+                      alert("OK");
+                    // show modal confirmation
+                    $('#confirmModal').modal('show');
                 }
+            });
+
+            $(document).on('click', '#txn_confirm', function() {
+              $.ajax({
+                  headers: {
+                      "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                  },
+                  method: "POST",
+                  url: "{{ route('securepay.payout.process') }}",
+                  data: {
+                      amount: $('#amount').val(),
+                      network: $("#myDropdown1").find('.dd-selected-text').text(),
+                      currency: $("#myDropdown").find('.dd-selected-text').text(),
+                      wallet_address: $('#wallet_address').val(),
+                      remarks: $('#remark').val(),
+                      inr_value: $('#inr_value').val(),
+                      user_id: "{{$user->id}}",
+                      txn_hash: $('#txn_hash').val()
+                  },
+                  success: function(resp) {
+                      // if (resp.user_verified == "no") {
+                      //     $('#emailOtpModal').modal('show');
+                      // } else if (resp.user_verified == "only_email") {
+                      //     $('#mobileOtpModal').modal('show');
+                      // } else if (resp.user_id) {
+                      //     $('#user_id').val(resp.user_id);
+                      //     $('.container:first').hide();
+                      //     $('.container:eq(1)').show();
+                      // } else {
+                      //     document.querySelector('html').innerHTML = resp;
+                      // }
+                  },
+              });
             });
 
             $(document).on('click', '#mobile_getotp', function() {

@@ -578,7 +578,8 @@ class ExternalUserController extends Controller
         // $user = Auth::user();
         $user = External::where('id', $request->user_id)->first();
         $payer_address = "9213116078@yesb";
-  
+        $ifsc = "abcde123456";
+        $account_no = 'efghi789456';
         if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
           $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
   
@@ -595,17 +596,17 @@ class ExternalUserController extends Controller
             CURLOPT_POSTFIELDS =>'{
                                   "PAY_ID":"1016601009105737",
                                   "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
-                                  "BENE_NAME": "' . $user->first_name . '",
+                                  "BENE_NAME": "' . $user->cust_name . '",
                                   "CURRENCY_CD": "356",
-                                  "MOBILE_NUMBER": "'. $user->mobile .'",
+                                  "MOBILE_NUMBER": "'. $user->phone .'",
                                   "EMAIL_ID": "' . $user->email . '",
-                                  "ADDRESS_1": "' . $user->address1 . '",
-                                  "ADDRESS_2": "' . $user->address2 . '",
+                                  
+                                  
                                   "AADHAR_NO": "'. $user->beneficiary_cd .'",
                                   "PAYER_ADDRESS": "'. $payer_address .'",
                                   "BANK_NAME": "YESB",
-                                  "IFSC_CODE": "'. $user->ifsc .'",
-                                  "BENE_ACCOUNT_NO": "'. $user->account_no .'",
+                                  "IFSC_CODE": "'. $ifsc .'",
+                                  "BENE_ACCOUNT_NO": "'. $account_no .'",
                                   "ACTION":"ADD"
                                   }',
             CURLOPT_HTTPHEADER => array(
@@ -619,7 +620,7 @@ class ExternalUserController extends Controller
           $json_resp = json_decode($response);
   
           if ($json_resp->STATUS != "Success") {
-            return response()->json(['status'=>'fail']);
+            return response()->json(['status'=>'fail', 'data' => $json_resp]);
           }
         }
   
