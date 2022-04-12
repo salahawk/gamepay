@@ -568,7 +568,7 @@ class ExternalUserController extends Controller
 
     public function processPayout(Request $request) {
         // $user = Auth::user();
-        $user = User::where('email', $request->EMAIL)->first();
+        $user = External::where('email', $request->EMAIL)->first();
         $payer_address = "9213116078@yesb";
   
         if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
