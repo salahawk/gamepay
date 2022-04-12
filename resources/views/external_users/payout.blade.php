@@ -118,8 +118,7 @@
                             </div>
                         </div>
                         <div class="col-12 mb-2 pt-2">
-                            <a href="#" class="btn btn-primary border-radius6 w-100 disabled" id="confirm_pay">Continue
-                                to Pay</a>
+                            <a href="#" class="btn btn-primary border-radius6 w-100 disabled" id="confirm_pay">Create Request</a>
                         </div>
                         <div class="col-12 mb-2 pt-2">
                             <div class="text-center"><img src="{{ asset('assets/img/upi (2).png') }}" />
