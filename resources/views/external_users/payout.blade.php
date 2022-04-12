@@ -92,7 +92,7 @@
                         </div>
                         <div class="col-12 mb-2">
                             <input type="text" class="form-control border-radius6" id="receiver_address"
-                                aria-describedby="name" placeholder="Enter Destination Address" value="0xd4F67944E4d6C6351DdC782bb2D722C830A1d69f" readonly>
+                                aria-describedby="name" placeholder="Enter Destination Address" value="">
                         </div>
                         <div class="col-12 mb-2">
                           <input type="text" class="form-control border-radius6" id="wallet_address"
