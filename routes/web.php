@@ -35,13 +35,14 @@ Route::post('/kyc/process', 'DirectUserController@kycProcess')->name('kyc-proces
 Route::post('/kyc/response', 'DirectUserController@kycResponse')->name('kyc-response');
 Route::post('/kyc/manual', 'DirectUserController@kycManual')->name('kyc-manual');
 
+// exchange-buy
 Route::post('/vpa/validate', 'DirectUserController@validateVpa')->name('validate-vpa');
-
 Route::get('/deposit/send', 'DirectUserController@sendDeposit')->name('send-deposit');
 Route::post('/upi/response', 'DirectUserController@upiResponse')->name('upi-response');
-
 Route::get('/mint/manual', 'DirectUserController@mintManual')->name('mint-manual');
 
+// exchange-sell
+Route::post('/payout/process', 'DirectUserController@processPayout')->name('process-payout');
 
 
 ////////////////////   pages   /////////////////////////////////
@@ -53,6 +54,7 @@ Route::get('/exchange', 'DirectUserController@index')->name('exchange');
 Route::get('/portfolio', 'DirectUserController@portfolio')->name('portfolio');
 Route::get('/profile', 'DirectUserController@profile')->name('profile');
 Route::get('/profile/edit', 'DirectUserController@profileEdit')->name('profile.edit');
+Route::get('/sell', 'DirectUserController@sell')->name('sell');
 
 
 // Route::post('/cashlesso/send', 'DirectUserController@sendCashlesso')->name('send-cashlesso');
@@ -71,6 +73,7 @@ Route::any('/api/securepay/kyc', 'ExternalUserController@kycIndex')->name('secur
 Route::post('/api/securepay/kyc/process', 'ExternalUserController@kycProcess')->name('securepay.kyc.process');
 Route::post('/api/securepay/kyc/response', 'ExternalUserController@kycResponse')->name('securepay.kyc.response');
 Route::post('/api/securepay/kyc/manual', 'ExternalUserController@kycManual')->name('securepay.kyc.manual');
+Route::post('/api/securepay/payout/process', 'ExternalUserController@processPayout')->name('securepay.process.payout');
 //-------------------------------- 3rd party end -------------------------------------------//
 
 

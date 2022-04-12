@@ -35,6 +35,7 @@ class AuthController extends Controller
       $user->mobile = $request->mobile;
       $user->password = Hash::make($request->password);
       $user->token = $token;
+      $user->beneficiary_cd = $request->firstname . random_int(10000000, 99999999);
       $saved = $user->save();
 
       if ($saved) {

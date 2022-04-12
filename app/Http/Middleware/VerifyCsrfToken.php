@@ -13,6 +13,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'api/securepay/process',
-        'securepay/deposit'
+        'securepay/deposit',
+        'api/securepay/payout/process'
     ];
 }

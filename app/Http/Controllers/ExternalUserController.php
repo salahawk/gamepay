@@ -565,4 +565,139 @@ class ExternalUserController extends Controller
           return response()->json(['status' => 'fail']);
       }
     }
+
+    public function processPayout(Request $request) {
+        // $user = Auth::user();
+        $user = User::where('email', $request->EMAIL)->first();
+        $payer_address = "9213116078@yesb";
+  
+        if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
+          $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
+  
+          $curl = curl_init();
+          curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>'{
+                                  "PAY_ID":"1016601009105737",
+                                  "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
+                                  "BENE_NAME": "' . $user->first_name . '",
+                                  "CURRENCY_CD": "356",
+                                  "MOBILE_NUMBER": "'. $user->mobile .'",
+                                  "EMAIL_ID": "' . $user->email . '",
+                                  "ADDRESS_1": "' . $user->address1 . '",
+                                  "ADDRESS_2": "' . $user->address2 . '",
+                                  "AADHAR_NO": "'. $user->beneficiary_cd .'",
+                                  "PAYER_ADDRESS": "'. $payer_address .'",
+                                  "BANK_NAME": "YESB",
+                                  "IFSC_CODE": "'. $user->ifsc .'",
+                                  "BENE_ACCOUNT_NO": "'. $user->account_no .'",
+                                  "ACTION":"ADD"
+                                  }',
+            CURLOPT_HTTPHEADER => array(
+              'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+              'Content-Type: application/json'
+            ),
+          ));
+  
+          $response = curl_exec($curl);
+          curl_close($curl);
+          $json_resp = json_decode($response);
+  
+          if ($json_resp->STATUS != "Success") {
+            return response()->json(['status'=>'fail']);
+          }
+        }
+  
+        // if present in DB, make transaction
+        $order_id = $user->first_name . random_int(100000, 99999);
+        $amount = $request->amount;
+        $comment = "test";
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => 'https://uat.cashlesso.com/payout/v2/initateTransaction',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS =>'{
+                                "PAY_ID": "1016601009105737",
+                                "ORDER_ID": "' . $order_id . '",
+                                "TXN_AMOUNT": "' . $amount . '",
+                                "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
+                                "BENE_COMMENT": "' . $comment . '",
+                                "TXN_PAYMENT_TYPE": "NEFT"
+                                } ',
+          CURLOPT_HTTPHEADER => array(
+            'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+            'Content-Type: application/json'
+          ),
+        ));
+  
+        $response = curl_exec($curl);
+  
+        curl_close($curl);
+        $json_resp = json_decode($response);
+  
+        $payout = new Payout;
+        $payout->user_id = $user->id;
+        $payout->hash = $json_resp->hash;
+        $payout->status = $json_resp->status;
+        $payout->beneficiary_cd = $json_resp->beneficiary_cd;
+        $payout->pay_id = $json_resp->pay_id;
+        $payout->order_id = $json_resp->order_id;
+        $payout->action = $json_resp->action;
+        $payout->txn_amount = $json_resp->txn_amount;
+        $payout->response_message = $json_resp->response_message;
+        $payout->txn_payment_type = $json_resp->txn_payment_type;
+        $payout->total_amount = $json_resp->total_amount;
+        $payout->save();
+  
+  
+      }
+  
+      protected function verifyPayout($beneficiary_cd) {
+        $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
+  
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => 'https://uat.cashlesso.com/payout/beneficiaryMaintenance',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS =>'{
+                                "PAY_ID":"1016601009105737",
+                                "BENEFICIARY_CD":"'. $beneficiary_cd .'",
+                                "ACTION":"VERIFY"
+                                } ',
+          CURLOPT_HTTPHEADER => array(
+            'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+            'Content-Type: application/json'
+          ),
+        ));
+  
+        $response = curl_exec($curl);
+  
+        curl_close($curl);
+        $json_resp = json_decode($response);
+  
+        if (empty($json_resp) || $json_resp->STATUS != "Success") {
+          return false;
+        } else {
+          return true;
+        }
+      }
 }

@@ -11,7 +11,8 @@
               <li class="py-3 border-bottom"> <a href="{{route('portfolio')}}"> <i
                           class="menu-icon ti-stats-up"></i>Portfolio</a> </li>
               <!-- <li class="py-3"> <a href="wallet.html"> <i class="menu-icon ti-money"></i>GAMERE</a> </li>-->
-
+              <li class="py-3 border-bottom"> <a href="{{route('sell')}}"> <i
+                class="menu-icon ti-stats-up"></i>Sell</a> </li>
               <!-- /.menu-title -->
 
 
