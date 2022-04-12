@@ -579,7 +579,7 @@ class ExternalUserController extends Controller
         $user = External::where('id', $request->user_id)->first();
         $payer_address = "9213116078@yesb";
         $ifsc = "abcde123456";
-        $account_no = 'efghi789456';
+        $account_no = '316805000799';
         if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
           $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
   
