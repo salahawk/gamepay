@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use App\Models\Deposit;
 use App\Models\External;
+use App\Models\Payout;
 
 class ExternalUserController extends Controller
 {
@@ -570,16 +571,25 @@ class ExternalUserController extends Controller
         $user = External::where('email', $request->EMAIL)->first();
         if (empty($user)) {
             return response()->json(['status'=>'Email not found']);
-        } else 
+        } else {
+            $user->pan_status = $request->PAN_STATUS;
+            $user->ifsc = $request->IFSC;
+            $user->account_no = $request->ACCOUNT_NO;
+            $user->payer_address = $request->PAYER_ADDRESS;
+            $user->save();
+
             return view('external_users.payout')->with('user', $user);
+
+        }
     }
 
     public function processPayout(Request $request) {
         // $user = Auth::user();
         $user = External::where('id', $request->user_id)->first();
-        $payer_address = "9213116078@yesb";
-        $ifsc = "abcde123456";
-        $account_no = '316805000799';
+        $payer_address = $user->payer_address; // $payer_address = "9213116078@yesb";
+        $ifsc = $user->ifsc; // $ifsc = "ICIC0003168";
+        $account_no = $user->account_no; // $account_no = '316805000799';
+        $addahar = $user->addahar; //$addahar = '640723564873';
         if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
           $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
   
@@ -602,7 +612,7 @@ class ExternalUserController extends Controller
                                   "EMAIL_ID": "' . $user->email . '",
                                   
                                   
-                                  "AADHAR_NO": "'. $user->beneficiary_cd .'",
+                                  "AADHAR_NO": "'. $addahar .'",
                                   "PAYER_ADDRESS": "'. $payer_address .'",
                                   "BANK_NAME": "YESB",
                                   "IFSC_CODE": "'. $ifsc .'",
@@ -617,15 +627,15 @@ class ExternalUserController extends Controller
   
           $response = curl_exec($curl);
           curl_close($curl);
-          $json_resp = json_decode($response);
+          $json_resp0 = json_decode($response);
   
-          if ($json_resp->STATUS != "Success") {
-            return response()->json(['status'=>'fail', 'data' => $json_resp]);
+          if ($json_resp0->STATUS != "Success") {
+            return response()->json(['status'=>'fail', 'data' => $json_resp0]);
           }
         }
   
         // if present in DB, make transaction
-        $order_id = $user->first_name . random_int(100000, 99999);
+        $order_id = $user->cust_name . random_int(100000, 999999);
         $amount = $request->amount;
         $comment = "test";
         $curl = curl_init();
@@ -659,19 +669,23 @@ class ExternalUserController extends Controller
   
         $payout = new Payout;
         $payout->user_id = $user->id;
-        $payout->hash = $json_resp->hash;
-        $payout->status = $json_resp->status;
-        $payout->beneficiary_cd = $json_resp->beneficiary_cd;
-        $payout->pay_id = $json_resp->pay_id;
-        $payout->order_id = $json_resp->order_id;
-        $payout->action = $json_resp->action;
-        $payout->txn_amount = $json_resp->txn_amount;
-        $payout->response_message = $json_resp->response_message;
-        $payout->txn_payment_type = $json_resp->txn_payment_type;
-        $payout->total_amount = $json_resp->total_amount;
-        $payout->save();
+        $payout->hash = $json_resp->HASH;
+        $payout->status = $json_resp->STATUS;
+        $payout->beneficiary_cd = $json_resp->BENEFICIARY_CD;
+        $payout->pay_id = $json_resp->PAY_ID;
+        $payout->order_id = $json_resp->ORDER_ID;
+        $payout->action = $json_resp->ACTION;
+        $payout->txn_amount = $json_resp->TXN_AMOUNT;
+        $payout->response_message = $json_resp->RESPONSE_MESSAGE;
+        $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
+        $payout->total_amount = $json_resp->TOTAL_AMOUNT;
+        $saved = $payout->save();
   
-  
+        if ($saved) {
+            return response()->json(['status' => 'success']);
+        } else {
+            return response()->json(['status' => 'false', 'data' => $json_resp]);
+        }
       }
   
       protected function verifyPayout($beneficiary_cd) {
@@ -702,7 +716,7 @@ class ExternalUserController extends Controller
   
         curl_close($curl);
         $json_resp = json_decode($response);
-  
+ 
         if (empty($json_resp) || $json_resp->STATUS != "Success") {
           return false;
         } else {

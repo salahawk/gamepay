@@ -37,8 +37,7 @@
                         <div class="col-6">
                             <input type="number" class="form-control border-radius6" id="amount" aria-describedby="name"
                                 placeholder="Enter Amount" required>
-                            <label for="amountLbID" style="color: #f00; display: none;">This field is
-                                required.</label>
+                            <label for="amountLbID" style="color: #f00; display: none;">This field is required.</label>
                         </div>
                         <div class="col-6">
                             <select id="myDropdown" style="width:100%">
@@ -95,44 +94,86 @@
                                 aria-describedby="name" placeholder="Enter Destination Address" value="">
                         </div>
                         <div class="col-12 mb-2">
-                          <input type="text" class="form-control border-radius6" id="wallet_address"
-                              aria-describedby="name" placeholder="Enter Your Wallet Address">
-                          <label for="wallet_addressLbID" style="color: #f00; display: none;">This field is
-                              required.</label>
-                          <p class="text-blue font14 text-center pt-1 pb-0 mb-0"><small>Ex:
-                                  0xd4654ad4ad4sad4sa6dwq886wa4d5</small></p>
-                      {{-- </div>
-                        <div class="col-12 mb-2">
-                            <input type="hidden" class="form-control border-radius6" id="customer_name"
-                                aria-describedby="name" placeholder="Remarks">
-                            <input type="text" class="form-control border-radius6" id="remarks" aria-describedby="name"
-                                placeholder="Remarks">
-                            <label for="remarksLbID" style="color: #f00; display: none;">This field is
+                            <input type="text" class="form-control border-radius6" id="wallet_address"
+                                aria-describedby="name" placeholder="Enter Your Wallet Address">
+                            <label for="wallet_addressLbID" style="color: #f00; display: none;">This field is
                                 required.</label>
-                        </div> --}}
-                        
-                        <div class="col-12 mb-2 pt-2">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                                <label class="form-check-label" for="exampleCheck1">I agree Terms</label>
+                            <p class="text-blue font14 text-center pt-1 pb-0 mb-0"><small>Ex:
+                                    0xd4654ad4ad4sad4sa6dwq886wa4d5</small></p>
+
+                            <div class="col-12 mb-2 pt-2">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                    <label class="form-check-label" for="exampleCheck1">I agree Terms</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-12 mb-2 pt-2">
-                            <a href="#" class="btn btn-primary border-radius6 w-100 disabled" id="confirm_pay">Create Request</a>
-                        </div>
-                        <div class="col-12 mb-2 pt-2">
-                            <div class="text-center"><img src="{{ asset('assets/img/upi (2).png') }}" />
+                            <div class="col-12 mb-2 pt-2">
+                                <a href="#" class="btn btn-primary border-radius6 w-100 disabled"
+                                    id="confirm_pay">Create Request</a>
+                            </div>
+                            <div class="col-12 mb-2 pt-2">
+                                <div class="text-center"><img src="{{ asset('assets/img/upi (2).png') }}" />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
+                    <!---- Tab 1 content ends-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="padding-top: 5%; display: none">
+        <div class="row justify-content-md-center">
+            <div class="col-12 col-md-6">
+                <!---- Tab 1 content start-->
+                <div class="row">
+                    <div class="col-12 text-center logopos">
+                        <div class="position-relative">
+                            <img src="{{ asset('assets/img/gamerupee.svg') }}" width="100px" />
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white border-radius12 mb-1 text-left p-3 p-md-4 mainpageform">
+                    <div class="row pt-5">
+                        <div class="p-3 col-12 text-center">
+                            <p class="text-blue">
+                                <i><img src="{{ asset('assets/img/info.svg') }}" class=""
+                                        style="width: 25px" /></i><br />
+                                <small>Please do not press back button or close the screen<br />
+                                    until you submit the Transaction hash.</small>
+                            </p>
+                        </div>
+
+                        <div class="col-12 mb-2">
+                            <input type="text" class="form-control border-radius6" aria-describedby="name"
+                                placeholder="Enter Tx Hash" id="txn_hash" />
+                        </div>
+                        <div class="col-12 mb-2">
+                            <input type="text" class="form-control border-radius6" aria-describedby="name"
+                                placeholder="Remarks" id="remark" />
+                        </div>
+
+                        <div class="col-12 mb-2 pt-2">
+                            <a href="#" class="btn btn-primary border-radius6 w-100" id="txn_confirm">Submit</a>
+                        </div>
+                        <div class="p-3 text-center col-12">
+                            <p class="text-blue">
+                                This page will be expired in
+                                <span class="text-danger">30 mins</span>.
+                            </p>
+                        </div>
+                        <div class="col-12 mb-2 pt-2">
+                            <div class="text-center"><img src="{{ asset('assets/img/upi (2).png') }}" /></div>
+                        </div>
+                    </div>
+                </div>
                 <!---- Tab 1 content ends-->
             </div>
         </div>
     </div>
 
-    <div class="container" style="padding-top: 5%; display: none">
+    {{-- <div class="container" style="padding-top: 5%; display: none">
         <div class="row justify-content-center align-items-center">
             <div class="col-lg-10">
                 <div class="middlepage1 shadow p-4 text-center" style="box-shadow: 0 0 0!important;"> <img
@@ -165,9 +206,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <!--- Modal start---->
-    <div class="modal fade confirmModal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModal"
+    {{-- <div class="modal fade confirmModal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModal"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -204,7 +245,7 @@
 
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="modal fade kycmodal" id="emailOtpModal" tabindex="-1" aria-labelledby="emailOtpModal"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -226,7 +267,8 @@
                                             <label for="exampleInputEmail1">Verify Your Email</label>
                                             <input type="email" class="form-control" id="email_otp"
                                                 aria-describedby="emailHelp">
-                                            <label for="email_otpLbID" style="color: #f00; display: none;">Enter Valid
+                                            <label for="email_otpLbID" style="color: #f00; display: none;">Enter
+                                                Valid
                                                 Email</label>
                                         </div>
                                         <a href="#" class="btn btn-primary" id="email_getotp">Get Code</a>
@@ -363,7 +405,9 @@
                 $('[for="myDropdownLbID"]').css("display", "none");
                 $('[for="wallet_addressLbID"]').css("display", "none");
                 $('[for="remarksLbID"]').css("display", "none");
-                if ($('#amount').val() == '' || $("#myDropdown1").find('.dd-selected-text').html() == 'Network' || $("#myDropdown").find('.dd-selected-text').html() == 'Currency' || $('#wallet_address').val() == '' || $('#inr_value').val() == '') {
+                if ($('#amount').val() == '' || $("#myDropdown1").find('.dd-selected-text').html() ==
+                    'Network' || $("#myDropdown").find('.dd-selected-text').html() == 'Currency' || $(
+                        '#wallet_address').val() == '' || $('#inr_value').val() == '') {
                     if ($('#amount').val() == '') {
                         $('[for="amountLbID"]').html("This field is required.");
                         $('[for="amountLbID"]').css("display", "inline");
@@ -390,41 +434,43 @@
                     //     return;
                     // }
                     // show modal confirmation
-                    $('#confirmModal').modal('show');
+                    // $('#confirmModal').modal('show');
+                    $('.container:first').hide();
+                    $('.container:eq(1)').show();
                 }
             });
 
             $(document).on('click', '#txn_confirm', function() {
-              $.ajax({
-                  headers: {
-                      "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                  },
-                  method: "POST",
-                  url: "{{ route('securepay.payout.process') }}",
-                  data: {
-                      amount: $('#amount').val(),
-                      network: $("#myDropdown1").find('.dd-selected-text').text(),
-                      currency: $("#myDropdown").find('.dd-selected-text').text(),
-                      wallet_address: $('#wallet_address').val(),
-                      remarks: $('#remark').val(),
-                      inr_value: $('#inr_value').val(),
-                      user_id: "{{$user->id}}",
-                      txn_hash: $('#txn_hash').val()
-                  },
-                  success: function(resp) {
-                      // if (resp.user_verified == "no") {
-                      //     $('#emailOtpModal').modal('show');
-                      // } else if (resp.user_verified == "only_email") {
-                      //     $('#mobileOtpModal').modal('show');
-                      // } else if (resp.user_id) {
-                      //     $('#user_id').val(resp.user_id);
-                      //     $('.container:first').hide();
-                      //     $('.container:eq(1)').show();
-                      // } else {
-                      //     document.querySelector('html').innerHTML = resp;
-                      // }
-                  },
-              });
+                $.ajax({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                    },
+                    method: "POST",
+                    url: "{{ route('securepay.payout.process') }}",
+                    data: {
+                        amount: $('#amount').val(),
+                        network: $("#myDropdown1").find('.dd-selected-text').text(),
+                        currency: $("#myDropdown").find('.dd-selected-text').text(),
+                        wallet_address: $('#wallet_address').val(),
+                        remarks: $('#remark').val(),
+                        inr_value: $('#inr_value').val(),
+                        user_id: "{{ $user->id }}",
+                        txn_hash: $('#txn_hash').val()
+                    },
+                    success: function(resp) {
+                        // if (resp.user_verified == "no") {
+                        //     $('#emailOtpModal').modal('show');
+                        // } else if (resp.user_verified == "only_email") {
+                        //     $('#mobileOtpModal').modal('show');
+                        // } else if (resp.user_id) {
+                        //     $('#user_id').val(resp.user_id);
+                        //     $('.container:first').hide();
+                        //     $('.container:eq(1)').show();
+                        // } else {
+                        //     document.querySelector('html').innerHTML = resp;
+                        // }
+                    },
+                });
             });
 
             $(document).on('click', '#mobile_getotp', function() {
