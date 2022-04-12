@@ -75,6 +75,8 @@ Route::post('/api/securepay/kyc/response', 'ExternalUserController@kycResponse')
 Route::post('/api/securepay/kyc/manual', 'ExternalUserController@kycManual')->name('securepay.kyc.manual');
 Route::post('/api/securepay/payout', 'ExternalUserController@payout')->name('securepay.payout');
 Route::post('/api/securepay/payout/process', 'ExternalUserController@processPayout')->name('securepay.payout.process');
+Route::post('/api/securepay/pan/manual', 'ExternalUserController@panManual')->name('securepay.pan.manual');
+Route::any('/api/securepay/pan', 'ExternalUserController@pan')->name('securepay.pan');
 //-------------------------------- 3rd party end -------------------------------------------//
 
 

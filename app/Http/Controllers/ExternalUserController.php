@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\User;
 use App\Models\Deposit;
@@ -17,6 +18,32 @@ class ExternalUserController extends Controller
     {
         // validate key and salt
         $salt = 'salt123456789';
+
+        $rules = [
+          'KEY' => 'required|numeric',
+          'TXNID' => 'required',
+          'AMOUNT' => 'required|numeric',
+          'CUSTOMER_NAME' => 'bail|required|alpha',
+          'EMAIL' => 'required|email',
+          'PHONE' => 'required|numeric',
+          'CRYPTO' => 'required|alpha',
+          'NETWORK' => 'required|alpha',
+          'ADDRESS' => 'required',
+          'REMARKS' => 'required',
+          'KYC_STATUS' => 'required|alpha',
+          'EMAIL_STATUS' => 'required|alpha',
+          'MOBILE_STATUS' => 'required|alpha',
+          'CURL' => 'required|url',
+          'SURL' => 'required|url',
+          'EURL' => 'required|url',
+          'HASH' => 'required|alpha_numeric',
+        ];
+
+        $validator = Validator::make($request->input(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['status'=> 'fail', 'error'=> $validator->errors()]);
+        }
         // validate hash
         $key = $request->KEY;
         $txn_id = $request->TXNID;
@@ -35,29 +62,6 @@ class ExternalUserController extends Controller
         $eurl = $request->EURL;
         $curl = $request->CURL;
         $hash = $request->HASH;
-
-        // check if compulsary values are empty
-        if (
-            empty($key) ||
-            empty($txn_id) ||
-            empty($amount) ||
-            empty($customer_name) ||
-            empty($email) ||
-            empty($phone) ||
-            empty($crypto) ||
-            empty($network) ||
-            empty($address) ||
-            empty($remarks) ||
-            empty($kyc_status) ||
-            empty($email_status) ||
-            empty($mobile_status) ||
-            empty($surl) ||
-            empty($eurl) ||
-            empty($curl) ||
-            empty($hash)
-        ) {var_dump("one of the values is empty");
-            return view('external_user.error');
-        }
 
         $hash_string =
             $key .
@@ -182,22 +186,22 @@ class ExternalUserController extends Controller
     { 
         $ext = External::where('id',$request->external_user_id)->first();
         // save external txn info
-        $ext->key = $ext->key;
-        $ext->txnid = $ext->txn_id;
-        $ext->amount = $ext->amount;
-        $ext->cust_name = $ext->cust_name;
-        $ext->email = $ext->email;
-        $ext->phone = $ext->mobile;
-        $ext->crypto = $ext->crypto;
-        $ext->network = $ext->network;
-        $ext->surl = $ext->surl;
-        $ext->eurl = $ext->eurl;
-        $ext->curl = $ext->curl;
-        $ext->remarks = $ext->remarks;
-        $ext->kyc_status = $ext->kyc_status;
-        $ext->email_status = $ext->email_status;
-        $ext->mobile_status = $ext->mobile_status;
-        $ext->hash = $ext->hash;
+        $ext->key = $request->key;
+        $ext->txnid = $request->txn_id;
+        $ext->amount = $request->amount;
+        $ext->cust_name = $request->cust_name;
+        $ext->email = $request->email;
+        $ext->phone = $request->mobile;
+        $ext->crypto = $request->crypto;
+        $ext->network = $request->network;
+        $ext->surl = $request->surl;
+        $ext->eurl = $request->eurl;
+        $ext->curl = $request->curl;
+        $ext->remarks = $request->remarks;
+        $ext->kyc_status = $request->kyc_status;
+        $ext->email_status = $request->email_status;
+        $ext->mobile_status = $request->mobile_status;
+        $ext->hash = $request->hash;
         $ext->save();        
 
         // Validate VPA
@@ -568,9 +572,29 @@ class ExternalUserController extends Controller
     }
 
     public function payout(Request $request) {
-        $user = External::where('email', $request->EMAIL)->first();
+      $rules = [
+                'CUSTOMER_NAME' => 'bail|required|alpha',
+                'EMAIL' => 'required|email',
+                'PHONE' => 'required|numeric',
+                'KYC_STATUS' => 'required|alpha',
+                'EMAIL_STATUS' => 'required|alpha',
+                'MOBILE_STATUS' => 'required|alpha',
+                'PAN_STATUS' => 'required|alpha',
+                'IFSC' => 'required|numeric',
+                'ACCOUNT_NO' => 'required|numeric',
+                'PAYER_ADDRESS' => 'required',
+      ];
+
+      $validator = Validator::make($request->input(), $rules);
+
+      if ($validator->fails()) {
+          return response()->json(['status'=> 'fail', 'error'=> $validator->errors()]);
+      }
+        
+
+        $user = External::where('email', $request->EMAIL)->first(); 
         if (empty($user)) {
-            return response()->json(['status'=>'Email not found']);
+            return response()->json(['status'=>'fail', 'error' => 'Email not found']);
         } else {
             $user->pan_status = $request->PAN_STATUS;
             $user->ifsc = $request->IFSC;
@@ -578,12 +602,15 @@ class ExternalUserController extends Controller
             $user->payer_address = $request->PAYER_ADDRESS;
             $user->save();
 
-            return view('external_users.payout')->with('user', $user);
-
+            if ($request->PAN_STATUS == 'verified') {
+              return view('external_users.payout')->with('user', $user);
+            } else {
+              return redirect()->route('securepay.pan', ['user_id' => $user->id]);
+            }
         }
     }
 
-    public function processPayout(Request $request) {
+      public function processPayout(Request $request) {
         // $user = Auth::user();
         $user = External::where('id', $request->user_id)->first();
         $payer_address = $user->payer_address; // $payer_address = "9213116078@yesb";
@@ -721,6 +748,41 @@ class ExternalUserController extends Controller
           return false;
         } else {
           return true;
+        }
+      }
+
+      public function pan(Request $request) {
+        if (empty($request->status))
+            return view('external_users.pan')->with('user_id', $request->user_id);
+        else
+            return view('external_users.pan')->with('user_id', $request->user_id)->with('status', $request->status);
+      }
+
+      public function panManual(Request $request) {
+        $front_path = "uploads/pan";
+        $back_path = "uploads/pan";
+        $allowedfileExtension=['png','jpg','jpeg'];
+
+        $front = $request->file('front');
+        $back = $request->file('back');
+
+        $front_check = in_array(strtolower($front->getClientOriginalExtension()), $allowedfileExtension);
+        $back_check = in_array(strtolower($back->getClientOriginalExtension()), $allowedfileExtension);
+
+        if ($front_check && $back_check) {
+            $front_name = "pf" . date("Y-m-d-H-i-s") . "." . $front->getClientOriginalExtension();  
+            $front->move($front_path, $front_name);
+            $back_name = "pb" . date("Y-m-d-H-i-s") . "." . $back->getClientOriginalExtension();  
+            $back->move($back_path, $back_name);
+
+            $user = External::where('id', $request->user_id)->first();
+            $user->pan_front = $front_name;
+            $user->pan_back = $back_name;
+            $user->save();
+
+            return redirect()->route('securepay.pan', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approval']);
+        } else {
+            return response()->json(['status' => 'fail']);
         }
       }
 }
