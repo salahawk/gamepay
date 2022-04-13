@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
+use Twilio\Rest\Client;
+use Mail;
+use Auth;
+
 use App\Models\User;
 use App\Models\Deposit;
 use App\Models\External;
@@ -119,12 +123,35 @@ class ExternalUserController extends Controller
                             ->where('mobile_status', 'verified')
                             ->first();
         
-        if (!empty($user)) { // redirect to the verification
+        if (!empty($user)) {
+          $user->key = $key;
+          $user->txnid = $txn_id;
+          $user->amount = $amount;
+          $user->cust_name = $customer_name;
+          $user->email = $email;
+          $user->phone = $phone;
+          $user->crypto = $crypto;
+          $user->network = $network;
+          $user->address = $address;
+          $user->remarks = $remarks;
+          $user->kyc_status = $kyc_status;
+          $user->email_status = $email_status;
+          $user->mobile_status = $mobile_status;
+          $user->surl = $surl;
+          $user->eurl = $eurl;
+          $user->curl = $curl;
+          $user->hash = $hash;
+          $saved = $user->save();
+
           return redirect()->route('securepay.upi', [
               'external_user_id' => $user->id,
           ]);
         }
         
+        $garbage = External::where('address', $address)
+                          ->where('email', $email)
+                          ->delete();
+
         // insert DB
         $sample = new External();
         $sample->key = $key;
@@ -159,6 +186,100 @@ class ExternalUserController extends Controller
         }
     }
 
+    public function sendMobileOtp(Request $request)
+    {
+        $random_code = random_int(100000, 999999);
+        
+        $sample = External::where('id', $request->user_id)->first();				
+        $sample->otp_value = $random_code;
+        $sample->phone = $request->mobile_number;
+        $saved = $sample->save();
+
+        if ($saved) {
+            $text = 'Sending the mobile verification code: ' . $random_code;
+            $otp_data['phone'] = $request->mobile_number;
+            $otp_data['text'] = $text;
+            $this->sendSMS($otp_data);
+            return response()->json(['status' => 'success']);
+        } else {
+            return response()->json(['status' => 'fail']);
+        }
+    }
+
+    protected function sendSMS($data)
+    {
+        $sid = 'ACff03be6cdd84b244ef95ec58ec7b4689';
+        $token = '3ee55f03cf4da970e837d189232f5fcf';
+
+        $client = new Client($sid, $token);
+        return $client->messages->create($data['phone'], [
+            'from' => '+14302041158',
+            'body' => $data['text'],
+        ]);
+    }
+
+    public function submitMobileOtp(Request $request)
+    {
+        $aUser = External::where('id', $request->user_id)->first();
+
+        if (empty($aUser)) {
+            return response()->json(['status' => 'fail']);
+        }
+
+        if ($aUser->otp_value == $request->submit_value) {
+            $aUser->mobile_status = "verified";
+            $aUser->save();
+            return response()->json(['status' => 'success', 'user_id' => $aUser->id]);
+        } else {
+            return response()->json(['status' => 'fail']);
+        }
+    }
+
+    public function sendEmailOtp(Request $request)
+    {
+        $random_code = random_int(100000, 999999);
+        $email = $request->email_address;
+        $data = ['name' => 'Verification', 'code' => $random_code];
+        $aUser = External::where('id', $request->user_id)->first();
+
+        if (empty($aUser)) {
+        	return response()->json(['status' => 'fail']);
+				}
+
+        Mail::send('merchants.email-otp', $data, function ($message) use (
+            $email
+        ) {
+            $message
+                ->to($email, 'GAMERE')
+                ->subject('GAMERE email confirming request');
+            $message->from('JAX@gamepay.com', 'GAMERE');
+        });
+
+        $aUser->email = $email;
+        $aUser->otp_value = $random_code;
+        $aUser->save();
+
+				return response()->json(['status' => 'success']);
+    }
+
+    public function submitEmailOtp(Request $request)
+    {
+        $aUser = External::where('id', $request->user_id)->first();
+
+        if (empty($aUser)) {
+            return response()->json(['status' => 'fail']);
+        }
+
+        if ($aUser->otp_value == $request->submit_value) {
+					$aUser->email_status = 'verified';
+					$aUser->save();
+          return response()->json(['status' => 'success']);
+        } else {
+            return response()->json(['status' => 'fail']);
+        }
+    }
+
+
     public function getUpi(Request $request)
     {
         return view('external_users.get-payer-address')
@@ -184,42 +305,21 @@ class ExternalUserController extends Controller
 
     public function deposit(Request $request)
     { 
-        $ext = External::where('id',$request->external_user_id)->first();
-        // save external txn info
-        $ext->key = $request->key;
-        $ext->txnid = $request->txn_id;
-        $ext->amount = $request->amount;
-        $ext->cust_name = $request->cust_name;
-        $ext->email = $request->email;
-        $ext->phone = $request->mobile;
-        $ext->crypto = $request->crypto;
-        $ext->network = $request->network;
-        $ext->surl = $request->surl;
-        $ext->eurl = $request->eurl;
-        $ext->curl = $request->curl;
-        $ext->remarks = $request->remarks;
-        $ext->kyc_status = $request->kyc_status;
-        $ext->email_status = $request->email_status;
-        $ext->mobile_status = $request->mobile_status;
-        $ext->hash = $request->hash;
-        $ext->save();        
-
-        // Validate VPA
-        $url = 'https://uat.cashlesso.com/pgws/upi/validateVpa';
-
+        $user = External::where('id', $request->external_user_id)->first();      
+      
         $pay_id = env('PAY_ID');
-        $orderAmount = $ext->amount;
-        $orderId = $ext->cust_name . random_int(1000, 9999);
+        $orderAmount = $user->amount;
+        $orderId = $user->cust_name . random_int(10000, 99999);
         $orderCurrencyId = '356';
-        $payeAddress = $ext->payer_address;
-        $customerEmail = $ext->email;
-        $customerPhone = $ext->mobile_number;
-        $productinfo = 'GAMERE';
-        $customerName = $ext->cust_name;
+        $payeAddress = $user->payer_address;
+        $customerEmail = $user->email;
+        $customerPhone = $user->phone;
+        $productinfo = 'GAMERER';
+        $customerName = $user->cust_name;
         $customerId = $orderId;
 
         $gwUrl = 'https://uat.cashlesso.com/pgws/upi/initiateCollect';
-        $returnUrl = 'http://127.0.0.1:8000/upi/response';
+        $returnUrl = 'http://gamepay.online/upi/response';
 
         $signValues = [
             'PAY_ID' => $pay_id,
@@ -283,41 +383,45 @@ class ExternalUserController extends Controller
         curl_close($curlCollet);
 
         $responsePayment = json_decode($responseCollect);
+
         $orderId = $responsePayment->ORDER_ID;
-        
         $aDeposit = new Deposit();
-        $aDeposit->user_id = $ext->id;
+        $aDeposit->user_id = $user->id;
         $aDeposit->is_external = 1;
         $aDeposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
-        if (!empty($responsePayment->TXN_ID)) {
-            $aDeposit->txnid = $responsePayment->TXN_ID;
-        }
-        if (!empty($responsePayment->CURRENCY_CODE)) {
-            $aDeposit->currency_code = $responsePayment->CURRENCY_CODE;
-        }
-        if (!empty($responsePayment->STATUS)) {
-            $aDeposit->status = $responsePayment->STATUS;
-        }
-        $aDeposit->pay_id = $responsePayment->PAY_ID;
-        $aDeposit->order_id = $responsePayment->ORDER_ID;
+        $aDeposit->currency_code = $orderCurrencyId;
+        $aDeposit->pay_id = $pay_id;
+        $aDeposit->order_id = $orderId;
         $aDeposit->amount = $orderAmount;
-        if (!empty($responsePayment->TOTAL_AMOUNT)) {
-            $aDeposit->total_amount = $responsePayment->TOTAL_AMOUNT;
-        }
         $aDeposit->cust_name = $customerName;
         $aDeposit->hash = $responsePayment->HASH;
-        if (!empty($responsePayment->ACQ_ID)) {
-            $aDeposit->acq_id = $responsePayment->ACQ_ID;
-        }
         $aDeposit->email = $customerEmail;
         $aDeposit->phone = $customerPhone;
         $aDeposit->payer_address = $payeAddress;
-        $aDeposit->wallet = $ext->wallet_address;
+        $aDeposit->wallet = $user->address;
         $aDeposit->product_desc = $productinfo;
-        $aDeposit->save();
+        $aDeposit->network = $user->network;
+        $aDeposit->crypto = $user->crypto;
+        $aDeposit->key = $user->key;
+        $aDeposit->remarks = $user->remarks;
 
-        //echo '<pre>';
-        //print_r($responsePayment);
+        if (!empty($responsePayment->TXN_ID)) {
+            $aDeposit->txnid = $responsePayment->TXN_ID;
+        }
+
+        if (!empty($responsePayment->STATUS)) {
+            $aDeposit->status = $responsePayment->STATUS;
+        }
+        
+        if (!empty($responsePayment->TOTAL_AMOUNT)) {
+            $aDeposit->total_amount = $responsePayment->TOTAL_AMOUNT;
+        }
+        
+        if (!empty($responsePayment->ACQ_ID)) {
+            $aDeposit->acq_id = $responsePayment->ACQ_ID;
+        }
+
+        $aDeposit->save();
 
         if (
             $responsePayment->RESPONSE_CODE == 000 &&
@@ -519,7 +623,10 @@ class ExternalUserController extends Controller
         if (empty($request->status))
             return view('external_users.kyc')->with('user_id', $request->user_id);
         else
-            return view('external_users.kyc')->with('user_id', $request->user_id)->with('status', $request->status);
+        return view('external_users.pan')->with('user_id', $request->user_id)
+                                        ->with('status', $request->status)
+                                        ->with('pan_front', $request->pan_front)
+                                        ->with('pan_back', $request->pan_back);
     }
 
     public function kycProcess(Request $request) {
@@ -565,7 +672,10 @@ class ExternalUserController extends Controller
           $user->back_img = $back_name;
           $user->save();
 
-          return redirect()->route('securepay.kyc', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approval']);
+          return redirect()->route('securepay.pan', ['user_id' => $user->id, 
+                                                    'status' => 'Manual KYC images are under approval',
+                                                    'pan_front' => $front_name,
+                                                    'pan_back' => $back_name]);
       } else {
           return response()->json(['status' => 'fail']);
       }
@@ -610,140 +720,20 @@ class ExternalUserController extends Controller
         }
     }
 
-      public function addPayout(Request $request) {
-        // $user = Auth::user();
-        $user = External::where('id', $request->user_id)->first();
-        $payer_address = $user->payer_address; // $payer_address = "9213116078@yesb";
-        $ifsc = $user->ifsc; // $ifsc = "ICIC0003168";
-        $account_no = $user->account_no; // $account_no = '316805000799';
-        $addahar = $user->addahar; //$addahar = '640723564873';
-        $pay_id = '1016601009105737';
-        if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
-          $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
-  
-          $curl = curl_init();
-          curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>'{
-                                  "PAY_ID":"'. $pay_id .'",
-                                  "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
-                                  "BENE_NAME": "' . $user->cust_name . '",
-                                  "CURRENCY_CD": "356",
-                                  "MOBILE_NUMBER": "'. $user->phone .'",
-                                  "EMAIL_ID": "' . $user->email . '",
-                                  
-                                  
-                                  "AADHAR_NO": "'. $addahar .'",
-                                  "PAYER_ADDRESS": "'. $payer_address .'",
-                                  "BANK_NAME": "YESB",
-                                  "IFSC_CODE": "'. $ifsc .'",
-                                  "BENE_ACCOUNT_NO": "'. $account_no .'",
-                                  "ACTION":"ADD"
-                                  }',
-            CURLOPT_HTTPHEADER => array(
-              'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
-              'Content-Type: application/json'
-            ),
-          ));
-  
-          $response = curl_exec($curl);
-          curl_close($curl);
-          $json_resp0 = json_decode($response);
-  
-          if ($json_resp0->STATUS != "Success") {
-            return response()->json(['status'=>'fail', 'data' => $json_resp0]);
-          }
-        }
-  
-        // if present in DB, make transaction
-        $order_id = $user->cust_name . random_int(100000, 999999);
-        $amount = $request->amount;
-
-        $payout = new Payout;
-        $payout->user_id = $user->id;
-        // $payout->hash = $json_resp->HASH;
-        $payout->status = "pending";
-        $payout->beneficiary_cd = $user->beneficiary_cd;
-        $payout->pay_id = $pay_id;
-        $payout->order_id = $order_id;
-        // $payout->action = $json_resp->ACTION;
-        $payout->txn_amount = $amount;
-        // $payout->response_message = $json_resp->RESPONSE_MESSAGE;
-        // $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
-        // $payout->total_amount = $json_resp->TOTAL_AMOUNT;
-        $payout->txn_hash = $request->txn_hash;
-        $payout->remarks = $request->remarks;
-        $payout->is_external = 1;
-        $saved = $payout->save();
-
-        // $order_id = $user->cust_name . random_int(100000, 999999);
-        // $amount = $request->amount;
-        // $comment = "test";
-        // $curl = curl_init();
-        // curl_setopt_array($curl, array(
-        //   CURLOPT_URL => 'https://uat.cashlesso.com/payout/v2/initateTransaction',
-        //   CURLOPT_RETURNTRANSFER => true,
-        //   CURLOPT_ENCODING => '',
-        //   CURLOPT_MAXREDIRS => 10,
-        //   CURLOPT_TIMEOUT => 0,
-        //   CURLOPT_FOLLOWLOCATION => true,
-        //   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        //   CURLOPT_CUSTOMREQUEST => 'POST',
-        //   CURLOPT_POSTFIELDS =>'{
-        //                         "PAY_ID": "1016601009105737",
-        //                         "ORDER_ID": "' . $order_id . '",
-        //                         "TXN_AMOUNT": "' . $amount . '",
-        //                         "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
-        //                         "BENE_COMMENT": "' . $comment . '",
-        //                         "TXN_PAYMENT_TYPE": "NEFT"
-        //                         } ',
-        //   CURLOPT_HTTPHEADER => array(
-        //     'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
-        //     'Content-Type: application/json'
-        //   ),
-        // ));
-  
-        // $response = curl_exec($curl);
-  
-        // curl_close($curl);
-        // $json_resp = json_decode($response);
-  
-        // $payout = new Payout;
-        // $payout->user_id = $user->id;
-        // $payout->hash = $json_resp->HASH;
-        // $payout->status = $json_resp->STATUS;
-        // $payout->beneficiary_cd = $json_resp->BENEFICIARY_CD;
-        // $payout->pay_id = $json_resp->PAY_ID;
-        // $payout->order_id = $json_resp->ORDER_ID;
-        // $payout->action = $json_resp->ACTION;
-        // $payout->txn_amount = $json_resp->TXN_AMOUNT;
-        // $payout->response_message = $json_resp->RESPONSE_MESSAGE;
-        // $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
-        // $payout->total_amount = $json_resp->TOTAL_AMOUNT;
-        // $payout->txn_hash = $request->txn_hash;
-        // $payout->remarks = $request->remarks;
-        // $saved = $payout->save();
-  
-        // if ($saved) {
-        //     return response()->json(['status' => 'success']);
-        // } else {
-        //     return response()->json(['status' => 'false', 'data' => $json_resp]);
-        // }
-      }
-  
-      protected function verifyPayout($beneficiary_cd) {
+    public function addPayout(Request $request) {
+      // $user = Auth::user();
+      $user = External::where('id', $request->user_id)->first();
+      $payer_address = $user->payer_address; // $payer_address = "9213116078@yesb";
+      $ifsc = $user->ifsc; // $ifsc = "ICIC0003168";
+      $account_no = $user->account_no; // $account_no = '316805000799';
+      $addahar = $user->addahar; //$addahar = '640723564873';
+      $pay_id = '1016601009105737';
+      if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
         $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
-  
+
         $curl = curl_init();
         curl_setopt_array($curl, array(
-          CURLOPT_URL => 'https://uat.cashlesso.com/payout/beneficiaryMaintenance',
+          CURLOPT_URL => $url,
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
           CURLOPT_MAXREDIRS => 10,
@@ -752,66 +742,186 @@ class ExternalUserController extends Controller
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => 'POST',
           CURLOPT_POSTFIELDS =>'{
-                                "PAY_ID":"1016601009105737",
-                                "BENEFICIARY_CD":"'. $beneficiary_cd .'",
-                                "ACTION":"VERIFY"
-                                } ',
+                                "PAY_ID":"'. $pay_id .'",
+                                "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
+                                "BENE_NAME": "' . $user->cust_name . '",
+                                "CURRENCY_CD": "356",
+                                "MOBILE_NUMBER": "'. $user->phone .'",
+                                "EMAIL_ID": "' . $user->email . '",
+                                
+                                
+                                "AADHAR_NO": "'. $addahar .'",
+                                "PAYER_ADDRESS": "'. $payer_address .'",
+                                "BANK_NAME": "YESB",
+                                "IFSC_CODE": "'. $ifsc .'",
+                                "BENE_ACCOUNT_NO": "'. $account_no .'",
+                                "ACTION":"ADD"
+                                }',
           CURLOPT_HTTPHEADER => array(
             'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
             'Content-Type: application/json'
           ),
         ));
-  
+
         $response = curl_exec($curl);
-  
         curl_close($curl);
-        $json_resp = json_decode($response);
- 
-        if (empty($json_resp) || $json_resp->STATUS != "Success") {
-          return false;
-        } else {
-          return true;
+        $json_resp0 = json_decode($response);
+
+        if ($json_resp0->STATUS != "Success") {
+          return response()->json(['status'=>'fail', 'data' => $json_resp0]);
         }
       }
 
-      public function pan(Request $request) {
-        if (empty($request->status))
-            return view('external_users.pan')->with('user_id', $request->user_id);
-        else
-            return view('external_users.pan')->with('user_id', $request->user_id)
-                                            ->with('status', $request->status)
-                                            ->with('pan_front', $request->pan_front)
-                                            ->with('pan_back', $request->pan_back);
+      // if present in DB, make transaction
+      $order_id = $user->cust_name . random_int(100000, 999999);
+      $amount = $request->amount;
+
+      $payout = new Payout;
+      $payout->user_id = $user->id;
+      // $payout->hash = $json_resp->HASH;
+      $payout->status = "pending";
+      $payout->beneficiary_cd = $user->beneficiary_cd;
+      $payout->pay_id = $pay_id;
+      $payout->order_id = $order_id;
+      // $payout->action = $json_resp->ACTION;
+      $payout->txn_amount = $amount;
+      // $payout->response_message = $json_resp->RESPONSE_MESSAGE;
+      // $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
+      // $payout->total_amount = $json_resp->TOTAL_AMOUNT;
+      $payout->txn_hash = $request->txn_hash;
+      $payout->remarks = $request->remarks;
+      $payout->is_external = 1;
+      $saved = $payout->save();
+
+      // $order_id = $user->cust_name . random_int(100000, 999999);
+      // $amount = $request->amount;
+      // $comment = "test";
+      // $curl = curl_init();
+      // curl_setopt_array($curl, array(
+      //   CURLOPT_URL => 'https://uat.cashlesso.com/payout/v2/initateTransaction',
+      //   CURLOPT_RETURNTRANSFER => true,
+      //   CURLOPT_ENCODING => '',
+      //   CURLOPT_MAXREDIRS => 10,
+      //   CURLOPT_TIMEOUT => 0,
+      //   CURLOPT_FOLLOWLOCATION => true,
+      //   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      //   CURLOPT_CUSTOMREQUEST => 'POST',
+      //   CURLOPT_POSTFIELDS =>'{
+      //                         "PAY_ID": "1016601009105737",
+      //                         "ORDER_ID": "' . $order_id . '",
+      //                         "TXN_AMOUNT": "' . $amount . '",
+      //                         "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
+      //                         "BENE_COMMENT": "' . $comment . '",
+      //                         "TXN_PAYMENT_TYPE": "NEFT"
+      //                         } ',
+      //   CURLOPT_HTTPHEADER => array(
+      //     'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+      //     'Content-Type: application/json'
+      //   ),
+      // ));
+
+      // $response = curl_exec($curl);
+
+      // curl_close($curl);
+      // $json_resp = json_decode($response);
+
+      // $payout = new Payout;
+      // $payout->user_id = $user->id;
+      // $payout->hash = $json_resp->HASH;
+      // $payout->status = $json_resp->STATUS;
+      // $payout->beneficiary_cd = $json_resp->BENEFICIARY_CD;
+      // $payout->pay_id = $json_resp->PAY_ID;
+      // $payout->order_id = $json_resp->ORDER_ID;
+      // $payout->action = $json_resp->ACTION;
+      // $payout->txn_amount = $json_resp->TXN_AMOUNT;
+      // $payout->response_message = $json_resp->RESPONSE_MESSAGE;
+      // $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
+      // $payout->total_amount = $json_resp->TOTAL_AMOUNT;
+      // $payout->txn_hash = $request->txn_hash;
+      // $payout->remarks = $request->remarks;
+      // $saved = $payout->save();
+
+      // if ($saved) {
+      //     return response()->json(['status' => 'success']);
+      // } else {
+      //     return response()->json(['status' => 'false', 'data' => $json_resp]);
+      // }
+    }
+  
+    protected function verifyPayout($beneficiary_cd) {
+      $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
+
+      $curl = curl_init();
+      curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://uat.cashlesso.com/payout/beneficiaryMaintenance',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS =>'{
+                              "PAY_ID":"1016601009105737",
+                              "BENEFICIARY_CD":"'. $beneficiary_cd .'",
+                              "ACTION":"VERIFY"
+                              } ',
+        CURLOPT_HTTPHEADER => array(
+          'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+          'Content-Type: application/json'
+        ),
+      ));
+
+      $response = curl_exec($curl);
+
+      curl_close($curl);
+      $json_resp = json_decode($response);
+
+      if (empty($json_resp) || $json_resp->STATUS != "Success") {
+        return false;
+      } else {
+        return true;
       }
+    }
 
-      public function panManual(Request $request) {
-        $front_path = "uploads/pan";
-        $back_path = "uploads/pan";
-        $allowedfileExtension=['png','jpg','jpeg'];
+    public function pan(Request $request) {
+      if (empty($request->status))
+          return view('external_users.pan')->with('user_id', $request->user_id);
+      else
+          return view('external_users.pan')->with('user_id', $request->user_id)
+                                          ->with('status', $request->status)
+                                          ->with('pan_front', $request->pan_front)
+                                          ->with('pan_back', $request->pan_back);
+    }
 
-        $front = $request->file('front');
-        $back = $request->file('back');
+    public function panManual(Request $request) {
+      $front_path = "uploads/pan";
+      $back_path = "uploads/pan";
+      $allowedfileExtension=['png','jpg','jpeg'];
 
-        $front_check = in_array(strtolower($front->getClientOriginalExtension()), $allowedfileExtension);
-        $back_check = in_array(strtolower($back->getClientOriginalExtension()), $allowedfileExtension);
+      $front = $request->file('front');
+      $back = $request->file('back');
 
-        if ($front_check && $back_check) {
-            $front_name = "pf" . date("Y-m-d-H-i-s") . "." . $front->getClientOriginalExtension();  
-            $front->move($front_path, $front_name);
-            $back_name = "pb" . date("Y-m-d-H-i-s") . "." . $back->getClientOriginalExtension();  
-            $back->move($back_path, $back_name);
+      $front_check = in_array(strtolower($front->getClientOriginalExtension()), $allowedfileExtension);
+      $back_check = in_array(strtolower($back->getClientOriginalExtension()), $allowedfileExtension);
 
-            $user = External::where('id', $request->user_id)->first();
-            $user->pan_front = $front_name;
-            $user->pan_back = $back_name;
-            $user->save();
+      if ($front_check && $back_check) {
+          $front_name = "pf" . date("Y-m-d-H-i-s") . "." . $front->getClientOriginalExtension();  
+          $front->move($front_path, $front_name);
+          $back_name = "pb" . date("Y-m-d-H-i-s") . "." . $back->getClientOriginalExtension();  
+          $back->move($back_path, $back_name);
 
-            return redirect()->route('securepay.pan', ['user_id' => $user->id, 
-                                                      'status' => 'Manual KYC images are under approval',
-                                                      'pan_front' => $front_name,
-                                                      'pan_back' => $back_name]);
-        } else {
-            return response()->json(['status' => 'fail']);
-        }
+          $user = External::where('id', $request->user_id)->first();
+          $user->pan_front = $front_name;
+          $user->pan_back = $back_name;
+          $user->save();
+
+          return redirect()->route('securepay.pan', ['user_id' => $user->id, 
+                                                    'status' => 'Manual KYC images are under approval',
+                                                    'pan_front' => $front_name,
+                                                    'pan_back' => $back_name]);
+      } else {
+          return response()->json(['status' => 'fail']);
       }
+    }
 }

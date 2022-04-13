@@ -44,8 +44,7 @@
                                 <option value="0" class="text-blue" data-description=""><span
                                         style="color:#ccc;">Currency</span></option>
                                 <option value="0" class="text-blue"
-                                    data-imagesrc="{{ asset('assets/img/Gamerupee.png') }}" data-description="">G
-                                    RUPEE
+                                    data-imagesrc="{{ asset('assets/img/Gamerupee.png') }}" data-description="">G RUPEE
                                 </option>
                                 <option value="1" class="text-blue"
                                     data-imagesrc="{{ asset('assets/img/JR_blue_d.png') }}" data-description="">USDT
@@ -133,7 +132,7 @@
                                     <p class="text-dark">Please Enter Your UPI ID</p>
                                     <div class="row pb-3">
                                         <div class="col-12">
-                                            <input type="hidden" id="user_id">
+                                            <input type="hidden" id="user_id" value="{!! $external_user_id !!}">
                                             <input class="form-control form-control-lg text-center" name="payeraddress"
                                                 type="text" placeholder="Eg: Yourphonenumber@apl" required>
                                         </div>
@@ -332,7 +331,7 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "POST",
-                    url: "{{ route('send-mobile-otp') }}",
+                    url: "{{ route('securepay.sendMobileOtp') }}",
                     data: {
                         wallet_address: $('#wallet_address').val(),
                         mobile_number: $('#mobile_number').val(),
@@ -362,7 +361,7 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "POST",
-                    url: "{{ route('submit-mobile-otp') }}",
+                    url: "{{ route('securepay.submitMobileOtp') }}",
                     data: {
                         submit_value: $('#mobile_code').val(),
                         mobile_number: $('#mobile_number').val(),
@@ -373,7 +372,7 @@
                         if (resp.status == "success") {
                             alert("Mobile OTP is successful.");
                             if (kyc != 'verified') {
-                            location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
+                            location.href = "{{ route('securepay.kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
                             } else {
                             $('.container:first').hide();
                             $('.container:eq(1)').show();
@@ -401,9 +400,9 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "POST",
-                    url: "{{ route('send-email-otp') }}",
+                    url: "{{ route('securepay.sendEmailOtp') }}",
                     data: {
-                    email_address: $('#email_otp').val(),
+                        email_address: $('#email_otp').val(),
                         user_id: "{{ $user_id }}"
                     },
                     success: function(resp) {
@@ -411,8 +410,8 @@
                             // $('#email_getotp').removeClass("disabled");
                             alert("Email OTP is successfully sent. Please wait 1 min.");
                         } else {
-                        alert("Sending email OTP is failed. Please try again.");
-                        return;
+                          alert("Sending email OTP is failed. Please try again.");
+                          return;
                         }
                     },
                 });
@@ -429,7 +428,7 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "POST",
-                    url: "{{ route('submit-email-otp') }}",
+                    url: "{{ route('securepay.submitEmailOtp') }}",
                     data: {
                         submit_value: $('#email_code').val(),
                         email_address: $('#email_otp').val(),
@@ -466,7 +465,7 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
                 method: "post",
-                url: "{{ route('validate-vpa') }}",
+                url: "{{ route('securepay.validate') }}",
                 data: {
                     payer_address: $('input[name="payeraddress"]').val(),
                     user_id: "{{ $user_id }}"
