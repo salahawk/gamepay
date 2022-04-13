@@ -44,7 +44,7 @@
                         <div class="col-12">
                             <div>
                                 <div class="p-3 py-4 boxblue text-center">
-                                    <h4 class="text-center text-blue pb-3">Bank Documents</h4>
+                                    <h4 class="text-center text-blue pb-3">upload PAN Document</h4>
                                     <h3 style="color: cornflowerblue">
                                         @if (!empty($status))
                                             {{ $status }}
