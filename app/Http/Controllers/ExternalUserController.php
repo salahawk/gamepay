@@ -22,8 +22,8 @@ class ExternalUserController extends Controller
         $rules = [
           'KEY' => 'required|numeric',
           'TXNID' => 'required',
-          'AMOUNT' => 'required|numeric',
-          'CUSTOMER_NAME' => 'bail|required|alpha',
+          'AMOUNT' => 'required|numeric|min: 500|max: 50000',
+          'CUSTOMER_NAME' => 'bail|required|alpha|min: 2|max: 30',
           'EMAIL' => 'required|email',
           'PHONE' => 'required|numeric',
           'CRYPTO' => 'required|alpha',
@@ -40,7 +40,7 @@ class ExternalUserController extends Controller
         ];
 
         $validator = Validator::make($request->input(), $rules);
-var_dump($request->AMOUNT);
+
         if ($validator->fails()) {
             return response()->json(['status'=> 'fail', 'error'=> $validator->errors()]);
         }
