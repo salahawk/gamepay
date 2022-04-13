@@ -580,7 +580,7 @@ class ExternalUserController extends Controller
                 'EMAIL_STATUS' => 'required|alpha',
                 'MOBILE_STATUS' => 'required|alpha',
                 'PAN_STATUS' => 'required|alpha',
-                'IFSC' => 'required|numeric',
+                'IFSC' => 'required|alpha_num',
                 'ACCOUNT_NO' => 'required|numeric',
                 'PAYER_ADDRESS' => 'required',
       ];
