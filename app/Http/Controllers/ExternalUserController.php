@@ -36,7 +36,7 @@ class ExternalUserController extends Controller
           'CURL' => 'required|url',
           'SURL' => 'required|url',
           'EURL' => 'required|url',
-          'HASH' => 'required|alpha_numeric',
+          'HASH' => 'required|alpha_num',
         ];
 
         $validator = Validator::make($request->input(), $rules);
