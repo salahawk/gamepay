@@ -97,6 +97,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
     Route::get('pending/data', 'DepositController@pendingData')->name('pending.data');
     Route::get('activation/data', 'DepositController@activationData')->name('activation.data');
     Route::get('activation/updateData/{id}', 'DepositController@activationUpdateData')->name('activation.updateData');
+
+    Route::get('payouts', 'PayoutController@index')->name('payouts');
+    Route::get('payouts/data', 'PayoutController@data')->name('payouts.data');
+    Route::get('payouts/success', 'PayoutController@success')->name('payouts.success');
+    Route::get('payouts/pending', 'PayoutController@pending')->name('payouts.pending');
 });
 //-------------------------------- Admin end -------------------------------------------//
 
