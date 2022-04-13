@@ -36,6 +36,7 @@ class PayoutController extends Controller
     }
 
     public function process(Request $request) {
+        
         // if present in DB, make transaction
         $payout = Payout::where('id', $request->id)->first();
         $order_id = $payout->order_id;

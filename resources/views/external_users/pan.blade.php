@@ -54,6 +54,7 @@
                                         enctype="multipart/form-data">
                                         @csrf
                                         <input type="hidden" name="user_id" value="{{ $user_id }}" />
+                                        @if (empty($status))
                                         <div class="form-group">
                                             <label for="formFileLg" class="form-label text-blue">Please Upload Doc
                                                 front</label>
@@ -67,6 +68,14 @@
                                                 name="back" />
                                         </div>
                                         <button type="submit" class="btn btn-primary btn-lg">Upload</button>
+                                        @else
+                                        <div class="form-group">
+                                            <p class="form-control form-control-lg" id="front">{{ $pan_front }}</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <p class="form-control form-control-lg" id="front">{{ $pan_back }}</p>
+                                        </div>
+                                        @endif
                                     </form>
                                 </div>
                             </div>

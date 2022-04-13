@@ -778,7 +778,10 @@ class ExternalUserController extends Controller
         if (empty($request->status))
             return view('external_users.pan')->with('user_id', $request->user_id);
         else
-            return view('external_users.pan')->with('user_id', $request->user_id)->with('status', $request->status);
+            return view('external_users.pan')->with('user_id', $request->user_id)
+                                            ->with('status', $request->status)
+                                            ->with('pan_front', $request->pan_front)
+                                            ->with('pan_back', $request->pan_back);
       }
 
       public function panManual(Request $request) {
@@ -803,7 +806,10 @@ class ExternalUserController extends Controller
             $user->pan_back = $back_name;
             $user->save();
 
-            return redirect()->route('securepay.pan', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approval']);
+            return redirect()->route('securepay.pan', ['user_id' => $user->id, 
+                                                      'status' => 'Manual KYC images are under approval',
+                                                      'pan_front' => $front_name,
+                                                      'pan_back' => $back_name]);
         } else {
             return response()->json(['status' => 'fail']);
         }
