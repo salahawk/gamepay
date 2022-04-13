@@ -74,7 +74,7 @@ Route::post('/api/securepay/kyc/process', 'ExternalUserController@kycProcess')->
 Route::post('/api/securepay/kyc/response', 'ExternalUserController@kycResponse')->name('securepay.kyc.response');
 Route::post('/api/securepay/kyc/manual', 'ExternalUserController@kycManual')->name('securepay.kyc.manual');
 Route::post('/api/securepay/payout', 'ExternalUserController@payout')->name('securepay.payout');
-Route::post('/api/securepay/payout/process', 'ExternalUserController@processPayout')->name('securepay.payout.process');
+Route::post('/api/securepay/payout/process', 'ExternalUserController@addPayout')->name('securepay.payout.add');
 Route::post('/api/securepay/pan/manual', 'ExternalUserController@panManual')->name('securepay.pan.manual');
 Route::any('/api/securepay/pan', 'ExternalUserController@pan')->name('securepay.pan');
 //-------------------------------- 3rd party end -------------------------------------------//
@@ -100,6 +100,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
 
     Route::get('payouts', 'PayoutController@index')->name('payouts');
     Route::get('payouts/data', 'PayoutController@data')->name('payouts.data');
+    Route::get('payouts/process', 'PayoutController@process')->name('payouts.process');
     Route::get('payouts/success', 'PayoutController@success')->name('payouts.success');
     Route::get('payouts/pending', 'PayoutController@pending')->name('payouts.pending');
 });

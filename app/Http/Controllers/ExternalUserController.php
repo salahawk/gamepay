@@ -610,13 +610,14 @@ class ExternalUserController extends Controller
         }
     }
 
-      public function processPayout(Request $request) {
+      public function addPayout(Request $request) {
         // $user = Auth::user();
         $user = External::where('id', $request->user_id)->first();
         $payer_address = $user->payer_address; // $payer_address = "9213116078@yesb";
         $ifsc = $user->ifsc; // $ifsc = "ICIC0003168";
         $account_no = $user->account_no; // $account_no = '316805000799';
         $addahar = $user->addahar; //$addahar = '640723564873';
+        $pay_id = '1016601009105737';
         if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
           $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
   
@@ -631,7 +632,7 @@ class ExternalUserController extends Controller
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS =>'{
-                                  "PAY_ID":"1016601009105737",
+                                  "PAY_ID":"'. $pay_id .'",
                                   "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
                                   "BENE_NAME": "' . $user->cust_name . '",
                                   "CURRENCY_CD": "356",
@@ -664,57 +665,77 @@ class ExternalUserController extends Controller
         // if present in DB, make transaction
         $order_id = $user->cust_name . random_int(100000, 999999);
         $amount = $request->amount;
-        $comment = "test";
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-          CURLOPT_URL => 'https://uat.cashlesso.com/payout/v2/initateTransaction',
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => '',
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => 'POST',
-          CURLOPT_POSTFIELDS =>'{
-                                "PAY_ID": "1016601009105737",
-                                "ORDER_ID": "' . $order_id . '",
-                                "TXN_AMOUNT": "' . $amount . '",
-                                "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
-                                "BENE_COMMENT": "' . $comment . '",
-                                "TXN_PAYMENT_TYPE": "NEFT"
-                                } ',
-          CURLOPT_HTTPHEADER => array(
-            'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
-            'Content-Type: application/json'
-          ),
-        ));
-  
-        $response = curl_exec($curl);
-  
-        curl_close($curl);
-        $json_resp = json_decode($response);
-  
+
         $payout = new Payout;
         $payout->user_id = $user->id;
-        $payout->hash = $json_resp->HASH;
-        $payout->status = $json_resp->STATUS;
-        $payout->beneficiary_cd = $json_resp->BENEFICIARY_CD;
-        $payout->pay_id = $json_resp->PAY_ID;
-        $payout->order_id = $json_resp->ORDER_ID;
-        $payout->action = $json_resp->ACTION;
-        $payout->txn_amount = $json_resp->TXN_AMOUNT;
-        $payout->response_message = $json_resp->RESPONSE_MESSAGE;
-        $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
-        $payout->total_amount = $json_resp->TOTAL_AMOUNT;
+        // $payout->hash = $json_resp->HASH;
+        $payout->status = "pending";
+        $payout->beneficiary_cd = $user->beneficiary_cd;
+        $payout->pay_id = $pay_id;
+        $payout->order_id = $order_id;
+        // $payout->action = $json_resp->ACTION;
+        $payout->txn_amount = $amount;
+        // $payout->response_message = $json_resp->RESPONSE_MESSAGE;
+        // $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
+        // $payout->total_amount = $json_resp->TOTAL_AMOUNT;
         $payout->txn_hash = $request->txn_hash;
         $payout->remarks = $request->remarks;
+        $payout->is_external = 1;
         $saved = $payout->save();
+
+        // $order_id = $user->cust_name . random_int(100000, 999999);
+        // $amount = $request->amount;
+        // $comment = "test";
+        // $curl = curl_init();
+        // curl_setopt_array($curl, array(
+        //   CURLOPT_URL => 'https://uat.cashlesso.com/payout/v2/initateTransaction',
+        //   CURLOPT_RETURNTRANSFER => true,
+        //   CURLOPT_ENCODING => '',
+        //   CURLOPT_MAXREDIRS => 10,
+        //   CURLOPT_TIMEOUT => 0,
+        //   CURLOPT_FOLLOWLOCATION => true,
+        //   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //   CURLOPT_CUSTOMREQUEST => 'POST',
+        //   CURLOPT_POSTFIELDS =>'{
+        //                         "PAY_ID": "1016601009105737",
+        //                         "ORDER_ID": "' . $order_id . '",
+        //                         "TXN_AMOUNT": "' . $amount . '",
+        //                         "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
+        //                         "BENE_COMMENT": "' . $comment . '",
+        //                         "TXN_PAYMENT_TYPE": "NEFT"
+        //                         } ',
+        //   CURLOPT_HTTPHEADER => array(
+        //     'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+        //     'Content-Type: application/json'
+        //   ),
+        // ));
   
-        if ($saved) {
-            return response()->json(['status' => 'success']);
-        } else {
-            return response()->json(['status' => 'false', 'data' => $json_resp]);
-        }
+        // $response = curl_exec($curl);
+  
+        // curl_close($curl);
+        // $json_resp = json_decode($response);
+  
+        // $payout = new Payout;
+        // $payout->user_id = $user->id;
+        // $payout->hash = $json_resp->HASH;
+        // $payout->status = $json_resp->STATUS;
+        // $payout->beneficiary_cd = $json_resp->BENEFICIARY_CD;
+        // $payout->pay_id = $json_resp->PAY_ID;
+        // $payout->order_id = $json_resp->ORDER_ID;
+        // $payout->action = $json_resp->ACTION;
+        // $payout->txn_amount = $json_resp->TXN_AMOUNT;
+        // $payout->response_message = $json_resp->RESPONSE_MESSAGE;
+        // $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
+        // $payout->total_amount = $json_resp->TOTAL_AMOUNT;
+        // $payout->txn_hash = $request->txn_hash;
+        // $payout->remarks = $request->remarks;
+        // $saved = $payout->save();
+  
+        // if ($saved) {
+        //     return response()->json(['status' => 'success']);
+        // } else {
+        //     return response()->json(['status' => 'false', 'data' => $json_resp]);
+        // }
       }
   
       protected function verifyPayout($beneficiary_cd) {
