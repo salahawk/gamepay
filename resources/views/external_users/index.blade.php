@@ -132,7 +132,7 @@
                                     <p class="text-dark">Please Enter Your UPI ID</p>
                                     <div class="row pb-3">
                                         <div class="col-12">
-                                            <input type="hidden" id="user_id" value="{!! $external_user_id !!}">
+                                            <input type="hidden" id="user_id" value="">
                                             <input class="form-control form-control-lg text-center" name="payeraddress"
                                                 type="text" placeholder="Eg: Yourphonenumber@apl" required>
                                         </div>
