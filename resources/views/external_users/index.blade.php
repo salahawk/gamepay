@@ -453,7 +453,6 @@
                             $('#email_submit').removeClass("disabled");
                             $('#email_getotp').removeClass("disabled");
                             return;
-                            // location.href = "{{ route('home') }}";
                         }
                     },
                 });

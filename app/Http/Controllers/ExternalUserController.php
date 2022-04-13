@@ -40,7 +40,7 @@ class ExternalUserController extends Controller
         ];
 
         $validator = Validator::make($request->input(), $rules);
-
+var_dump($request->AMOUNT);
         if ($validator->fails()) {
             return response()->json(['status'=> 'fail', 'error'=> $validator->errors()]);
         }
