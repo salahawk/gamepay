@@ -706,6 +706,8 @@ class ExternalUserController extends Controller
         $payout->response_message = $json_resp->RESPONSE_MESSAGE;
         $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
         $payout->total_amount = $json_resp->TOTAL_AMOUNT;
+        $payout->txn_hash = $request->txn_hash;
+        $payout->remarks = $request->remarks;
         $saved = $payout->save();
   
         if ($saved) {
