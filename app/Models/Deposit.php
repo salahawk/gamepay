@@ -13,8 +13,8 @@ class Deposit extends Model
     //     return $this->belongsTo('App\Models\User', 'doer_id');
     // }
 
-    // public function offer() {
-    // 	return $this->belongsTo('App\Models\Offer', 'order_id');
-    // }
+    public function user() {
+    	return $this->belongsTo('App\Models\User', 'user_id');
+    }
 	
 }

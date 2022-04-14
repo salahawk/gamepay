@@ -623,7 +623,7 @@ class ExternalUserController extends Controller
         if (empty($request->status))
             return view('external_users.kyc')->with('user_id', $request->user_id);
         else
-        return view('external_users.pan')->with('user_id', $request->user_id)
+            return view('external_users.pan')->with('user_id', $request->user_id)
                                         ->with('status', $request->status)
                                         ->with('pan_front', $request->pan_front)
                                         ->with('pan_back', $request->pan_back);

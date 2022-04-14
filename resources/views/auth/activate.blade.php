@@ -87,7 +87,7 @@ table.body .img-responsive {
             <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding:20px 20px 20px 20px; text-align: center; background: #fbc800" valign="top"><img src="{{asset('assets/img/logo.png')}}" /></td>
           </tr>
           <tr>
-            <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box;background: #fbc800" valign="top"><img src="{{asset('assets/ /email.jpg')}}" style="width: 100%" /></td>
+            <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box;background: #fbc800" valign="top"><img src="{{asset('assets/img/email.jpg')}}" style="width: 100%" /></td>
           </tr>
           <!-- START MAIN CONTENT AREA -->
           <tr>

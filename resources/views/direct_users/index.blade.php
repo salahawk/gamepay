@@ -133,7 +133,7 @@
 																									<p class="text-dark">Please Enter Your UPI ID</p>
 																									<div class="row pb-3">
 																											<div class="col-12">
-																													<input type="hidden" id="user_id">
+																													<input type="hidden" id="deposit_id">
 																													<input class="form-control form-control-lg text-center"
 																															name="payeraddress" type="text"
 																															placeholder="Eg: Yourphonenumber@apl" required>
@@ -362,8 +362,8 @@
                                 $('#emailOtpModal').modal('show');
                             } else if (resp.user_verified == "only_email") {
 															$('#mobileOtpModal').modal('show');
-														}	else if (resp.user_id) {
-                                $('#user_id').val(resp.user_id);
+														}	else if (resp.deposit_id) {
+                                $('#deposit_id').val(resp.deposit_id);
                                 $('.container:first').hide();
                                 $('.container:eq(1)').show();
                             } else {
@@ -513,7 +513,7 @@
                     url: "{{ route('validate-vpa') }}",
                     data: {
                         payer_address: $('input[name="payeraddress"]').val(),
-                        user_id: $('#user_id').val(),
+                        deposit_id: $('#deposit_id').val(),
                     },
                     success: function(resp) {
                         $('.btnSubmit').prop('disabled', false);

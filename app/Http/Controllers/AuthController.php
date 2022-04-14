@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use App\Models\User;
+
 use Auth;
 use Hash;
 use Illuminate\Support\Str;
 use Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
+
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -19,12 +22,24 @@ class AuthController extends Controller
     }
 
     public function signup(Request $request) {
-      $request->validate([
-          'firstname' => 'required',
-          'lastname' => 'required',
-          'email' => 'required|email|unique:users',
-          'password' => 'required|min:6',
-      ]);
+      $rules = [
+        'firstname' => 'required',
+        'lastname' => 'required',
+        'email' => 'required|email|unique:users',
+        'mobile' => 'required|numeric|unique:users',
+        'password' => 'required|min:6',
+      ];
+
+      $validator = Validator::make($request->input(), $rules);
+
+      if ($validator->fails()) {
+        $message = '';
+        $errors = json_decode($validator->errors());
+        foreach($errors as $key => $value) {
+            $message .= $value[0] . '\n';
+        }
+        return redirect()->route('index')->with('error', $message);  
+      }
 
       $token = Str::random(64);
 

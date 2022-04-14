@@ -46,11 +46,12 @@ class DirectUserController extends Controller
           $deposit->inr_value = $request->inr_value;
           $deposit->is_external = 0;
           $deposit->cust_name = $user->first_name;
+          $deposit->wallet = $request->wallet_address;
           $deposit->save();
 
             return response()->json([
                 'user_verified' => 'yes',
-                'user_id' => $user->id,
+                'deposit_id' => $deposit->id,
             ]);
         }
     }
@@ -59,11 +60,11 @@ class DirectUserController extends Controller
     {
         $auth_token = $this->getAuthToken();
         if ($this->_validateVpa($auth_token, $request->payer_address)) {
-            $deposit = Deposit::where('user_id', $request->user_id)->where('is_external', 0)->first();
+            $deposit = Deposit::where('id', $request->deposit_id)->first();
             $deposit->payer_address = $request->payer_address;
             $deposit->save();
             // return response()->json(['status' => 'success']);
-            return redirect()->route('send-deposit', ['user_id' => $user->id, 'authToken' => $auth_token]);
+            return redirect()->route('send-deposit', ['deposit_id' => $request->deposit_id, 'authToken' => $auth_token]);
         } else {
             return response()->json(['status' => 'fail']);
         }
@@ -207,24 +208,21 @@ class DirectUserController extends Controller
 
     public function sendDeposit(Request $request)
     {
-        $deposit = Deposit::where('user_id', $request->user_id)->where('is_external', 0)->first();
-
-        // Validate VPA
-        $url = 'https://uat.cashlesso.com/pgws/upi/validateVpa';
+        $deposit = Deposit::where('id', $request->deposit_id)->first();
 
         $pay_id = env('PAY_ID');
         $orderAmount = $deposit->amount;
-        $orderId = $deposit->cust_name . random_int(1000, 9999);
+        $orderId = $deposit->cust_name . random_int(10000, 99999);
         $orderCurrencyId = '356';
         $payeAddress = $deposit->payer_address;
-        $customerEmail = $deposit->email;
-        $customerPhone = $deposit->mobile;
+        $customerEmail = $deposit->user->email;
+        $customerPhone = $deposit->user->mobile;
         $productinfo = 'GAMERE';
         $customerName = $deposit->cust_name;
         $customerId = $orderId;
 
         $gwUrl = 'https://uat.cashlesso.com/pgws/upi/initiateCollect';
-        $returnUrl = 'http://127.0.0.1:8000/upi/response';
+        $returnUrl = 'http://gamepay.online/upi/response';
 
         $signValues = [
             'PAY_ID' => $pay_id,
@@ -265,18 +263,18 @@ class DirectUserController extends Controller
 					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 					CURLOPT_CUSTOMREQUEST => 'POST',
 					CURLOPT_POSTFIELDS =>'{
-					"PAY_ID":  "'.env('PAY_ID').'",
-					"AMOUNT":  "'.$orderAmount.'",
-					"ORDER_ID":  "'.$orderId.'",
-					"CURRENCY_CODE":  "'.$orderCurrencyId.'",
-					"PAYER_ADDRESS":  "'.$payeAddress.'",
-					"CUST_EMAIL":  "'.$customerEmail.'",
-					"CUST_PHONE":  "'.$customerPhone.'",
-					"HASH":  "'.$requestHash.'",
-					"PRODUCT_DESC":  "'.$productinfo.'",
-					"CUST_NAME":  "'.$customerName.'",
-					"CUST_ID":  "'.$customerId.'"
-				}',
+                                "PAY_ID":  "'.env('PAY_ID').'",
+                                "AMOUNT":  "'.$orderAmount.'",
+                                "ORDER_ID":  "'.$orderId.'",
+                                "CURRENCY_CODE":  "'.$orderCurrencyId.'",
+                                "PAYER_ADDRESS":  "'.$payeAddress.'",
+                                "CUST_EMAIL":  "'.$customerEmail.'",
+                                "CUST_PHONE":  "'.$customerPhone.'",
+                                "HASH":  "'.$requestHash.'",
+                                "PRODUCT_DESC":  "'.$productinfo.'",
+                                "CUST_NAME":  "'.$customerName.'",
+                                "CUST_ID":  "'.$customerId.'"
+                              }',
 					CURLOPT_HTTPHEADER => array(
 					'Content-Type: application/json',
 					"Authorization: Bearer $request->authToken") 
@@ -286,38 +284,33 @@ class DirectUserController extends Controller
         curl_close($curlCollet);
 
 				$responsePayment=json_decode($responseCollect);
-				
-				$orderId=$responsePayment->ORDER_ID;
-        
-
+			
+        // save deposit transaction data
 				$deposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
-				if (!empty($responsePayment->TXN_ID)) {
+        $deposit->currency_code = $orderCurrencyId;
+				$deposit->pay_id = $pay_id;
+        $deposit->order_id = $orderId;
+        $deposit->email = $customerEmail;
+				$deposit->phone = $customerPhone;
+        $deposit->product_desc = $productinfo;
+
+        if (!empty($responsePayment->TXN_ID)) {
           $deposit->txnid = $responsePayment->TXN_ID;
         }
-				if (!empty($responsePayment->CURRENCY_CODE)) {
-					$deposit->currency_code = $responsePayment->CURRENCY_CODE;
-				}
         if (!empty($responsePayment->STATUS)) {
           $deposit->status = $responsePayment->STATUS;
         }
-				$deposit->pay_id	 = $responsePayment->PAY_ID;
-				$deposit->order_id = $responsePayment->ORDER_ID;
-				$deposit->amount = $orderAmount;
 				if (!empty($responsePayment->TOTAL_AMOUNT)) {
 					$deposit->total_amount = $responsePayment->TOTAL_AMOUNT;
 				}
-				$deposit->cust_name = $customerName;
-				$deposit->hash = $responsePayment->HASH;
+        if (!empty($responsePayment->HASH)) {
+          $deposit->hash = $responsePayment->HASH;
+        }
 				if (!empty($responsePayment->ACQ_ID)) {
 					$deposit->acq_id = $responsePayment->ACQ_ID;
 				}
-				$deposit->email = $customerEmail;
-				$deposit->phone = $customerPhone;
-				$deposit->payer_address = $payeAddress;
-				$deposit->wallet = $aUser->wallet_address;
-				$deposit->product_desc = $productinfo;
+				
 				$deposit->save();
-
 				
 				if($responsePayment->RESPONSE_CODE==000 && $responsePayment->STATUS=='Sent to Bank'){
 					// $data['status']=$responsePayment->STATUS;
@@ -502,7 +495,10 @@ class DirectUserController extends Controller
 			if (empty($request->status))
         return view('direct_users.kyc')->with('user_id', $request->user_id);
 			else
-				return view('direct_users.kyc')->with('user_id', $request->user_id)->with('status', $request->status);
+				return view('direct_users.kyc')->with('user_id', $request->user_id)
+                                      ->with('status', $request->status)
+                                      ->with('pan_front', $request->pan_front)
+                                      ->with('pan_back', $request->pan_back);
     }
 
 		public function kycProcess(Request $request) {
@@ -548,7 +544,10 @@ class DirectUserController extends Controller
         $user->back_img = $back_name;
         $user->save();
 
-        return redirect()->route('kyc', ['user_id' => $user->id, 'status' => 'Manual KYC images are under approval']);
+        return redirect()->route('kyc', ['user_id' => $user->id, 
+                                        'status' => 'Manual KYC images are under approval',
+                                        'pan_front' => $front_name,
+                                        'pan_back' => $back_name]);
       } else {
         return response()->json(['status' => 'fail']);
       }
@@ -701,5 +700,9 @@ class DirectUserController extends Controller
       } else {
         return true;
       }
+    }
+
+    public function sell() {
+      return view('direct_users.sell')->with('user', Auth::user());
     }
 }
