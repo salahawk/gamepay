@@ -47,6 +47,7 @@ class DirectUserController extends Controller
           $deposit->is_external = 0;
           $deposit->cust_name = $user->first_name;
           $deposit->wallet = $request->wallet_address;
+          $deposit->order_id = $user->first_name . random_int(10000, 99999);
           $deposit->save();
 
             // return response()->json([
@@ -55,11 +56,11 @@ class DirectUserController extends Controller
             // ]);
 
           // add third party bank calculation
-          // $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*";
-			    // $eurl = hash('sha512', $valuecheck);
-          // $url = 'https://coinpaisecoupon.com/pgway/acquirer/upipay.php';
-          // $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
-          // return redirect()->away($url."?encdata=". $encData);
+          $valuecheck = $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->phone."|*".urldecode($deposit->cust_name)."|*";
+			    $eurl = hash('sha512', $valuecheck);
+          $url = 'https://coinpaisecoupon.com/pgway/acquirer/upipay.php';
+          $encData=urlencode(base64_encode("firstname=$deposit->cust_name&mobile=$user->phone&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$eurl"));
+          return redirect()->away($url."?encdata=". $encData);
         }
     }
 
@@ -219,7 +220,7 @@ class DirectUserController extends Controller
 
         $pay_id = env('PAY_ID');
         $orderAmount = $deposit->amount;
-        $orderId = $deposit->cust_name . random_int(10000, 99999);
+        $orderId = $deposit->order_id;
         $orderCurrencyId = '356';
         $payeAddress = $deposit->payer_address;
         $customerEmail = $deposit->user->email;
