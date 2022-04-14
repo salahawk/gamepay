@@ -930,4 +930,8 @@ class ExternalUserController extends Controller
           return response()->json(['status' => 'fail']);
       }
     }
+
+    public function responseUPI(Request $request) {
+      var_dump($request->input());
+    }
 }
