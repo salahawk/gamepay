@@ -142,10 +142,15 @@ class ExternalUserController extends Controller
           $user->curl = $curl;
           $user->hash = $hash;
           $saved = $user->save();
+          
+          // return redirect()->route('securepay.upi', [
+          //     'external_user_id' => $user->id,
+          // ]);
 
-          return redirect()->route('securepay.upi', [
-              'external_user_id' => $user->id,
-          ]);
+          // add third party bank calculation
+          $url = 'https://coinpaisecoupon.com/pgway/acquirer/upipay.php';
+          $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
+          return redirect()->away($url."?encdata=". $encData);
         }
         
         $garbage = External::where('address', $address)
@@ -278,7 +283,6 @@ class ExternalUserController extends Controller
             return response()->json(['status' => 'fail']);
         }
     }
-
 
     public function getUpi(Request $request)
     {
