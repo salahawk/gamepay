@@ -150,7 +150,7 @@ class ExternalUserController extends Controller
           // add third party bank calculation
           $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*";
 			    $eurl = hash('sha512', $valuecheck);
-          $url = 'https://coinpaisecoupon.com/pgway/acquirer/upipay.php';
+          $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
           $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
           return redirect()->away($url."?encdata=". $encData);
         }

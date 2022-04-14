@@ -49,10 +49,17 @@ class DirectUserController extends Controller
           $deposit->wallet = $request->wallet_address;
           $deposit->save();
 
-            return response()->json([
-                'user_verified' => 'yes',
-                'deposit_id' => $deposit->id,
-            ]);
+            // return response()->json([
+            //     'user_verified' => 'yes',
+            //     'deposit_id' => $deposit->id,
+            // ]);
+
+          // add third party bank calculation
+          // $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*";
+			    // $eurl = hash('sha512', $valuecheck);
+          // $url = 'https://coinpaisecoupon.com/pgway/acquirer/upipay.php';
+          // $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
+          // return redirect()->away($url."?encdata=". $encData);
         }
     }
 
