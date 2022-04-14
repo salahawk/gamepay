@@ -23,8 +23,7 @@
                                     <option value="0" class="text-blue" data-description=""><span
                                             style="color:#ccc;">Currency</span></option>
                                     <option value="0" class="text-blue"
-                                        data-imagesrc="{{ asset('assets/img/Gamerupee.png') }}" data-description="">G
-                                        RUPEE
+                                        data-imagesrc="{{ asset('assets/img/Gamerupee.png') }}" data-description="">G RUPEE
                                     </option>
                                     <option value="1" class="text-blue"
                                         data-imagesrc="{{ asset('assets/img/usdt.png') }}" data-description="">
@@ -103,8 +102,63 @@
                 </div>
             </div>
         </div>
+        <div class="container" style="padding-top: 5%; display: none">
+          <div class="row justify-content-md-center">
+              <div class="col-12 col-md-6">
+                  <!---- Tab 1 content start-->
+                  <div class="row">
+                      <div class="col-12 text-center logopos">
+                          <div class="position-relative">
+                              <img src="{{ asset('assets/img/gamerupee.svg') }}" width="100px" />
+                          </div>
+                      </div>
+                  </div>
+                  <div class="bg-white border-radius12 mb-1 text-left p-3 p-md-4 mainpageform">
+                      <div class="row pt-5">
+                          <div class="p-3 col-12 text-center">
+                              <p class="text-blue">
+                                  <i><img src="{{ asset('assets/img/info.svg') }}" class=""
+                                          style="width: 25px" /></i><br />
+                                  <small>Please do not press back button or close the screen<br />
+                                      until you submit the Transaction hash.</small>
+                              </p>
+                          </div>
+  
+                          <div class="col-12 mb-2">
+                              <input type="text" class="form-control border-radius6" aria-describedby="name"
+                                  placeholder="Enter Tx Hash" id="txn_hash" />
+                          </div>
+                          <div class="col-12 mb-2">
+                              <input type="text" class="form-control border-radius6" aria-describedby="name"
+                                  placeholder="Remarks" id="remark" />
+                          </div>
+  
+                          <div class="col-12 mb-2 pt-2">
+                              <a href="#" class="btn btn-primary border-radius6 w-100" id="txn_confirm" type="button">Submit</a>
+                          </div>
+                          <div class="p-3 text-center col-12">
+                              <p class="text-blue">
+                                  This page will be expired in
+                                  <span class="text-danger">30 mins</span>.
+                              </p>
+                          </div>
+                          <div class="col-12 mb-2 pt-2">
+                              <div class="text-center"><img src="{{ asset('assets/img/upi (2).png') }}" /></div>
+                          </div>
+                      </div>
+                  </div>
+                  <!---- Tab 1 content ends-->
+              </div>
+          </div>
+      </div>
     </div>
+    @endsection
 
+    @section('footer_scripts')
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
+    <script src="{{ asset('assets/js/custom.select.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/dropdown.js') }}"></script>
     <script>
         $(document).ready(function() {
             $('#myDropdown').ddslick({
@@ -175,6 +229,7 @@
             });
 
             $(document).on('click', '#txn_confirm', function() {
+              $(this).prop('disabled', true);
                 $.ajax({
                     headers: {
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -186,6 +241,7 @@
                         network: $("#myDropdown1").find('.dd-selected-text').text(),
                         currency: $("#myDropdown").find('.dd-selected-text').text(),
                         wallet_address: $('#wallet_address').val(),
+                        receiver: $('#receiver_address').val(),
                         remarks: $('#remark').val(),
                         inr_value: $('#inr_value').val(),
                         user_id: "{{ $user->id }}",

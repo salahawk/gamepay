@@ -556,7 +556,8 @@ class DirectUserController extends Controller
     public function portfolio(Request $request) {
       $total = 7000.34;
       $deposits = Deposit::where('user_id', Auth::user()->id)->where('is_external', 0)->get();
-      return view('portfolios.index')->with('deposits', $deposits)->with('total', $total);
+      $payouts = Payout::where('user_id', Auth::user()->id)->where('is_external', 0)->get();
+      return view('portfolios.index')->with('deposits', $deposits)->with('payouts', $payouts)->with('total', $total);
     }
 
     public function profile(Request $reqeust) {
@@ -594,7 +595,7 @@ class DirectUserController extends Controller
                                 "EMAIL_ID": "' . $user->email . '",
                                 "ADDRESS_1": "' . $user->address1 . '",
                                 "ADDRESS_2": "' . $user->address2 . '",
-                                "AADHAR_NO": "'. $user->beneficiary_cd .'",
+                                "AADHAR_NO": "'. $user->aadhar_no .'",
                                 "PAYER_ADDRESS": "'. $payer_address .'",
                                 "BANK_NAME": "YESB",
                                 "IFSC_CODE": "'. $user->ifsc .'",
@@ -609,15 +610,15 @@ class DirectUserController extends Controller
 
         $response = curl_exec($curl);
         curl_close($curl);
-        $json_resp = json_decode($response);
+        $json_resp1 = json_decode($response);
 
-        if ($json_resp->STATUS != "Success") {
-          return response()->json(['status'=>'fail']);
+        if ($json_resp1->STATUS != "Success") {
+          return response()->json(['status'=>'adding beneficiary fail']);
         }
       }
 
       // if present in DB, make transaction
-      $order_id = $user->first_name . random_int(100000, 99999);
+      $order_id = $user->first_name . random_int(100000, 999999);
       $amount = $request->amount;
       $comment = "test";
       $curl = curl_init();
@@ -651,19 +652,27 @@ class DirectUserController extends Controller
 
       $payout = new Payout;
       $payout->user_id = $user->id;
-      $payout->hash = $json_resp->hash;
-      $payout->status = $json_resp->status;
-      $payout->beneficiary_cd = $json_resp->beneficiary_cd;
-      $payout->pay_id = $json_resp->pay_id;
-      $payout->order_id = $json_resp->order_id;
-      $payout->action = $json_resp->action;
-      $payout->txn_amount = $json_resp->txn_amount;
-      $payout->response_message = $json_resp->response_message;
-      $payout->txn_payment_type = $json_resp->txn_payment_type;
-      $payout->total_amount = $json_resp->total_amount;
-      $payout->save();
+      $payout->hash = $json_resp->HASH;
+      $payout->status = $json_resp->STATUS;
+      $payout->beneficiary_cd = $json_resp->BENEFICIARY_CD;
+      $payout->pay_id = $json_resp->PAY_ID;
+      $payout->order_id = $json_resp->ORDER_ID;
+      $payout->action = $json_resp->ACTION;
+      $payout->txn_amount = $json_resp->TXN_AMOUNT;
+      $payout->response_message = $json_resp->RESPONSE_MESSAGE;
+      $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
+      $payout->total_amount = $json_resp->TOTAL_AMOUNT;
+      $payout->is_external = 0;
+      $payout->txn_hash = $request->txn_hash;
+      $payout->network = $request->network;
+      $payout->currency = $request->currency;
+      $payout->sender = $request->wallet_address;
+      $payout->receiver = $request->receiver;
+      $payout->inr_value = $request->inr_value;
+      $payout->remarks = $request->remarks;
+      $saved = $payout->save();
 
-
+      return redirect()->route('portfolio');
     }
 
     protected function verifyPayout($beneficiary_cd) {

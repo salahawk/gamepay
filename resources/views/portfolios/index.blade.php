@@ -45,9 +45,20 @@
                                         <td>{!! $deposit->wallet!!}<br />
                                             <span class="font-weight-normal text-muted">{!! $deposit->crypto!!}</span>
                                         </td>
-                                        <td>{!! $deposit->txn_type !!}</td>
+                                        <td>Deposit</td>
                                         <td><img src="{{asset('assets/img/btc.png')}}" />{!! $deposit->amount !!}</td>
                                         <td><span class="badge badge-complete">{!! $deposit->status !!}</span></td>
+                                    </tr>
+                                    @endforeach
+                                    @foreach($payouts as $payout)
+                                    <tr>
+                                        <td>{!! $payout->updated_at !!}</td>
+                                        <td>{!! $payout->sender!!}<br />
+                                            <span class="font-weight-normal text-muted">{!! $payout->currency !!}</span>
+                                        </td>
+                                        <td>Payout</td>
+                                        <td><img src="{{asset('assets/img/btc.png')}}" />{!! $payout->txn_amount !!}</td>
+                                        <td><span class="badge badge-complete">{!! $payout->status !!}</span></td>
                                     </tr>
                                     @endforeach
                                 </tbody>
