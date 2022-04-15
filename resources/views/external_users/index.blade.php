@@ -444,9 +444,12 @@
                             } else if (kyc != 'verified') {
                             location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
                             } else {
-                            $('.container:first').hide();
-                            $('.container:eq(1)').show();
-                            }
+                            // $('.container:first').hide();
+                            // $('.container:eq(1)').show();
+
+                            // redirect to the external UPI April 15
+                            location.href = "{{ $awayUrl }}";
+
                         } else {
                             alert("Email OTP verification is failed. Please try again");
                             $('#email_submit').removeClass("disabled");

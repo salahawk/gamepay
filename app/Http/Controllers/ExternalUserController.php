@@ -181,20 +181,22 @@ class ExternalUserController extends Controller
         $saved = $sample->save();
 
         $user_id = $sample->id;
+
+        $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*";
+        $eurl = hash('sha512', $valuecheck);
+        $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
+        $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
+        $awayUrl = $url."?encdata=". $encData;
         // redirect to the verification
         if ($email_status == 'verified' && $mobile_status =="verified" && $kyc_status != 'verified') {
           return redirect()->route('securepay.kyc', ['user_id' => $user_id]);
         } else if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
-          return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email'));
-        } else {
+          return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
+        } else {            
             // return redirect()->route('securepay.upi', [
             //     'external_user_id' => $user_id,
             // ]);
 
-            $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*";
-			    $eurl = hash('sha512', $valuecheck);
-          $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
-          $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
           return redirect()->away($url."?encdata=". $encData);
         }
     }
