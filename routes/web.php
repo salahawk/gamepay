@@ -21,7 +21,7 @@ Route::post('/user/login', 'AuthController@login')->name('login');
 Route::get('/user/logout', 'AuthController@logout')->name('logout');
 Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify'); 
 
-Route::group(['middleware' => 'auth'], function() {
+// Route::group(['middleware' => 'auth'], function() {
     Route::get('/user/check', 'DirectUserController@checkUser')->name('user-check');
 
     // mobile OTP
@@ -61,7 +61,7 @@ Route::group(['middleware' => 'auth'], function() {
     // Route::post('/cashlesso/send', 'DirectUserController@sendCashlesso')->name('send-cashlesso');
     // Route::post('/cashlesso/response', 'DirectUserController@responseCashlesso')->name('response-cashlesso');
     //-------------------------------- Direct end -------------------------------------------//
-});
+// });
 
 //-------------------------------- 3rd party -------------------------------------------//
 ////////////////// otp ///////////////////
