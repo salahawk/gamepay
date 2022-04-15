@@ -374,9 +374,10 @@
                             if (kyc != 'verified') {
                             location.href = "{{ route('securepay.kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
                             } else {
-                            $('.container:first').hide();
-                            $('.container:eq(1)').show();
+                            // $('.container:first').hide();
+                            // $('.container:eq(1)').show();
                             $('#mobileOtpModal').modal('toggle');
+                            location.href = "{{ $awayUrl }}";
                             }
                         } else {
                             alert("Mobile OTP is failed. Please try again.");
