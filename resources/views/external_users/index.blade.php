@@ -448,9 +448,9 @@
                             // $('.container:first').hide();
                             // $('.container:eq(1)').show();
 
-                            // redirect to the external UPI April 15
+                            // redirect to theexternal UPI April 15
                             location.href = "{{ $awayUrl }}";
-
+                            }
                         } else {
                             alert("Email OTP verification is failed. Please try again");
                             $('#email_submit').removeClass("disabled");
