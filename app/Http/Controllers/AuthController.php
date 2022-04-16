@@ -94,15 +94,20 @@ class AuthController extends Controller
             'email' => 'required',
             'password' => 'required',
         ]);
-   
+        
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            Session::put('user_id', Auth::user()->id);
+            $user = User::where('id', Auth::user()->id)->first();
 
-            return redirect()->intended('exchange')->with('message', 'You have Successfully loggedin');
+            if ($user->email_status == "verified") {
+                Session::put('user_id', Auth::user()->id);
+                return redirect()->intended('exchange')->with('message', 'You have Successfully loggedin');
+            } else {
+                return redirect()->route('index')->with('warning', 'Your email address is not verified. Please check your inbox or spam folder.');
+            }
         }
   
-        return redirect()->route('index')->with('warning', 'Check credential again or Complete email verification.');
+        return redirect()->route('index')->with('warning', 'Wrong credential. Please try again!');
     }
 
     public function logout(Request $request) {
