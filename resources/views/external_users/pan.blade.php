@@ -59,13 +59,13 @@
                                             <label for="formFileLg" class="form-label text-blue">Please Upload Doc
                                                 front</label>
                                             <input class="form-control form-control-lg" id="front" type="file"
-                                                name="front" />
+                                                name="front" required />
                                         </div>
                                         <div class="form-group">
                                             <label for="formFileLg" class="form-label text-blue">Please Upload Doc
                                                 back</label>
                                             <input class="form-control form-control-lg" id="back" type="file"
-                                                name="back" />
+                                                name="back" required />
                                         </div>
                                         <button type="submit" class="btn btn-primary btn-lg">Upload</button>
                                         @else
