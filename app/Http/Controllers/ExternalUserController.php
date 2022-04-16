@@ -100,7 +100,7 @@ class ExternalUserController extends Controller
             '|' .
             $curl .
             '|' .
-            $salt;
+            $SALT;
 
         $hash_value = hash('sha256', $hash_string);
 
