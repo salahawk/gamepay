@@ -494,13 +494,7 @@ class ExternalUserController extends Controller
         $deposits = Deposit::where('wallet', $request->wallet)->get();
         $num = $deposits->count();
 
-        $exec_phrase =
-            'node contract-interact.js ' .
-            $aDeposit->wallet .
-            ' ' .
-            $aDeposit->amount .
-            ' ' .
-            $num;
+        $exec_phrase = 'node contract-interact.js ' . $aDeposit->wallet . ' ' . $aDeposit->amount;
 
         chdir('../');
         exec($exec_phrase, $var, $result);
@@ -977,7 +971,19 @@ class ExternalUserController extends Controller
       $deposit->is_external = 1;
       $saved = $deposit->save();
 
-      if ($saved) return response()->json(['status'=>'success']);
-      else return response()->json(['status'=>'fail']);
+      if (!$saved) {
+        return response()->json(['status'=>'fail']);        
+      }
+
+      if ($request->STATUS == "Captured") {
+        // mint tokens
+        $exec_phrase =
+            'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
+
+        // print_r($exec_phrase); exit();
+        chdir('../');
+        exec($exec_phrase, $var, $result);
+      }
+      return response()->json(['status'=>'success']);
     }
 }

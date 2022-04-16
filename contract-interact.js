@@ -29,7 +29,7 @@ let contract = new web3.eth.Contract(abi, contractAddress);
 
 let merchant = process.argv[2];
 let amountString = process.argv[3]; 
-let num = process.argv[4];
+// let num = process.argv[4];
 amount = web3.utils.toWei(amountString);
 
 // set operator
@@ -48,6 +48,14 @@ async function setOperator(merchant) {
     await contract.methods.add_operator_merchant(OPERATOR_WALLET, merchant).send({from: ADMIN_WALLET, gas: gas});
 }
 
+async function checkHaveoperator(merchant) {
+    let operator = await contract.methods.merchant_to_operator(merchant).call();
+    if (operator != "0x0000000000000000000000000000000000000000") {
+        return true;
+    } else {
+        return false;
+    }
+}
 // add fee wallet
 async function setFeeWallet(merchant) {
     web3.nonce = await web3.getTransactionCount(web3.address)
@@ -75,11 +83,10 @@ async function mint(merchant, amount) {
 }
 
 void async function main() {
-    if (num != 1) { 
-        console.log(num)
+    let check = await checkHaveoperator(merchant);
+    if (check) { 
         await mint(merchant, amount);
-    }
-    else { console.log("here: ", num);
+    } else {
         await setOperator(merchant);
         console.log("hey, setOperator");
         await mint(merchant, amount);

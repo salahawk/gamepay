@@ -97,7 +97,7 @@ Route::post('api/securepay/response', 'ExternalUserController@responseUPI')->nam
 
 
 //-------------------------------- Admin -------------------------------------------//
-Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin', 'middleware' => 'auth'], function() {
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], function() {
     Route::get('deposits', 'DepositController@index')->name('deposits');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
     Route::get('success', 'DepositController@successIndex')->name('success');
