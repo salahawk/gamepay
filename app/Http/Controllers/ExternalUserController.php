@@ -940,7 +940,7 @@ class ExternalUserController extends Controller
     }
 
     public function responseUPI(Request $request) {
-      $user = External::where('txn_id', $request->ORDER_ID)->first();
+      $user = External::where('txnid', $request->ORDER_ID)->first();
       
       if(empty($user)) {
         return view('404');
