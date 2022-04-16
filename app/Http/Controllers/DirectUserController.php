@@ -20,7 +20,7 @@ class DirectUserController extends Controller
 {
     public function index()
     {
-        return view('direct_users.index');
+        return view('direct_users.index')->with('user', Auth::user());
     }
 
     public function checkUser(Request $request)

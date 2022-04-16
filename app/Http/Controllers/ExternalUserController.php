@@ -946,6 +946,30 @@ class ExternalUserController extends Controller
         return view('404');
       }
 
+      $deposit = new Deposit;
+      $deposit->created_date = $request->RESPONSE_DATE_TIME;
+      $deposit->phone = $request->CUST_PHONE;
+      $deposit->payer_address = $request->CARD_MASK;
+      $deposit->currency_code = $request->CURRENCY_CODE;
+      $deposit->status = $request->STATUS;
+      $deposit->amount = $request->AMOUNT;
+      $deposit->email = $request->CUST_EMAIL;
+      $deposit->txn_type = $request->TXNTYPE;
+      $deposit->pay_id = $request->PAY_ID;
+      $deposit->order_id = $request->ORDER_ID;
+      $deposit->total_amount = $request->TOTAL_AMOUNT;
+      $deposit->hash = $request->generateHash;
+      $deposit->wallet = $user->address;
+      $deposit->cust_name = $user->cust_name;
+      $deposit->crypto = $user->crypto;
+      $deposit->network = $user->network;
+      $deposit->inr_value = $user->inr_value;
+      $deposit->crypto = $user->crypto;
+      $deposit->user_id = $user->id;
+      $deposit->is_external = 1;
+      $saved = $deposit->save();
 
+      if ($saved) return response()->json(['status'=>'success']);
+      else return response()->json(['status'=>'fail']);
     }
 }

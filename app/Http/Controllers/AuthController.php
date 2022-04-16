@@ -102,7 +102,7 @@ class AuthController extends Controller
             return redirect()->intended('exchange')->with('message', 'You have Successfully loggedin');
         }
   
-        return redirect()->route('index')->with('warning', 'Oppes! You have entered invalid credentials');
+        return redirect()->route('index')->with('warning', 'Check credential again or Complete email verification.');
     }
 
     public function logout(Request $request) {

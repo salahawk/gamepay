@@ -177,7 +177,7 @@
 																											<div class="form-group">
 																													<label for="exampleInputEmail1">Verify Your Email</label>
 																													<input type="email" class="form-control" id="email_otp"
-																															aria-describedby="emailHelp">
+																															aria-describedby="emailHelp" value="{{ $user->email }}">
 																													<label for="email_otpLbID"
 																															style="color: #f00; display: none;">Enter Valid
 																															Email</label>
@@ -195,7 +195,7 @@
 																											<div class="form-group">
 																													<label for="exampleInputEmail1">Enter Email OTP</label>
 																													<input type="number" class="form-control" id="email_code"
-																															aria-describedby="mobile">
+																															aria-describedby="mobile" value="">
 																													<label for="email_codeLbID"
 																															style="color: #f00; display: none;">OTP
 																															Wrong</label>
@@ -233,8 +233,8 @@
 																											<div class="form-group">
 																													<label for="exampleInputEmail1">Verify Your Mobile
 																															Number</label>
-																													<input type="number" class="form-control" id="mobile_number"
-																															aria-describedby="mobile" placeholder="1234567890">
+																													<input type="tel" class="form-control" id="mobile_number"
+																															aria-describedby="mobile" placeholder="1234567890"  min="10" max="12" required>
 																													<label for="mobile_numberLbID"
 																															style="color: #f00; display: none;">Enter
 																															Valid Mobile Number</label>

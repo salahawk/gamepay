@@ -15,6 +15,6 @@ class VerifyCsrfToken extends Middleware
         'api/securepay/process',
         'securepay/deposit',
         'api/securepay/payout',
-        'securepay/response'
+        'api/securepay/response'
     ];
 }
