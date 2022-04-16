@@ -364,6 +364,9 @@
 															$('#mobileOtpModal').modal('show');
 														}	else if (resp.user_verified == "yes" && resp.url != '') {
                               location.href = resp.url
+                            } else if (resp.user_verified == "kyc_need") {
+                              location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + resp
+                                    .user_id;
                             } else if (resp.deposit_id) {
                                 $('#deposit_id').val(resp.deposit_id);
                                 $('.container:first').hide();

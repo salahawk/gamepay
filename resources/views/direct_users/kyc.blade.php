@@ -72,10 +72,10 @@
 @endsection
 
 @section('footer_scripts')
-
     <script src='https://cdn.veriff.me/sdk/js/1.1/veriff.min.js'></script>
     <script src='https://cdn.veriff.me/incontext/js/v1/veriff.js'></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    {{-- <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> --}}
+    
     <script>
         const veriff = Veriff({
             host: 'https://stationapi.veriff.com',

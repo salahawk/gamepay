@@ -30,7 +30,8 @@ class DirectUserController extends Controller
         if (empty($user)) {
           return redirect()->route('index');
         } else if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
-          return redirect()->route('kyc', ['user_id' => $user->id]);
+          // return redirect()->route('kyc', ['user_id' => $user->id]);
+          return response()->json(['user_verified' => 'kyc_need', 'user_id' => $user->id]);
         } else if ($user->email_status == "verified" && $user->mobile_status != "verified" && $user->kyc_status != "verified") {
           return response()->json(['user_verified' => 'only_email']);
         } else if ($user->email_status != "verified" || $user->mobile_status != "verified" || $user->kyc_status != "verified") {
