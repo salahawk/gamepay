@@ -698,7 +698,7 @@ class ExternalUserController extends Controller
                 'EMAIL_STATUS' => 'required|alpha',
                 'MOBILE_STATUS' => 'required|alpha',
                 'PAN_STATUS' => 'required|alpha',
-                'IFSC' => 'required|alpha_num',
+                'IFSC' => 'required|alpha_num|between: 10, 12',
                 'ACCOUNT_NO' => 'required|numeric',
                 'PAYER_ADDRESS' => 'required',
       ];
@@ -933,7 +933,7 @@ class ExternalUserController extends Controller
       }
     }
 
-    public function responseUPI(Request $request) {
+    public function responseDepositUPI(Request $request) {
       $SALT = 'salt123456789';
       $user = External::where('txnid', $request->ORDER_ID)->first();
       

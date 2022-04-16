@@ -77,6 +77,7 @@ Route::post('/api/securepay/process', 'ExternalUserController@index')->name('sec
 Route::post('/api/securepay/validate', 'ExternalUserController@validateVpa')->name('securepay.validate');
 Route::get('/api/securepay/deposit', 'ExternalUserController@deposit')->name('securepay.deposit');
 Route::get('/api/securepay/upi', 'ExternalUserController@getUpi')->name('securepay.upi');
+Route::post('api/securepay/response', 'ExternalUserController@responseDepositUPI')->name('securepay.response');
 ///////////////// kyc /////////////////
 Route::any('/api/securepay/kyc', 'ExternalUserController@kycIndex')->name('securepay.kyc');
 Route::post('/api/securepay/kyc/process', 'ExternalUserController@kycProcess')->name('securepay.kyc.process');
@@ -88,7 +89,7 @@ Route::post('/api/securepay/payout/process', 'ExternalUserController@addPayout')
 Route::post('/api/securepay/pan/manual', 'ExternalUserController@panManual')->name('securepay.pan.manual');
 Route::any('/api/securepay/pan', 'ExternalUserController@pan')->name('securepay.pan');
 ///////////////// external  /////////////////
-Route::post('api/securepay/response', 'ExternalUserController@responseUPI')->name('securepay.response');
+
 //-------------------------------- 3rd party end -------------------------------------------//
 
 
