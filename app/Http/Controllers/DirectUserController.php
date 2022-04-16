@@ -58,9 +58,10 @@ class DirectUserController extends Controller
           // add third party bank calculation
           $valuecheck = $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->phone."|*".urldecode($deposit->cust_name)."|*";
 			    $eurl = hash('sha512', $valuecheck);
-          $url = 'https://coinpaisecoupon.com/pgway/acquirer/upipay.php';
+          $url = 'https://coinsplashgifts.com/pgway/acquirer/upipay.php';
           $encData=urlencode(base64_encode("firstname=$deposit->cust_name&mobile=$user->phone&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$eurl"));
-          return redirect()->away($url."?encdata=". $encData);
+          return response()->json(['user_verified' => 'yes', 'url' => $url."?encdata=". $encData]);
+          // return redirect()->away($url."?encdata=". $encData);
         }
     }
 

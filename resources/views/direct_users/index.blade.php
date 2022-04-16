@@ -362,7 +362,9 @@
                                 $('#emailOtpModal').modal('show');
                             } else if (resp.user_verified == "only_email") {
 															$('#mobileOtpModal').modal('show');
-														}	else if (resp.deposit_id) {
+														}	else if (resp.user_verified == "yes" && resp.url != '') {
+                              location.href = resp.url
+                            } else if (resp.deposit_id) {
                                 $('#deposit_id').val(resp.deposit_id);
                                 $('.container:first').hide();
                                 $('.container:eq(1)').show();

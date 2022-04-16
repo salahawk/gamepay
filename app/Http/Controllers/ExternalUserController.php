@@ -185,7 +185,7 @@ class ExternalUserController extends Controller
         $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $SALT;
         $eurl = hash('sha512', $valuecheck);
         $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
-        $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
+        $url = 'https://coinsplashgifts.com/pgway/acquirer/upipay.php';
         $awayUrl = $url."?encdata=". $encData;
         // redirect to the verification
         if ($email_status == 'verified' && $mobile_status =="verified" && $kyc_status != 'verified') {
