@@ -102,13 +102,12 @@
                     <table class="table table-bordered" id="dataTable">
                         <thead>
                             <tr>
-                                <th>Transaction ID</th>
+                                <th>Order ID</th>
+                                <th>Txn Date</th>
                                 <th>Email</th>
-                                <th>Name</th>
                                 <th>Amount</th>
                                 <th>Status</th>
-                                <th>Transaction Date</th>
-                                <th>Provider</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -142,12 +141,11 @@
             type: "GET"
         },
         columns: [
-            {data: 'txnid', name: 'txnid'},
+            {data: 'order_id', name: 'order_id'},
+            {data: 'created_date', name: 'created_date'},
             {data: 'email', name: 'email'},
-            {data: 'cust_name', name: 'cust_name'},
             {data: 'amount', name: 'amount'},
             {data: 'status', name: 'status'},
-            {data: 'created_date', name: 'created_date'},
             {data: 'action', name: 'action'},
         ],
         });

@@ -21,7 +21,7 @@ class ExternalUserController extends Controller
     public function index(Request $request)
     {
         // validate key and salt
-        $salt = 'salt123456789';
+        $SALT = 'salt123456789';
 
         $rules = [
           'KEY' => 'required|numeric',
@@ -148,7 +148,7 @@ class ExternalUserController extends Controller
           // ]);
 
           // add third party bank calculation
-          $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*";
+          $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $SALT;
 			    $eurl = hash('sha512', $valuecheck);
           $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
           $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
@@ -182,7 +182,7 @@ class ExternalUserController extends Controller
 
         $user_id = $sample->id;
 
-        $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*";
+        $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $SALT;
         $eurl = hash('sha512', $valuecheck);
         $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
         $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
@@ -946,6 +946,13 @@ class ExternalUserController extends Controller
         return view('404');
       }
 
+      // hash generation check
+      $hash_string = "|". $request->ORDER_ID . "|" . $request->AMOUNT . "|" . $request->FIRST_NAME . "|" . $request->CUST_EMAIL . "|" . $request->STATUS . "|";
+      $hash_string .= $SALT;
+      $hash = hash("sha512", $hash_string);
+      if ($hash != $request->generateHash) {
+        return response()->json(['status' => 'fail', "data" => 'hash is wrong']);
+      }
       $deposit = new Deposit;
       $deposit->created_date = $request->RESPONSE_DATE_TIME;
       $deposit->phone = $request->CUST_PHONE;
@@ -960,7 +967,7 @@ class ExternalUserController extends Controller
       $deposit->total_amount = $request->TOTAL_AMOUNT;
       $deposit->hash = $request->generateHash;
       $deposit->wallet = $user->address;
-      $deposit->cust_name = $user->cust_name;
+      $deposit->cust_name = $request->FIRST_NAME;
       $deposit->crypto = $user->crypto;
       $deposit->network = $user->network;
       $deposit->inr_value = $user->inr_value;

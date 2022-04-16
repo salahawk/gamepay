@@ -234,7 +234,7 @@
 																													<label for="exampleInputEmail1">Verify Your Mobile
 																															Number</label>
 																													<input type="tel" class="form-control" id="mobile_number"
-																															aria-describedby="mobile" placeholder="1234567890"  min="10" max="12" required>
+																															aria-describedby="mobile" placeholder="1234567890"  minlenghth="10" maxlength="12" required>
 																													<label for="mobile_numberLbID"
 																															style="color: #f00; display: none;">Enter
 																															Valid Mobile Number</label>
