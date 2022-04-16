@@ -446,7 +446,7 @@
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                     },
                     method: "POST",
-                    url: "{{ route('securepay.payout.process') }}",
+                    url: "{{ route('securepay.payout.add') }}",
                     data: {
                         amount: $('#amount').val(),
                         network: $("#myDropdown1").find('.dd-selected-text').text(),
