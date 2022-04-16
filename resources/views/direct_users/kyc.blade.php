@@ -74,7 +74,7 @@
 @section('footer_scripts')
     <script src='https://cdn.veriff.me/sdk/js/1.1/veriff.min.js'></script>
     <script src='https://cdn.veriff.me/incontext/js/v1/veriff.js'></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script>
         const veriff = Veriff({
             host: 'https://stationapi.veriff.com',
