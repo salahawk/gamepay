@@ -975,7 +975,7 @@ class ExternalUserController extends Controller
         return response()->json(['status'=>'fail']);        
       }
 
-      if ($request->STATUS == "Captured") {
+      if ($request->STATUS == "Captured" || $request->STATUS == "Success") {
         // mint tokens
         $exec_phrase =
             'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
