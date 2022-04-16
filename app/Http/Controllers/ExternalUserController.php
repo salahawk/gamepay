@@ -940,6 +940,7 @@ class ExternalUserController extends Controller
     }
 
     public function responseUPI(Request $request) {
+      $SALT = 'salt123456789';
       $user = External::where('txnid', $request->ORDER_ID)->first();
       
       if(empty($user)) {
