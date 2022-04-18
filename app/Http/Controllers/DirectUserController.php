@@ -25,6 +25,7 @@ class DirectUserController extends Controller
 
     public function checkUser(Request $request)
     {
+      $SALT = 'salt123456789';
         $user = User::where("id", Auth::user()->id)->first();
         
         if (empty($user)) {
@@ -57,7 +58,7 @@ class DirectUserController extends Controller
             // ]);
 
           // add third party bank calculation
-          $valuecheck = $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->phone."|*".urldecode($deposit->cust_name)."|*";
+          $valuecheck = $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->phone."|*".urldecode($deposit->cust_name)."|*" . $SALT;
 			    $eurl = hash('sha512', $valuecheck);
           $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
           $encData=urlencode(base64_encode("firstname=$deposit->cust_name&mobile=$user->phone&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$eurl"));
