@@ -53,7 +53,6 @@ class BuyController extends Controller
           // find predefined PSP provider based on IP address
           var_dump(\Request::getClientIp(true)); 
           var_dump($_SERVER['REMOTE_ADDR']);
-          var_dump($_SERVER['HTTP_CLIENT_IP']);
           var_dump(request()->path());
 
           $psp = Psp::where('ip_address', $request->ip())->first();
