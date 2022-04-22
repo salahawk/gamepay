@@ -56,6 +56,7 @@ class BuyController extends Controller
           var_dump(request()->path());
           // var_dump(request()->getHost());
           var_dump(request()->root());
+          var_dump($request->header());
           $psp = Psp::where('ip_address', $request->ip())->first();
           if (empty($psp)) {
             return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
