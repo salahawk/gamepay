@@ -54,7 +54,6 @@ class BuyController extends Controller
           var_dump(\Request::getClientIp(true)); 
           var_dump($_SERVER['REMOTE_ADDR']);
           var_dump(request()->path());
-          var_dump(Request::root());
           var_dump(request()->getHost());
           var_dump(request()->root());
           $psp = Psp::where('ip_address', $request->ip())->first();
