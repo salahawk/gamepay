@@ -51,7 +51,9 @@ class BuyController extends Controller
           }
           
           // find predefined PSP provider based on IP address
-          var_dump($request->header('origin'));
+          $ip_string = $request->header('origin');
+          $pieces = explode("//", $ip_string);
+          var_dump($pieces[1]);
           $psp = Psp::where('ip_address', $request->ip())->first();
           if (empty($psp)) {
             return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
