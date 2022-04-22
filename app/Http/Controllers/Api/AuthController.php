@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -17,10 +17,6 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function index() {
-        return view('auth.index');
-    }
-
     public function signup(Request $request) {
       $rules = [
         'firstname' => 'required',
@@ -38,7 +34,7 @@ class AuthController extends Controller
         foreach($errors as $key => $value) {
             $message .= $value[0] . '\n';
         }
-        return redirect()->route('index')->with('error', $message);  
+        return response()->json(['status' => 'fail', 'error' => $message]);
       }
 
       $email_token = Str::random(64);
@@ -64,14 +60,14 @@ class AuthController extends Controller
             $message->from('JAX@gamepay.com', 'GAMERE');
         });
 
-        return redirect()->route('index')->with('message','Registration successful! Please verify email to continue.');
+        return response()->json(['status'=>'success', 'message'=>'Registration successful! Please verify email to continue.']);
       }
-      return redirect()->view('404');
+      return response()->json(['status'=>'fail', 'message'=>'User can not be saved']);
     }
 
     public function verifyEmail($token)
     {
-        $user = User::where('email_token', $token)->first();
+        $user = User::where('token', $token)->first();
   
         $message = 'Sorry your email cannot be identified.';
   
@@ -85,51 +81,53 @@ class AuthController extends Controller
             }
         }
   
-      return redirect()->route('index')->with('message', $message);
+        return response()->json(['message'=> $message]);
     }
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required',
-            'password' => 'required',
-        ]);
-        
+        $rules = [
+          'email' => 'required|email',
+          'password' => 'required',
+        ];
+  
+        $validator = Validator::make($request->input(), $rules);
+  
+        if ($validator->fails()) {
+          $message = '';
+          $errors = json_decode($validator->errors());
+          foreach($errors as $key => $value) {
+              $message .= $value[0] . '\n';
+          }
+          return response()->json(['status' => 'fail', 'error' => $message]);
+        }
+
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            $user = User::where('id', Auth::user()->id)->first();
+            $user = User::where('email', $request->email)->first();
+            
 
             if ($user->email_status == "verified") {
-                Session::put('user_id', Auth::user()->id);
-                return redirect()->intended('exchange')->with('message', 'You have Successfully loggedin');
+                // Session::put('user_id', Auth::user()->id);
+                $authToken = $user->createToken('auth-token')->plainTextToken;
+                return response()->json([
+                  'status' => 'success',
+                  'access_token' => $authToken,
+                ]);
             } else {
-                return redirect()->route('index')->with('warning', 'Your email address is not verified. Please check your inbox or spam folder.');
+                return response()->json(['status'=>'fail', 'message'=>'Your email is not verified yet']);
             }
         }
   
-        return redirect()->route('index')->with('warning', 'Wrong credential. Please try again!');
+        return response()->json(['status'=>'fail', 'message'=>'The given data was invalid.']);
     }
 
     public function logout(Request $request) {
-      Session::flush();
-      Auth::logout();
+      auth()->user()->tokens()->delete();
 
-      return redirect()->route('index');
-    }
-
-    public function privacy() {
-        return view('infos.privacy');
-    }
-
-    public function terms() {
-        return view('infos.terms');
-    }
-
-    public function contact() {
-        return view('infos.contact');
-    }
-
-    public function refundPolicy() {
-        return view('infos.refund-policy');
+      return [
+          'status' => 'success',
+          'message' => 'Logged out'
+      ];
     }
 }

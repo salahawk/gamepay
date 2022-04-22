@@ -155,8 +155,7 @@ class ExternalUserController extends Controller
           return redirect()->away($url."?encdata=". $encData);
         }
         
-        $garbage = External::where('address', $address)
-                          ->where('email', $email)
+        $garbage = External::where('email', $email)
                           ->delete();
 
         // insert DB
@@ -993,5 +992,28 @@ class ExternalUserController extends Controller
         exec($exec_phrase, $var, $result);
       }
       return response()->json(['status'=>'success']);
+    }
+
+    protected function selectPsp($data) {
+        $psp = Psp::where('merchant_id', $data['merchant_id'])->first();
+        $user = External::where('user_id', $data['user_id'])->first();
+
+        if($psp->status == "") {
+            return "psp status is not available.";
+        }
+
+        $txn_id = $user->txn_id;
+        $amount = $user->amount;
+        $email = $user->email;
+        $phone = $user->phone;
+        $customer_name = $user->cust_name;
+
+        $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $SALT;
+        $eurl = hash('sha512', $valuecheck);
+        $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
+        $url = $psp->name;
+        $awayUrl = $url."?encdata=". $encData;
+
+        return $awayUrl;
     }
 }
