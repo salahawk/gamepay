@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 // Route::post('/user/signup', 'AuthController@signup')->name('signup');
 // Route::post('/user/login', 'AuthController@login')->name('login');
 // Route::get('/user/logout', 'AuthController@logout')->name('logout');
-// Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify'); 
+Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify'); 
 
 // Route::group(['middleware' => 'auth'], function() {
     // Route::get('/user/check', 'DirectUserController@checkUser')->name('user-check');
