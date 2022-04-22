@@ -54,9 +54,8 @@ class BuyController extends Controller
           var_dump(\Request::getClientIp(true)); 
           var_dump($_SERVER['REMOTE_ADDR']);
           var_dump($_SERVER['HTTP_CLIENT_IP']);
-          var_dump($_SERVER['HTTP_X_FORWARDED_FOR']);
           var_dump(request()->path());
-          
+
           $psp = Psp::where('ip_address', $request->ip())->first();
           if (empty($psp)) {
             return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
