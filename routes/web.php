@@ -15,47 +15,47 @@ use Illuminate\Support\Facades\Route;
 
 //-------------------------------- Direct -------------------------------------------//
 // Authentication
-// Route::get('/', 'AuthController@index')->name('index');
-// Route::post('/user/signup', 'AuthController@signup')->name('signup');
-// Route::post('/user/login', 'AuthController@login')->name('login');
-// Route::get('/user/logout', 'AuthController@logout')->name('logout');
+Route::get('/', 'AuthController@index')->name('index');
+Route::post('/user/signup', 'AuthController@signup')->name('signup');
+Route::post('/user/login', 'AuthController@login')->name('login');
+Route::get('/user/logout', 'AuthController@logout')->name('logout');
 Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify'); 
 
 // Route::group(['middleware' => 'auth'], function() {
-    // Route::get('/user/check', 'DirectUserController@checkUser')->name('user-check');
+    Route::get('/user/check', 'DirectUserController@checkUser')->name('user-check');
 
     // // mobile OTP
-    // Route::post('/otp/mobile/send', 'DirectUserController@sendMobileOtp')->name('send-mobile-otp');
-    // Route::post('/otp/mobile/submit', 'DirectUserController@submitMobileOtp')->name('submit-mobile-otp');
+    Route::post('/otp/mobile/send', 'DirectUserController@sendMobileOtp')->name('send-mobile-otp');
+    Route::post('/otp/mobile/submit', 'DirectUserController@submitMobileOtp')->name('submit-mobile-otp');
     // // email OTP
-    // Route::post('/otp/email/send', 'DirectUserController@sendEmailOtp')->name('send-email-otp');
-    // Route::post('/otp/email/submit', 'DirectUserController@submitEmailOtp')->name('submit-email-otp');
+    Route::post('/otp/email/send', 'DirectUserController@sendEmailOtp')->name('send-email-otp');
+    Route::post('/otp/email/submit', 'DirectUserController@submitEmailOtp')->name('submit-email-otp');
     // // kyc
-    // Route::any('/kyc', 'DirectUserController@kycIndex')->name('kyc');
-    // Route::post('/kyc/process', 'DirectUserController@kycProcess')->name('kyc-process');
-    // Route::post('/kyc/response', 'DirectUserController@kycResponse')->name('kyc-response');
-    // Route::post('/kyc/manual', 'DirectUserController@kycManual')->name('kyc-manual');
+    Route::any('/kyc', 'DirectUserController@kycIndex')->name('kyc');
+    Route::post('/kyc/process', 'DirectUserController@kycProcess')->name('kyc-process');
+    Route::post('/kyc/response', 'DirectUserController@kycResponse')->name('kyc-response');
+    Route::post('/kyc/manual', 'DirectUserController@kycManual')->name('kyc-manual');
 
     // // exchange-buy
-    // Route::post('/vpa/validate', 'DirectUserController@validateVpa')->name('validate-vpa');
-    // Route::get('/deposit/send', 'DirectUserController@sendDeposit')->name('send-deposit');
-    // Route::post('/upi/response', 'DirectUserController@upiResponse')->name('upi-response');
-    // Route::get('/mint/manual', 'DirectUserController@mintManual')->name('mint-manual');
+    Route::post('/vpa/validate', 'DirectUserController@validateVpa')->name('validate-vpa');
+    Route::get('/deposit/send', 'DirectUserController@sendDeposit')->name('send-deposit');
+    Route::post('/upi/response', 'DirectUserController@upiResponse')->name('upi-response');
+    Route::get('/mint/manual', 'DirectUserController@mintManual')->name('mint-manual');
 
     // // exchange-sell
-    // Route::post('/payout/process', 'DirectUserController@processPayout')->name('process-payout');
+    Route::post('/payout/process', 'DirectUserController@processPayout')->name('process-payout');
 
 
     // ////////////////////   pages   /////////////////////////////////
-    // Route::get('/privacy', 'AuthController@privacy')->name('privacy');
-    // Route::get('/terms', 'AuthController@terms')->name('terms');
-    // Route::get('/contact', 'AuthController@contact')->name('contact');
-    // Route::get('/refund-policy', 'AuthController@refundPolicy')->name('refund-policy');
-    // Route::get('/exchange', 'DirectUserController@index')->name('exchange');
-    // Route::get('/portfolio', 'DirectUserController@portfolio')->name('portfolio');
-    // Route::get('/profile', 'DirectUserController@profile')->name('profile');
-    // Route::get('/profile/edit', 'DirectUserController@profileEdit')->name('profile.edit');
-    // Route::get('/sell', 'DirectUserController@sell')->name('sell');
+    Route::get('/privacy', 'AuthController@privacy')->name('privacy');
+    Route::get('/terms', 'AuthController@terms')->name('terms');
+    Route::get('/contact', 'AuthController@contact')->name('contact');
+    Route::get('/refund-policy', 'AuthController@refundPolicy')->name('refund-policy');
+    Route::get('/exchange', 'DirectUserController@index')->name('exchange');
+    Route::get('/portfolio', 'DirectUserController@portfolio')->name('portfolio');
+    Route::get('/profile', 'DirectUserController@profile')->name('profile');
+    Route::get('/profile/edit', 'DirectUserController@profileEdit')->name('profile.edit');
+    Route::get('/sell', 'DirectUserController@sell')->name('sell');
 
 
     // Route::post('/cashlesso/send', 'DirectUserController@sendCashlesso')->name('send-cashlesso');
