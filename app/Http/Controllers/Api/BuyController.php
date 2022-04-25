@@ -198,7 +198,7 @@ class BuyController extends Controller
 
         return response()->json(['status' => 'success']);
       } else {
-        return response()->json(['status' => 'fail', 'message' => 'file types are not allowed image files']);
+        return response()->json(['status' => 'fail', 'message' => 'File types are not allowed image files']);
       }
 		}
     
@@ -225,7 +225,7 @@ class BuyController extends Controller
     // ifsc - ifsc number
     // @RETURN
     // user's all data
-    public function panSave(Request $request) {
+    public function savePan(Request $request) {
       // $rules = [
       //   'ifsc' => 'required',
       //   'account_no' => 'required'
@@ -253,7 +253,7 @@ class BuyController extends Controller
         $user->save();
         return response()->json(['status' => 'success']);
       } else {
-        return response()->json(['status' => 'fail', 'message' => 'file types are not allowed image files']);
+        return response()->json(['status' => 'fail', 'message' => 'File types are not allowed image files']);
       }
     }
 
