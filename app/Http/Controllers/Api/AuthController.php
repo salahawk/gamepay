@@ -51,7 +51,7 @@ class AuthController extends Controller
 
       if ($saved) {
         $activate_email = $request->email;
-        Mail::send('auth.activate', ['token'=> $email_token], function ($message) use (
+        Mail::send('auth.activate', ['token'=> $email_token, 'username'=>$user->first_name], function ($message) use (
             $activate_email
         ) {
             $message
@@ -67,7 +67,7 @@ class AuthController extends Controller
 
     public function verifyEmail($token)
     {
-        $user = User::where('token', $token)->first();
+        $user = User::where('email_token', $token)->first();
   
         $message = 'Sorry your email cannot be identified.';
   
