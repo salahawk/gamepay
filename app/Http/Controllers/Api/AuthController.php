@@ -55,9 +55,9 @@ class AuthController extends Controller
             $activate_email
         ) {
             $message
-                ->to($activate_email, 'GAMERE')
-                ->subject('GAMERE email confirming request');
-            $message->from('JAX@gamepay.com', 'GAMERE');
+                ->to($activate_email, 'Coinpaise')
+                ->subject('Coinpaise email confirming request');
+            $message->from('admin@coinpaise.com', 'Coinpaise');
         });
 
         return response()->json(['status'=>'success', 'message'=>'Registration successful! Please verify email to continue.']);
@@ -99,7 +99,7 @@ class AuthController extends Controller
           foreach($errors as $key => $value) {
               $message .= $value[0] . '\n';
           }
-          return response()->json(['status' => 'fail', 'error' => $message]);
+          return response()->json(['status' => 'fail', 'message' => $message]);
         }
 
         $credentials = $request->only('email', 'password');

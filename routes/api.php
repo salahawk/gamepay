@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 Route::post('register', 'Api\AuthController@signup');
-Route::get('register/verify/{token}', 'Api\AuthController@verifyEmail');
+Route::get('register/verify/{token}', 'Api\AuthController@verifyEmail')->name('api.email.verify');
 Route::post('login', 'Api\AuthController@login');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
