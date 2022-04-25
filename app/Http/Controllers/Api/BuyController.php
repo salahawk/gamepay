@@ -115,12 +115,12 @@ class BuyController extends Controller
 
     protected function sendSMS($data)
     {
-        $sid = 'ACff03be6cdd84b244ef95ec58ec7b4689';
-        $token = '3ee55f03cf4da970e837d189232f5fcf';
+        $sid = env('TWILIO_SID');
+        $token = env('TWILIO_TOKEN');
 
         $client = new Client($sid, $token);
         return $client->messages->create($data['phone'], [
-            'from' => '+14302041158',
+            'from' => env('TWILIO_NUMBER'),
             'body' => $data['text'],
         ]);
     }
@@ -219,6 +219,89 @@ class BuyController extends Controller
       return response()->json(['status' => 'success', 'deposits' => $deposits, 'payouts' => $payouts, 'total'=> $total]);
     }
 
+    // @params
+    // pan - file
+    // account_no - account number
+    // ifsc - ifsc number
+    // @RETURN
+    // user's all data
+    public function panSave(Request $request) {
+      // $rules = [
+      //   'ifsc' => 'required',
+      //   'account_no' => 'required'
+      // ];
+
+      // $validator = Validator::make($request->input(), $rules);
+
+      // if ($validator->fails()) {
+      //   return response()->json(['status' => 'fail', 'error' => $validator->errors()]);
+      // }
+
+      $user = auth()->user();
+      $user->account_no = $request->account_no;
+      $user->ifsc = $request->ifsc;
+
+      $pan_path = "uploads/pan";
+      $allowedfileExtension=['png','jpg','jpeg'];
+      $pan = $request->file('pan');
+      $pan_check = in_array(strtolower($pan->getClientOriginalExtension()), $allowedfileExtension);
+      if ($pan_check) {
+        $pan_name = "p" . date("Y-m-d-H-i-s") . "." . $pan->getClientOriginalExtension();  
+        $pan->move($pan_path, $pan_name);
+
+        $user->pan = $pan_name;
+        $user->save();
+        return response()->json(['status' => 'success']);
+      } else {
+        return response()->json(['status' => 'fail', 'message' => 'file types are not allowed image files']);
+      }
+    }
+
+    // @params
+    // pan - file
+    // account_no - account number
+    // ifsc - ifsc number
+    // @RETURN
+    // user's all data
+    public function processPayout(Request $request) {
+
+    }
+
+    // @params
+    // kyc data to store in DB
+    // @RETURN
+    // user's all data
+		public function processKyc(Request $request) {
+			$user = User::find(auth()->user()->id);
+			$user->kyc_type = "veriff";
+			$user->save();
+
+			$veriff = new Verification;
+			$veriff->user_id = $user->id;
+			$veriff->veriff_id = $request->veriff_id;
+			$veriff->veriff_url = $request->veriff_url;
+			$veriff->sessionToken = $request->sessionToken;
+			$veriff->is_verified = 0;
+			$veriff->is_external = 0;
+
+			$veriff->save();
+
+      return response()->json(['status'=>'success']);
+		}
+
+    public function responseKyc(Request $request) {
+			if ($request['status'] == 'success') {
+          $veriff = Veriffication::where('veriff_id', $request['verification']['id'])->first();
+          if (!empty($veriff)) {
+              $veriff->is_verified = 1;
+              $veriff->save();
+          } else {
+              print_r("veriffication contains wrong data");
+          }
+      } else {
+          print_r("veriffication contains wrong response");
+      }
+		}
 
     public function validateVpa(Request $request)
     {
@@ -596,33 +679,12 @@ class BuyController extends Controller
                                       ->with('pan_front', $request->pan_front)
                                       ->with('pan_back', $request->pan_back);
     }
-
-		public function kycProcess(Request $request) {
-			$user = User::where('id', $request->user_id)->first();
-			$user->kyc_type = "veriff";
-			$user->save();
-
-			$veriff = new Verification;
-			$veriff->user_id = $user->id;
-			$veriff->veriff_id = $request->veriff_id;
-			$veriff->veriff_url = $request->veriff_url;
-			$veriff->sessionToken = $request->sessionToken;
-			$veriff->is_verified = $request->is_verified;
-			$veriff->is_external = 0;
-
-			$veriff->save();
-		}
-
-		public function kycResponse(Request $request) {
-			print_r("expression"); exit();
-		}
-
     
     public function profileEdit(Request $reqeust) {
       return view('direct_users.profile-edit')->with('user', Auth::user());
     }
 
-    public function processPayout(Request $request) {
+    public function processPayoutORIGIN(Request $request) {
       // $user = Auth::user();
       $user = User::where('id', $request->user_id)->first();
       $payer_address = "9213116078@yesb";

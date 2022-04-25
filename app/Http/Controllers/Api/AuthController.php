@@ -106,13 +106,12 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->email)->first();
             
-
             if ($user->email_status == "verified") {
-                // Session::put('user_id', Auth::user()->id);
                 $authToken = $user->createToken('auth-token')->plainTextToken;
                 return response()->json([
                   'status' => 'success',
                   'access_token' => $authToken,
+                  'user' => $user
                 ]);
             } else {
                 return response()->json(['status'=>'fail', 'message'=>'Your email is not verified yet']);

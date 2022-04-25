@@ -36,7 +36,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('/user', 'Api\BuyController@showUser');
     Route::get('/portfolio', 'Api\BuyController@portfolio');
-
-    
+    Route::post('/pan', 'Api\BuyController@savePan');
+    Route::post('/payout-process', 'Api\BuyController@processPayout');
+    Route::post('/kyc/process', 'Api\BuyController@processKyc');
     
 });
+
+Route::post('/kyc/response', 'Api\BuyController@responseKyc');
