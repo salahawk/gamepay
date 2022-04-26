@@ -74,10 +74,10 @@ class BuyController extends Controller
 
 
           // add third party bank calculation
-          $valuecheck = $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->phone."|*".urldecode($deposit->cust_name)."|*" . $SALT;
+          $valuecheck = $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->mobile."|*".urldecode($deposit->cust_name)."|*" . $SALT;
 			    $eurl = hash('sha512', $valuecheck);
           $url = $psp->url;
-          $encData=urlencode(base64_encode("firstname=$deposit->cust_name&mobile=$user->phone&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$eurl"));
+          $encData=urlencode(base64_encode("firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$eurl"));
           return response()->json(['status' => 'success', 'url' => $url."?encdata=". $encData]);
         }
     }
@@ -264,7 +264,7 @@ class BuyController extends Controller
     // @RETURN
     // user's all data
     public function processPayout(Request $request) {
-      
+
     }
 
     // @params
