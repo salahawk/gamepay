@@ -19,10 +19,10 @@ class AuthController extends Controller
 {
     public function signup(Request $request) {
       $test = User::where('email', $request->email)->where('email_status', '<>', 'verified')->first();
-      if (empty($test)) {
+      if (!empty($test)) {
         $test->delete();
       }
-      
+
       $rules = [
         'firstname' => 'required',
         'lastname' => 'required',
