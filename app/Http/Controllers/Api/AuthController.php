@@ -49,9 +49,17 @@ class AuthController extends Controller
       $user->beneficiary_cd = $request->firstname . random_int(10000000, 99999999);
       $saved = $user->save();
 
+      $ip_string = $request->header('origin');
+      $pieces = explode("//", $ip_string);
+      $psp = Psp::where('ip_address', $pieces[1])->first();
+      if (empty($psp)) {
+        return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
+      }
+
+
       if ($saved) {
         $activate_email = $request->email;
-        Mail::send('auth.activate', ['token'=> $email_token, 'username'=>$user->first_name], function ($message) use (
+        Mail::send('auth.activate', ['token'=> $email_token, 'username'=>$user->first_name, 'psp_id'=> $psp->id], function ($message) use (
             $activate_email
         ) {
             $message
@@ -65,17 +73,19 @@ class AuthController extends Controller
       return response()->json(['status'=>'fail', 'message'=>'User can not be saved']);
     }
 
-    public function verifyEmail($token)
+    public function verifyEmail($psp_id, $token)
     {
         $user = User::where('email_token', $token)->first();
   
         $message = 'Sorry your email cannot be identified.';
-  
+        $psp = Psp::find($psp_id);
+
         if(!is_null($user) ) {
             if($user->email_status != 'verified') {
                 $user->email_status = 'verified';
                 $user->save();
                 $message = "Your e-mail is verified. You can now login.";
+                return redirect()->away("http://165.22.209.28/");
             } else {
                 $message = "Your e-mail is already verified. You can now login.";
             }

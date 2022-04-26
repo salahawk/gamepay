@@ -264,7 +264,7 @@ class BuyController extends Controller
     // @RETURN
     // user's all data
     public function processPayout(Request $request) {
-
+      
     }
 
     // @params
