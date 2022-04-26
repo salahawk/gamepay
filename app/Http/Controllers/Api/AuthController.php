@@ -13,6 +13,7 @@ use Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
+use App\Models\Psp;
 use App\Models\User;
 
 class AuthController extends Controller
