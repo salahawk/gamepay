@@ -26,21 +26,21 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Route::apiResource('teams', 'TeamApiController');
 
     // mobile OTP
-    Route::post('/otp-mobile/send', 'Api\BuyController@sendMobileOtp');
-    Route::post('/otp-mobile/check', 'Api\BuyController@submitMobileOtp');
+    Route::post('/otp-mobile/send', 'Api\ClientController@sendMobileOtp');
+    Route::post('/otp-mobile/check', 'Api\ClientController@submitMobileOtp');
     // email OTP
-    // Route::post('/otp-email/send', 'Api\BuyController@sendEmailOtp');
-    // Route::post('/otp-email/check', 'Api\BuyController@submitEmailOtp');
-    Route::post('/kyc/manual', 'Api\BuyController@kycManual');
-    Route::post('/deposit', 'Api\BuyController@deposit');
+    // Route::post('/otp-email/send', 'Api\ClientController@sendEmailOtp');
+    // Route::post('/otp-email/check', 'Api\ClientController@submitEmailOtp');
+    Route::post('/kyc/manual', 'Api\ClientController@kycManual');
+    Route::post('/deposit', 'Api\ClientController@deposit');
 
-    Route::get('/user', 'Api\BuyController@showUser');
-    Route::get('/portfolio', 'Api\BuyController@portfolio');
-    Route::post('/pan', 'Api\BuyController@savePan');
-    Route::post('/payout-process', 'Api\BuyController@processPayout');
-    Route::post('/kyc/process', 'Api\BuyController@processKyc');
+    Route::get('/user', 'Api\ClientController@showUser');
+    Route::get('/portfolio', 'Api\ClientController@portfolio');
+    Route::post('/pan', 'Api\ClientController@savePan');
+    Route::post('/payout-process', 'Api\ClientController@processPayout');
+    Route::post('/kyc/process', 'Api\ClientController@processKyc');
     
 });
 
-Route::post('/kyc/response', 'Api\BuyController@responseKyc');
-Route::post('/upi/response', 'Api\BuyController@responseUpi');
+Route::post('/kyc/response', 'Api\ClientController@responseKyc');
+Route::post('/upi/response', 'Api\ClientController@responseUpi');

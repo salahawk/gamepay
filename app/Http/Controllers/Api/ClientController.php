@@ -17,7 +17,7 @@ use App\Models\Payout;
 use App\Models\Psp;
 use Illuminate\Support\Facades\Validator;
 
-class BuyController extends Controller
+class ClientController extends Controller
 {
     // @params
     // amount - to be purchased
@@ -288,6 +288,44 @@ class BuyController extends Controller
 
       return response()->json(['status'=>'success']);
 		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function responseKyc(Request $request) {
 			if ($request['status'] == 'success') {
