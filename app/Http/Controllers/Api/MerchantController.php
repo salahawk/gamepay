@@ -860,20 +860,19 @@ class MerchantController extends Controller
         CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_POSTFIELDS =>'{
                               "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
-                              "ORDER_ID": "' . $order_id . '",
-                              "TXN_AMOUNT": "' . $amount . '",
+                              "TXN_AMOUNT": "' . $amount . '",                              
                               "BENE_COMMENT": "' . $comment . '",
-                              "TXN_PAYMENT_TYPE": "NEFT"
+                              "TXN_PAYMENT_TYPE": "NEFT",
+                              "ORDER_ID": "' . $order_id . '",
                               } ',
         CURLOPT_HTTPHEADER => array(
           'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
           'Content-Type: application/json'
         ),
       ));
-
       $response = curl_exec($curl);
-
       curl_close($curl);
+
       $json_resp = json_decode($response);
 
       $payout = new Payout;
