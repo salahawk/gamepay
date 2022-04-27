@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 
 use App\Models\Psp;
 use App\Models\User;
+use App\Models\Client;
 
 class AuthController extends Controller
 {
@@ -57,15 +58,16 @@ class AuthController extends Controller
 
       $ip_string = $request->header('origin');
       $pieces = explode("//", $ip_string);
-      $psp = Psp::where('ip_address', $pieces[1])->first();
-      if (empty($psp)) {
+      $client = Client::where('ip', $pieces[1])->first();
+
+      if (empty($client)) {
         return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
       }
 
 
       if ($saved) {
         $activate_email = $request->email;
-        Mail::send('auth.activate', ['token'=> $email_token, 'username'=>$user->first_name, 'psp_id'=> $psp->id], function ($message) use (
+        Mail::send('auth.activate', ['token'=> $email_token, 'username'=>$user->first_name, 'client_id'=> $client->id], function ($message) use (
             $activate_email
         ) {
             $message
@@ -79,19 +81,19 @@ class AuthController extends Controller
       return response()->json(['status'=>'fail', 'message'=>'User can not be saved']);
     }
 
-    public function verifyEmail($psp_id, $token)
+    public function verifyEmail($client_id, $token)
     {
         $user = User::where('email_token', $token)->first();
   
         $message = 'Sorry your email cannot be identified.';
-        $psp = Psp::find($psp_id);
+        $client = Client::find($client_id);
 
         if(!is_null($user) ) {
             if($user->email_status != 'verified') {
                 $user->email_status = 'verified';
                 $user->save();
                 $message = "Your e-mail is verified. You can now login.";
-                return redirect()->away("http://165.22.209.28/");
+                return redirect()->away($client->url);
             } else {
                 $message = "Your e-mail is already verified. You can now login.";
             }
@@ -140,9 +142,11 @@ class AuthController extends Controller
     public function logout(Request $request) {
       auth()->user()->tokens()->delete();
 
-      return [
-          'status' => 'success',
-          'message' => 'Logged out'
-      ];
+      // return [
+      //     'status' => 'success',
+      //     'message' => 'Logged out'
+      // ];
+      return redirect()->away($request->header('origin'));
     }
 }
+ 

@@ -217,7 +217,7 @@ class ClientController extends Controller
     // user's all data
     public function portfolio() {
       $total = 7000.34;
-      $deposits = Deposit::where('user_id', auth()->user()->id)->where('is_external', 0)->get();
+      $deposits = Deposit::where('user_id', auth()->user()->id)->where('is_client', 1)->get();
       $payouts = Payout::where('user_id', auth()->user()->id)->where('is_external', 0)->get();
       return response()->json(['status' => 'success', 'deposits' => $deposits, 'payouts' => $payouts, 'total'=> $total]);
     }
@@ -285,11 +285,12 @@ class ClientController extends Controller
         }
 
         if (!$this->verifyPayout($user->beneficiary_cd, $psp->payout_verify_url)) { // if not present in DB, then add
-          $url = $psp->add_verify_url;
+          $add_url = $psp->payout_add_url;
   
           $curl = curl_init();
+
           curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
+            CURLOPT_URL => $add_url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -297,28 +298,28 @@ class ClientController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>'{
-                                  "PAY_ID":"'. $pay_id .'",
-                                  "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
-                                  "BENE_NAME": "' . $user->cust_name . '",
-                                  "CURRENCY_CD": "356",
-                                  "MOBILE_NUMBER": "'. $user->phone .'",
-                                  "EMAIL_ID": "' . $user->email . '",
-                                  
-                                  
-                                  "PAYER_ADDRESS": "'. $payer_address .'",
-                                  "BANK_NAME": "YESB",
-                                  "IFSC_CODE": "'. $ifsc .'",
-                                  "BENE_ACCOUNT_NO": "'. $account_no .'",
-                                  "ACTION":"ADD"
-                                  }',
+            CURLOPT_POSTFIELDS => '{
+                                      "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
+                                      "BENE_NAME": "' . $user->cust_name . '",
+                                      "CURRENCY_CD": "356",
+                                      "MOBILE_NUMBER": "'. $user->phone .'",
+                                      "EMAIL_ID": "' . $user->email . '",
+                                      "PAYER_ADDRESS": "'. $payer_address .'",
+                                      "BANK_NAME": "YESB",
+                                      "IFSC_CODE": "'. $ifsc .'",
+                                      "BENE_ACCOUNT_NO": "'. $account_no .'",
+                                      "ADDRESS_1": "'. $user->address1 .'",
+                                      "ADDRESS_2": "'. $user->address2 .'",
+                                      "AADHAR_NO": "'. $user->aadhar_no .'",
+                                      "ACTION":"ADD"
+                                      }',
             CURLOPT_HTTPHEADER => array(
-              'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
-              'Content-Type: application/json'
+              'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42'
             ),
           ));
-  
+
           $response = curl_exec($curl);
+
           curl_close($curl);
           $json_resp0 = json_decode($response);
   
@@ -372,14 +373,14 @@ class ClientController extends Controller
         $payout->response_message = $json_resp->RESPONSE_MESSAGE;
         $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
         $payout->total_amount = $json_resp->TOTAL_AMOUNT;
-        $payout->txn_hash = $user->txn_hash;
+        // $payout->txn_hash = $user->txn_hash;
         $payout->remarks = $user->remarks;
         $payout->sender = $user->address;
         $payout->receiver = $user->receiver;
         $payout->network = $user->network;
         $payout->currency = $user->crypto;
         $payout->inr_value = $user->inr_value;
-        $payout->is_external = 1;
+        $payout->is_external = 0;
         $saved = $payout->save();
   
         if ($saved) {
@@ -387,7 +388,6 @@ class ClientController extends Controller
         } else {
             return response()->json(['status' => 'false', 'data' => $json_resp]);
         }
-  
     }
 
     // @params
@@ -447,12 +447,12 @@ class ClientController extends Controller
       $deposit->status = $request->STATUS;
       $deposit->amount = $request->AMOUNT;
       $deposit->email = $request->CUST_EMAIL;
-      $deposit->txn_type = $request->TXNTYPE;
-      $deposit->pay_id = $request->PAY_ID;
+      $deposit->txn_type = $request->PAYMENT_TYPE;
+      // $deposit->pay_id = $request->PAY_ID;
       $deposit->order_id = $request->ORDER_ID;
       $deposit->total_amount = $request->TOTAL_AMOUNT;
       $deposit->hash = $request->generateHash;
-      $deposit->cust_name = $request->FIRST_NAME;
+      // $deposit->cust_name = $request->FIRST_NAME;
       $saved = $deposit->save();
 
       if (!$saved) {
@@ -477,7 +477,7 @@ class ClientController extends Controller
     protected function verifyPayout($beneficiary_cd, $verify_url) {
       $curl = curl_init();
       curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://uat.cashlesso.com/payout/beneficiaryMaintenance',
+        CURLOPT_URL => $verify_url,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -580,9 +580,6 @@ class ClientController extends Controller
         $data = ['name' => 'Verification', 'code' => $random_code];
         if (!empty($request->user_id)) {
           $user = User::where('id', $request->user_id)->first();
-        } else {
-          $wallet_address = $request->wallet_address;
-				  $aUser = User::where('wallet_address', $wallet_address)->where('is_external', 0)->first();
         }
 				if (empty($aUser)) {
         	$aUser = new User();

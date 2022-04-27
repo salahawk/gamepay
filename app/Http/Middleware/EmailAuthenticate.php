@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EmailAuthenticate
@@ -21,7 +22,7 @@ class EmailAuthenticate
 
        if ($user->email_status != "verified") {
           //  return redirect('/verifyemail')->withErrors(['Account is not yet verified']);
-          return redirect()->away($request->header('origin'), ['message' => "Email is not verified"]);
+          return redirect()->away($request->header('origin'));
        }
 
        return $next($request);
