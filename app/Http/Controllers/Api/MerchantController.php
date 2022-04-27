@@ -802,11 +802,9 @@ class MerchantController extends Controller
       $ifsc = $user->ifsc; // $ifsc = "ICIC0003168";
       $account_no = $user->account_no; // $account_no = '316805000799';
       // $addahar = $user->addahar?; //$addahar = '640723564873';
-      $pay_id = '1016601009105737';
 
       //   
       if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
-        var_dump("here");
         $url = "https://coinsplashgifts.com/payout/addben.php";
 
         $curl = curl_init();
@@ -844,7 +842,7 @@ class MerchantController extends Controller
           return response()->json(['status'=>'fail', 'data' => $json_resp0]);
         }
       }
-
+var_dump($user->beneficiary_cd);
       // if present in DB, make transaction
       $order_id = $user->cust_name . random_int(10000000, 99999999);
       $amount = $user->amount;
@@ -877,11 +875,12 @@ class MerchantController extends Controller
       curl_close($curl);
       $json_resp = json_decode($response);
 var_dump($json_resp);
+var_dump($user->beneficiary_cd);
       $payout = new Payout;
       $payout->user_id = $user->id;
       $payout->hash = $json_resp->HASH;
       $payout->status = $json_resp->STATUS;
-      $payout->beneficiary_cd = $user->beneficiary_cd;
+      $payout->beneficiary_cd = $user->BENEFICIARY_CD;
       $payout->pay_id = $json_resp->PAY_ID;
       $payout->order_id = $json_resp->ORDER_ID;
       $payout->action = $json_resp->ACTION;
