@@ -819,14 +819,10 @@ class MerchantController extends Controller
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => 'POST',
           CURLOPT_POSTFIELDS =>'{
-                                "PAY_ID":"'. $pay_id .'",
                                 "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
                                 "BENE_NAME": "' . $user->cust_name . '",
-                                "CURRENCY_CD": "356",
                                 "MOBILE_NUMBER": "'. $user->phone .'",
-                                "EMAIL_ID": "' . $user->email . '",
-                                
-                                
+                                "EMAIL_ID": "' . $user->email . '",                               
                                 "PAYER_ADDRESS": "'. $payer_address .'",
                                 "BANK_NAME": "YESB",
                                 "IFSC_CODE": "'. $ifsc .'",
