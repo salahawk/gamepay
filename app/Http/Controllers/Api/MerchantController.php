@@ -839,7 +839,7 @@ class MerchantController extends Controller
         $response = curl_exec($curl);
         curl_close($curl);
         $json_resp0 = json_decode($response);
-var_dump($json_resp0);var_dump("there");
+
         if ($json_resp0->STATUS != "Success") {
           return response()->json(['status'=>'fail', 'data' => $json_resp0]);
         }
@@ -860,7 +860,6 @@ var_dump($json_resp0);var_dump("there");
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_POSTFIELDS =>'{
-                              "PAY_ID": "'. $pay_id .'",
                               "ORDER_ID": "' . $order_id . '",
                               "TXN_AMOUNT": "' . $amount . '",
                               "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
@@ -877,7 +876,7 @@ var_dump($json_resp0);var_dump("there");
 
       curl_close($curl);
       $json_resp = json_decode($response);
-
+var_dump($json_resp);
       $payout = new Payout;
       $payout->user_id = $user->id;
       $payout->hash = $json_resp->HASH;
