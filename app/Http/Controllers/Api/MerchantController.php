@@ -196,6 +196,24 @@ class MerchantController extends Controller
         if ($email_status == 'verified' && $mobile_status =="verified" && $kyc_status != 'verified') {
           return redirect()->route('securepay.kyc', ['user_id' => $user_id]);
         } else if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
+            $deposit = new Deposit;
+            $deposit->user_id = $user_id;
+            $deposit->amount = $amount;
+            $deposit->crypto = $crypto;
+            $deposit->network = $network;
+            $deposit->remarks = $remarks;
+            $deposit->is_client = 0;
+            $deposit->cust_name = $customer_name;
+            $deposit->wallet = $address;
+            $deposit->order_id = $customer_name . random_int(10000000, 99999999);
+            $deposit->caller_id = $merchant->id;
+            $deposit->save();
+
+            $valuecheck = $deposit->order_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $salt;
+            $eurl = hash('sha512', $valuecheck);
+            $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
+            $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
+            $awayUrl = $url."?encdata=". $encData;
           return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
         } else {            
             $deposit = new Deposit;
