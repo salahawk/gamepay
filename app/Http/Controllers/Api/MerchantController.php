@@ -809,7 +809,7 @@ class MerchantController extends Controller
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-          CURLOPT_URL => "'". $url . "'",
+          CURLOPT_URL => $url,
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
           CURLOPT_MAXREDIRS => 10,
@@ -834,9 +834,9 @@ class MerchantController extends Controller
           ),
         ));
 
-        $response = curl_exec($curl);
+        $response0 = curl_exec($curl);
         curl_close($curl);
-        $json_resp0 = json_decode($response);
+        $json_resp0 = json_decode($response0);
 
         if ($json_resp0->STATUS != "Success") {
           return response()->json(['status'=>'fail', 'data' => $json_resp0]);
@@ -933,7 +933,7 @@ class MerchantController extends Controller
       curl_close($curl);
       $json_resp = json_decode($response);
 
-      if (empty($json_resp)) {
+      if (empty($json_resp) || $json_resp->STATUS != "Success") {
         return false;
       } else {
         return true;
