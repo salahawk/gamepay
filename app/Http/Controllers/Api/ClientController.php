@@ -71,7 +71,7 @@ class ClientController extends Controller
           $deposit->is_client = 1;
           $deposit->cust_name = $user->first_name;
           $deposit->wallet = $request->wallet_address;
-          $deposit->order_id = $user->first_name . random_int(100000, 999999);
+          $deposit->order_id = random_int(10000000, 99999999);
           $deposit->caller_id = $psp->client_id;
           $deposit->save();
 
