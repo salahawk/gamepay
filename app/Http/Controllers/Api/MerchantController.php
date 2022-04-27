@@ -846,7 +846,7 @@ class MerchantController extends Controller
       // if present in DB, make transaction
       $order_id = $user->cust_name . random_int(10000000, 99999999);
       $amount = $user->amount;
-      $comment = "test";
+      $comment = "payout test";
 
       $curl = curl_init();
       curl_setopt_array($curl, array(
