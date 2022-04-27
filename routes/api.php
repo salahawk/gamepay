@@ -61,10 +61,10 @@ Route::get('/securepay/deposit', 'Api\MerchantController@deposit')->name('secure
 Route::get('/securepay/upi', 'Api\MerchantController@getUpi')->name('securepay.upi');
 
 ///////////////// kyc /////////////////
-Route::any('/securepay/kyc', 'MerchantController@kycIndex')->name('securepay.kyc');
-Route::post('/securepay/kyc/process', 'MerchantController@kycProcess')->name('securepay.kyc.process');
-Route::post('/securepay/kyc/response', 'MerchantController@kycResponse')->name('securepay.kyc.response');
-Route::post('/securepay/kyc/manual', 'MerchantController@kycManual')->name('securepay.kyc.manual');
+Route::any('/securepay/kyc', 'Api\MerchantController@kycIndex')->name('securepay.kyc');
+Route::post('/securepay/kyc/process', 'Api\MerchantController@kycProcess')->name('securepay.kyc.process');
+Route::post('/securepay/kyc/response', 'Api\MerchantController@kycResponse')->name('securepay.kyc.response');
+Route::post('/securepay/kyc/manual', 'Api\MerchantController@kycManual')->name('securepay.kyc.manual');
 ///////////////// payout /////////////////
 Route::post('/securepay/payout', 'Api\MerchantController@payout')->name('securepay.payout');
 Route::get('/securepay/payout/process', 'Api\MerchantController@addPayout')->name('securepay.payout.add');
