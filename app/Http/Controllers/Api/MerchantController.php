@@ -803,7 +803,6 @@ class MerchantController extends Controller
       $account_no = $user->account_no; // $account_no = '316805000799';
       // $addahar = $user->addahar?; //$addahar = '640723564873';
 
-      //   
       if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
         $url = "https://coinsplashgifts.com/payout/addben.php";
 
@@ -826,7 +825,7 @@ class MerchantController extends Controller
                                 "BANK_NAME": "YESB",
                                 "IFSC_CODE": "'. $ifsc .'",
                                 "BENE_ACCOUNT_NO": "'. $account_no .'",
-                                "ACTION":"ADD"
+                                "ACTION":"ADD",
                                 }',
           CURLOPT_HTTPHEADER => array(
             'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
@@ -836,6 +835,7 @@ class MerchantController extends Controller
 
         $response0 = curl_exec($curl);
         curl_close($curl);
+
         $json_resp0 = json_decode($response0);
 
         if ($json_resp0->STATUS != "Success") {
@@ -932,7 +932,7 @@ class MerchantController extends Controller
 
       curl_close($curl);
       $json_resp = json_decode($response);
-
+var_dump($json_resp);
       if (empty($json_resp) || $json_resp->STATUS != "Success") {
         return false;
       } else {
