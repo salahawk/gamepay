@@ -921,7 +921,7 @@ class MerchantController extends Controller
         CURLOPT_POSTFIELDS =>'{
                               "BENEFICIARY_CD":"'. $beneficiary_cd .'",
                               "ACTION":"VERIFY"
-                              } ',
+                              }',
         CURLOPT_HTTPHEADER => array(
           'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
           'Content-Type: application/json'
