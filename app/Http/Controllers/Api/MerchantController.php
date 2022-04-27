@@ -816,17 +816,17 @@ class MerchantController extends Controller
           CURLOPT_FOLLOWLOCATION => true,
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => 'POST',
-          CURLOPT_POSTFIELDS =>'{
-                                "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
-                                "BENE_NAME": "' . $user->cust_name . '",
-                                "MOBILE_NUMBER": "'. $user->phone .'",
-                                "EMAIL_ID": "' . $user->email . '",
-                                "PAYER_ADDRESS": "'. $payer_address .'",
-                                "BANK_NAME": "YESB",
-                                "IFSC_CODE": "'. $ifsc .'",
-                                "BENE_ACCOUNT_NO": "'. $account_no .'",
-                                "ACTION":"ADD",
-                                }',
+          CURLOPT_POSTFIELDS => array (
+                                "BENEFICIARY_CD" => $user->beneficiary_cd,
+                                "BENE_NAME" => $user->cust_name,
+                                "MOBILE_NUMBER" => $user->phone,
+                                "EMAIL_ID" => $user->email,
+                                "PAYER_ADDRESS" => $payer_address,
+                                "BANK_NAME" => "YESB",
+                                "IFSC_CODE" => $ifsc,
+                                "BENE_ACCOUNT_NO" => $account_no,
+                                "ACTION" => "ADD",
+          ),
           CURLOPT_HTTPHEADER => array(
             'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
             'Content-Type: application/json'
@@ -858,16 +858,15 @@ class MerchantController extends Controller
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS =>'{
-                              "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
-                              "TXN_AMOUNT": "' . $amount . '",                              
-                              "BENE_COMMENT": "' . $comment . '",
-                              "TXN_PAYMENT_TYPE": "NEFT",
-                              "ORDER_ID": "' . $order_id . '",
-                              } ',
+        CURLOPT_POSTFIELDS => array (
+                              "BENEFICIARY_CD" => $user->beneficiary_cd,
+                              "TXN_AMOUNT" => $amount,
+                              "BENE_COMMENT" => $comment,
+                              "TXN_PAYMENT_TYPE" => "NEFT",
+                              "ORDER_ID" => $order_id,
+        ),
         CURLOPT_HTTPHEADER => array(
           'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
-          'Content-Type: application/json'
         ),
       ));
       $response = curl_exec($curl);
@@ -931,8 +930,7 @@ class MerchantController extends Controller
 
       curl_close($curl);
       $json_resp = json_decode($response);
-var_dump($json_resp);
-var_dump("sdfsdfsdfsdfwsdfsdfsdf");
+
       if (empty($json_resp) || $json_resp->STATUS != "Success") {
         return false;
       } else {
