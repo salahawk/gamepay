@@ -933,6 +933,7 @@ class MerchantController extends Controller
       curl_close($curl);
       $json_resp = json_decode($response);
 var_dump($json_resp);
+var_dump("sdfsdfsdfsdfwsdfsdfsdf");
       if (empty($json_resp) || $json_resp->STATUS != "Success") {
         return false;
       } else {
