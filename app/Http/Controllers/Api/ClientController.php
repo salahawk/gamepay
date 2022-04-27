@@ -419,16 +419,15 @@ class ClientController extends Controller
     public function responseDeposit(Request $request) {
       $salt = '';
       $deposit = Deposit::where('order_id', $request->ORDER_ID)->first();
-var_dump($request->ORDER_ID);
-var_dump($request->input());
+
       if (empty($deposit)) {
         return response()->json(['status' => 'fail', "message" => 'Order id does not exist in DB.']);
       }
       if ($deposit->is_client) {
-        $client = Client::where('caller_id', $deposit->caller_id)->first();
+        $client = Client::where('id', $deposit->caller_id)->first();
         $salt = $client->salt;
       } else {
-        $merchant = Merchant::where('caller_id', $deposit->caller_id)->first();
+        $merchant = Merchant::where('id', $deposit->caller_id)->first();
         $salt = $merchant->salt;
       }
       
