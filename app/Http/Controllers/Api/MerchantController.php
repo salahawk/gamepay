@@ -153,7 +153,7 @@ class MerchantController extends Controller
           $deposit->is_client = 0;
           $deposit->cust_name = $customer_name;
           $deposit->wallet = $address;
-          $deposit->order_id = $customer_name . random_int(100000, 999999);
+          $deposit->order_id = random_int(10000000, 99999999);
           $deposit->caller_id = $merchant->id;
           $deposit->save();
 
@@ -211,7 +211,7 @@ class MerchantController extends Controller
             $deposit->is_client = 0;
             $deposit->cust_name = $customer_name;
             $deposit->wallet = $address;
-            $deposit->order_id = $customer_name . random_int(100000, 999999);
+            $deposit->order_id = random_int(10000000, 99999999);
             $deposit->caller_id = $merchant->id;
             $deposit->save();
 
@@ -348,7 +348,7 @@ class MerchantController extends Controller
       
         $pay_id = env('PAY_ID');
         $orderAmount = $user->amount;
-        $orderId = $user->cust_name . random_int(10000, 99999);
+        $orderId = random_int(1000000, 9999999);
         $orderCurrencyId = '356';
         $payeAddress = $user->payer_address;
         $customerEmail = $user->email;
@@ -828,7 +828,7 @@ class MerchantController extends Controller
       }
 
       // if present in DB, make transaction
-      $order_id = $user->cust_name . random_int(100000, 999999);
+      $order_id = random_int(10000000, 99999999);
       $amount = $user->amount;
       $comment = "test";
       $curl = curl_init();
