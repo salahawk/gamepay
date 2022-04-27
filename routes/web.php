@@ -45,7 +45,6 @@ Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify')
     // // exchange-sell
     Route::post('/payout/process', 'DirectUserController@processPayout')->name('process-payout');
 
-
     // ////////////////////   pages   /////////////////////////////////
     Route::get('/privacy', 'AuthController@privacy')->name('privacy');
     Route::get('/terms', 'AuthController@terms')->name('terms');
@@ -57,40 +56,12 @@ Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify')
     Route::get('/profile/edit', 'DirectUserController@profileEdit')->name('profile.edit');
     Route::get('/sell', 'DirectUserController@sell')->name('sell');
 
-
     // Route::post('/cashlesso/send', 'DirectUserController@sendCashlesso')->name('send-cashlesso');
     // Route::post('/cashlesso/response', 'DirectUserController@responseCashlesso')->name('response-cashlesso');
     //-------------------------------- Direct end -------------------------------------------//
 // });
 
-//-------------------------------- 3rd party -------------------------------------------//
-////////////////// otp ///////////////////
-// mobile OTP
-Route::post('api/otp/mobile/send', 'ExternalUserController@sendMobileOtp')->name('securepay.sendMobileOtp');
-Route::post('api/otp/mobile/submit', 'ExternalUserController@submitMobileOtp')->name('securepay.submitMobileOtp');
-// email OTP
-Route::post('api/otp/email/send', 'ExternalUserController@sendEmailOtp')->name('securepay.sendEmailOtp');
-Route::post('api/otp/email/submit', 'ExternalUserController@submitEmailOtp')->name('securepay.submitEmailOtp');
 
-////////////////// deposit ///////////////////
-Route::post('/api/securepay/process', 'ExternalUserController@index')->name('securepay.process');
-Route::post('/api/securepay/validate', 'ExternalUserController@validateVpa')->name('securepay.validate');
-Route::get('/api/securepay/deposit', 'ExternalUserController@deposit')->name('securepay.deposit');
-Route::get('/api/securepay/upi', 'ExternalUserController@getUpi')->name('securepay.upi');
-Route::post('api/securepay/response', 'ExternalUserController@responseDepositUPI')->name('securepay.response');
-///////////////// kyc /////////////////
-Route::any('/api/securepay/kyc', 'ExternalUserController@kycIndex')->name('securepay.kyc');
-Route::post('/api/securepay/kyc/process', 'ExternalUserController@kycProcess')->name('securepay.kyc.process');
-Route::post('/api/securepay/kyc/response', 'ExternalUserController@kycResponse')->name('securepay.kyc.response');
-Route::post('/api/securepay/kyc/manual', 'ExternalUserController@kycManual')->name('securepay.kyc.manual');
-///////////////// payout /////////////////
-Route::post('/api/securepay/payout', 'ExternalUserController@payout')->name('securepay.payout');
-Route::get('/api/securepay/payout/process', 'ExternalUserController@addPayout')->name('securepay.payout.add');
-Route::post('/api/securepay/pan/manual', 'ExternalUserController@panManual')->name('securepay.pan.manual');
-Route::any('/api/securepay/pan', 'ExternalUserController@pan')->name('securepay.pan');
-///////////////// external  /////////////////
-
-//-------------------------------- 3rd party end -------------------------------------------//
 
 
 

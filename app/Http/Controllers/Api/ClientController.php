@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Twilio\Rest\Client;
+use Twilio\Rest\Client as Twiliio;
 use Mail;
 use Auth;
 use Illuminate\Support\Facades\Session;
@@ -15,6 +15,8 @@ use App\Models\User;
 use App\Models\Verification;
 use App\Models\Payout;
 use App\Models\Psp;
+use App\Models\Client;
+use App\Models\Merchant;
 use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
@@ -28,7 +30,6 @@ class ClientController extends Controller
     // inr_value - inr value
     public function deposit(Request $request)
     {
-      $SALT = env('UPI_SALT');
         $user = User::find(auth()->user()->id);
         
         if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
@@ -50,11 +51,13 @@ class ClientController extends Controller
             return response()->json(['status' => 'fail', 'error' => $validator->errors()]);
           }
           
-          // find predefined PSP provider based on IP address
+          // find predefined PSP provider based on IP address for client
           $ip_string = $request->header('origin');
           $pieces = explode("//", $ip_string);
-          $psp = Psp::where('ip_address', $pieces[1])->first();
-          if (empty($psp)) {
+          $client = Client::where('ip', $pieces[1])->first();
+          $psp = Psp::where('client_id', $client->id)->first();
+
+          if (empty($client) || empty($psp)) {
             return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
           }
 
@@ -65,19 +68,19 @@ class ClientController extends Controller
           $deposit->network = $request->network;
           $deposit->remarks = $request->remarks;
           $deposit->inr_value = $request->inr_value;
-          $deposit->is_external = 0;
+          $deposit->is_client = 1;
           $deposit->cust_name = $user->first_name;
           $deposit->wallet = $request->wallet_address;
-          $deposit->order_id = $user->first_name . random_int(10000, 99999);
-          // $deposit->merchant = $psp->merchant_id;
+          $deposit->order_id = $user->first_name . random_int(100000, 999999);
+          $deposit->caller_id = $psp->client_id;
           $deposit->save();
 
 
           // add third party bank calculation
-          $valuecheck = $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->mobile."|*".urldecode($deposit->cust_name)."|*" . $SALT;
-			    $eurl = hash('sha512', $valuecheck);
+          $valuecheck = $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->mobile."|*".urldecode($deposit->cust_name)."|*" . $client->salt;
+			    $hash = hash('sha512', $valuecheck);
           $url = $psp->url;
-          $encData=urlencode(base64_encode("firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$eurl"));
+          $encData=urlencode(base64_encode("firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
           return response()->json(['status' => 'success', 'url' => $url."?encdata=". $encData]);
         }
     }
@@ -118,7 +121,7 @@ class ClientController extends Controller
         $sid = env('TWILIO_SID');
         $token = env('TWILIO_TOKEN');
 
-        $client = new Client($sid, $token);
+        $client = new Twiliio($sid, $token);
         return $client->messages->create($data['phone'], [
             'from' => env('TWILIO_NUMBER'),
             'body' => $data['text'],
@@ -264,7 +267,127 @@ class ClientController extends Controller
     // @RETURN
     // user's all data
     public function processPayout(Request $request) {
+        $user = User::find(auth()->user->id);
+        $payer_address = $user->payer_address; // $payer_address = "9213116078@yesb";
+        $ifsc = $user->ifsc; // $ifsc = "ICIC0003168";
+        $account_no = $user->account_no; // $account_no = '316805000799';
+        // $addahar = $user->addahar?; //$addahar = '640723564873';
+        $pay_id = '1016601009105737';
+  
+        // choose PSP
+        $ip_string = $request->header('origin');
+        $pieces = explode("//", $ip_string);
+        $client = Merchant::where('ip', $pieces[1])->first();
+        $psp = Psp::where('client_id', $client->id)->first();
 
+        if (empty($client) || empty($psp)) {
+          return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
+        }
+
+        if (!$this->verifyPayout($user->beneficiary_cd, $psp->payout_verify_url)) { // if not present in DB, then add
+          $url = $psp->add_verify_url;
+  
+          $curl = curl_init();
+          curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>'{
+                                  "PAY_ID":"'. $pay_id .'",
+                                  "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
+                                  "BENE_NAME": "' . $user->cust_name . '",
+                                  "CURRENCY_CD": "356",
+                                  "MOBILE_NUMBER": "'. $user->phone .'",
+                                  "EMAIL_ID": "' . $user->email . '",
+                                  
+                                  
+                                  "PAYER_ADDRESS": "'. $payer_address .'",
+                                  "BANK_NAME": "YESB",
+                                  "IFSC_CODE": "'. $ifsc .'",
+                                  "BENE_ACCOUNT_NO": "'. $account_no .'",
+                                  "ACTION":"ADD"
+                                  }',
+            CURLOPT_HTTPHEADER => array(
+              'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+              'Content-Type: application/json'
+            ),
+          ));
+  
+          $response = curl_exec($curl);
+          curl_close($curl);
+          $json_resp0 = json_decode($response);
+  
+          if ($json_resp0->STATUS != "Success") {
+            return response()->json(['status'=>'fail', 'data' => $json_resp0]);
+          }
+        }
+  
+        // if present in DB, make transaction
+        $order_id = $user->cust_name . random_int(100000, 999999);
+        $amount = $user->amount;
+        $comment = "test";
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $psp->payout_release_url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS =>'{
+                                "PAY_ID": "'. $pay_id .'",
+                                "ORDER_ID": "' . $order_id . '",
+                                "TXN_AMOUNT": "' . $amount . '",
+                                "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
+                                "BENE_COMMENT": "' . $comment . '",
+                                "TXN_PAYMENT_TYPE": "NEFT"
+                                } ',
+          CURLOPT_HTTPHEADER => array(
+            'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+            'Content-Type: application/json'
+          ),
+        ));
+  
+        $response = curl_exec($curl);
+  
+        curl_close($curl);
+        $json_resp = json_decode($response);
+  
+        $payout = new Payout;
+        $payout->user_id = $user->id;
+        $payout->hash = $json_resp->HASH;
+        $payout->status = $json_resp->STATUS;
+        $payout->beneficiary_cd = $json_resp->BENEFICIARY_CD;
+        $payout->pay_id = $json_resp->PAY_ID;
+        $payout->order_id = $json_resp->ORDER_ID;
+        $payout->action = $json_resp->ACTION;
+        $payout->txn_amount = $json_resp->TXN_AMOUNT;
+        $payout->response_message = $json_resp->RESPONSE_MESSAGE;
+        $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
+        $payout->total_amount = $json_resp->TOTAL_AMOUNT;
+        $payout->txn_hash = $user->txn_hash;
+        $payout->remarks = $user->remarks;
+        $payout->sender = $user->address;
+        $payout->receiver = $user->receiver;
+        $payout->network = $user->network;
+        $payout->currency = $user->crypto;
+        $payout->inr_value = $user->inr_value;
+        $payout->is_external = 1;
+        $saved = $payout->save();
+  
+        if ($saved) {
+            return response()->json(['status' => 'success']);
+        } else {
+            return response()->json(['status' => 'false', 'data' => $json_resp]);
+        }
+  
     }
 
     // @params
@@ -289,6 +412,101 @@ class ClientController extends Controller
       return response()->json(['status'=>'success']);
 		}
 
+    // @params
+    // response from PSP for deposit
+    // @return
+    // status
+    public function responseDeposit(Request $request) {
+      $salt = '';
+      $deposit = Deposit::where('order_id', $request->ORDER_ID)->first();
+
+      if (empty($deposit)) {
+        return response()->json(['status' => 'fail', "message" => 'Order id does not exist in DB.']);
+      }
+      if ($deposit->is_client) {
+        $client = Client::where('caller_id', $deposit->caller_id)->first();
+        $salt = $client->salt;
+      } else {
+        $merchant = Merchant::where('caller_id', $deposit->caller_id)->first();
+        $salt = $merchant->salt;
+      }
+      
+      // hash generation check
+      $hash_string = "|". $request->ORDER_ID . "|" . $request->AMOUNT . "|" . $request->FIRST_NAME . "|" . $request->CUST_EMAIL . "|" . $request->STATUS . "|";
+      $hash_string .= $salt;
+      $hash = hash("sha512", $hash_string);
+
+      if ($hash != $request->generateHash) {
+        return response()->json(['status' => 'fail', "message" => 'hash is wrong']);
+      }
+
+      $deposit->created_date = $request->RESPONSE_DATE_TIME;
+      $deposit->phone = $request->CUST_PHONE;
+      $deposit->payer_address = $request->CARD_MASK;
+      $deposit->currency_code = $request->CURRENCY_CODE;
+      $deposit->status = $request->STATUS;
+      $deposit->amount = $request->AMOUNT;
+      $deposit->email = $request->CUST_EMAIL;
+      $deposit->txn_type = $request->TXNTYPE;
+      $deposit->pay_id = $request->PAY_ID;
+      $deposit->order_id = $request->ORDER_ID;
+      $deposit->total_amount = $request->TOTAL_AMOUNT;
+      $deposit->hash = $request->generateHash;
+      $deposit->cust_name = $request->FIRST_NAME;
+      $saved = $deposit->save();
+
+      if (!$saved) {
+        return response()->json(['status'=>'fail']);        
+      }
+
+      if ($request->STATUS == "Captured" || $request->STATUS == "Success") {
+        // mint tokens
+        $exec_phrase =
+            'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
+
+        // print_r($exec_phrase); exit();
+        chdir('../');
+        exec($exec_phrase, $var, $result);
+        return response()->json(['status'=>'success', 'message'=>"successfully minted"]);
+      } else {
+        return response()->json(['status'=>'fail', 'message'=>"Deposit was not successful"]);
+      }
+      
+    }
+
+    protected function verifyPayout($beneficiary_cd, $verify_url) {
+      $curl = curl_init();
+      curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://uat.cashlesso.com/payout/beneficiaryMaintenance',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS =>'{
+                              "PAY_ID":"1016601009105737",
+                              "BENEFICIARY_CD":"'. $beneficiary_cd .'",
+                              "ACTION":"VERIFY"
+                              } ',
+        CURLOPT_HTTPHEADER => array(
+          'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+          'Content-Type: application/json'
+        ),
+      ));
+
+      $response = curl_exec($curl);
+
+      curl_close($curl);
+      $json_resp = json_decode($response);
+
+      if (empty($json_resp) || $json_resp->STATUS != "Success") {
+        return false;
+      } else {
+        return true;
+      }
+    }
 
 
 
@@ -829,41 +1047,7 @@ class ClientController extends Controller
       return redirect()->route('portfolio');
     }
 
-    protected function verifyPayout($beneficiary_cd) {
-      $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
-
-      $curl = curl_init();
-      curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://uat.cashlesso.com/payout/beneficiaryMaintenance',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS =>'{
-                              "PAY_ID":"1016601009105737",
-                              "BENEFICIARY_CD":"'. $beneficiary_cd .'",
-                              "ACTION":"VERIFY"
-                              } ',
-        CURLOPT_HTTPHEADER => array(
-          'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
-          'Content-Type: application/json'
-        ),
-      ));
-
-      $response = curl_exec($curl);
-
-      curl_close($curl);
-      $json_resp = json_decode($response);
-
-      if (empty($json_resp) || $json_resp->STATUS != "Success") {
-        return false;
-      } else {
-        return true;
-      }
-    }
+    
 
     public function sell() {
       return view('direct_users.sell')->with('user', Auth::user());

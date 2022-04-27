@@ -16,12 +16,12 @@ use App\Models\Deposit;
 use App\Models\External;
 use App\Models\Payout;
 
-class ExternalUserController extends Controller
+class MerchantController extends Controller
 {
     public function index(Request $request)
     {
         // validate key and salt
-        $SALT = 'salt123456789';
+        $salt = '';
 
         $rules = [
           'KEY' => 'required|numeric',
@@ -67,6 +67,12 @@ class ExternalUserController extends Controller
         $curl = $request->CURL;
         $hash = $request->HASH;
 
+        // select PSP for merchant
+        $ip_string = $request->header('origin');
+        $pieces = explode("//", $ip_string);
+        $merchant = Merchant::where('ip', $pieces[1])->first();
+        $salt = $merchant->salt;
+
         $hash_string =
             $key .
             '|' .
@@ -100,7 +106,7 @@ class ExternalUserController extends Controller
             '|' .
             $curl .
             '|' .
-            $SALT;
+            $salt;
 
         $hash_value = hash('sha256', $hash_string);
 
@@ -109,13 +115,6 @@ class ExternalUserController extends Controller
         }
         
         // check user if existing by wallet and email
-        // $user = User::where('wallet_address', $address)
-        //                     ->where('email', $email)
-        //                     ->where('email_status', 'verified')
-        //                     ->where('kyc_status', 'verified')
-        //                     ->where('mobile_status', 'verified')
-        //                     ->where('is_external', 1)
-        //                     ->first();
         $user = External::where('address', $address)
                             ->where('email', $email)
                             ->where('email_status', 'verified')
@@ -143,13 +142,23 @@ class ExternalUserController extends Controller
           $user->hash = $hash;
           $saved = $user->save();
           
-          // return redirect()->route('securepay.upi', [
-          //     'external_user_id' => $user->id,
-          // ]);
+
+          $deposit = new Deposit;
+          $deposit->user_id = $user->id;
+          $deposit->amount = $amount;
+          $deposit->crypto = $crypto;
+          $deposit->network = $network;
+          $deposit->remarks = $remarks;
+          $deposit->is_client = 0;
+          $deposit->cust_name = $customer_name;
+          $deposit->wallet = $address;
+          $deposit->order_id = $customer_name . random_int(100000, 999999);
+          $deposit->caller_id = $merchant->id;
+          $deposit->save();
 
           // add third party bank calculation
-          $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $SALT;
-			    $eurl = hash('sha512', $valuecheck);
+          $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $salt;
+		  $eurl = hash('sha512', $valuecheck);
           $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
           $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
           return redirect()->away($url."?encdata=". $encData);
@@ -192,9 +201,18 @@ class ExternalUserController extends Controller
         } else if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
           return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
         } else {            
-            // return redirect()->route('securepay.upi', [
-            //     'external_user_id' => $user_id,
-            // ]);
+            $deposit = new Deposit;
+            $deposit->user_id = $user_id;
+            $deposit->amount = $amount;
+            $deposit->crypto = $crypto;
+            $deposit->network = $network;
+            $deposit->remarks = $remarks;
+            $deposit->is_client = 0;
+            $deposit->cust_name = $customer_name;
+            $deposit->wallet = $address;
+            $deposit->order_id = $customer_name . random_int(100000, 999999);
+            $deposit->caller_id = $merchant->id;
+            $deposit->save();
 
           return redirect()->away($url."?encdata=". $encData);
         }
@@ -204,7 +222,7 @@ class ExternalUserController extends Controller
     {
         $random_code = random_int(100000, 999999);
         
-        $sample = External::where('id', $request->user_id)->first();				
+        $sample = External::where('id', $user_id)->first();				
         $sample->otp_value = $random_code;
         $sample->phone = $request->mobile_number;
         $saved = $sample->save();
@@ -292,6 +310,13 @@ class ExternalUserController extends Controller
             return response()->json(['status' => 'fail']);
         }
     }
+
+
+
+
+
+
+
 
     public function getUpi(Request $request)
     {
@@ -400,7 +425,7 @@ class ExternalUserController extends Controller
         $orderId = $responsePayment->ORDER_ID;
         $aDeposit = new Deposit();
         $aDeposit->user_id = $user->id;
-        $aDeposit->is_external = 1;
+        $aDeposit->is_client = 0;
         $aDeposit->created_date = $responsePayment->RESPONSE_DATE_TIME;
         $aDeposit->currency_code = $orderCurrencyId;
         $aDeposit->pay_id = $pay_id;
@@ -750,13 +775,14 @@ class ExternalUserController extends Controller
     }
 
     public function addPayout(Request $request) {
-      // $user = Auth::user();
       $user = External::where('id', $request->user_id)->first();
       $payer_address = $user->payer_address; // $payer_address = "9213116078@yesb";
       $ifsc = $user->ifsc; // $ifsc = "ICIC0003168";
       $account_no = $user->account_no; // $account_no = '316805000799';
       // $addahar = $user->addahar?; //$addahar = '640723564873';
       $pay_id = '1016601009105737';
+
+      //   
       if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
         $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
 
@@ -938,60 +964,6 @@ class ExternalUserController extends Controller
       } else {
           return response()->json(['status' => 'fail']);
       }
-    }
-
-    public function responseDepositUPI(Request $request) {
-      $SALT = 'salt123456789';
-      $user = External::where('txnid', $request->ORDER_ID)->first();
-      
-      if(empty($user)) {
-        return view('404');
-      }
-
-      // hash generation check
-      $hash_string = "|". $request->ORDER_ID . "|" . $request->AMOUNT . "|" . $request->FIRST_NAME . "|" . $request->CUST_EMAIL . "|" . $request->STATUS . "|";
-      $hash_string .= $SALT;
-      $hash = hash("sha512", $hash_string);
-      if ($hash != $request->generateHash) {
-        return response()->json(['status' => 'fail', "data" => 'hash is wrong']);
-      }
-      $deposit = new Deposit;
-      $deposit->created_date = $request->RESPONSE_DATE_TIME;
-      $deposit->phone = $request->CUST_PHONE;
-      $deposit->payer_address = $request->CARD_MASK;
-      $deposit->currency_code = $request->CURRENCY_CODE;
-      $deposit->status = $request->STATUS;
-      $deposit->amount = $request->AMOUNT;
-      $deposit->email = $request->CUST_EMAIL;
-      $deposit->txn_type = $request->TXNTYPE;
-      $deposit->pay_id = $request->PAY_ID;
-      $deposit->order_id = $request->ORDER_ID;
-      $deposit->total_amount = $request->TOTAL_AMOUNT;
-      $deposit->hash = $request->generateHash;
-      $deposit->wallet = $user->address;
-      $deposit->cust_name = $request->FIRST_NAME;
-      $deposit->crypto = $user->crypto;
-      $deposit->network = $user->network;
-      $deposit->inr_value = $user->inr_value;
-      $deposit->crypto = $user->crypto;
-      $deposit->user_id = $user->id;
-      $deposit->is_external = 1;
-      $saved = $deposit->save();
-
-      if (!$saved) {
-        return response()->json(['status'=>'fail']);        
-      }
-
-      if ($request->STATUS == "Captured" || $request->STATUS == "Success") {
-        // mint tokens
-        $exec_phrase =
-            'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
-
-        // print_r($exec_phrase); exit();
-        chdir('../');
-        exec($exec_phrase, $var, $result);
-      }
-      return response()->json(['status'=>'success']);
     }
 
     protected function selectPsp($data) {

@@ -21,7 +21,7 @@ Route::post('register', 'Api\AuthController@signup');
 Route::get('register/verify/{psp_id}/{token}', 'Api\AuthController@verifyEmail')->name('api.email.verify');
 Route::post('login', 'Api\AuthController@login');
 
-Route::group(['middleware' => ['auth:sanctum']], function () {
+Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     // Route::apiResource('projects', 'ProjectsApiController');
     // Route::apiResource('teams', 'TeamApiController');
 
@@ -43,4 +43,34 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 
 Route::post('/kyc/response', 'Api\ClientController@responseKyc');
-Route::post('/upi/response', 'Api\ClientController@responseUpi');
+
+//-------------------------------- Merchant(3rd party) -------------------------------------------//
+////////////////// otp ///////////////////
+// mobile OTP
+Route::post('/otp/mobile/send', 'Api\MerchantController@sendMobileOtp')->name('securepay.sendMobileOtp');
+Route::post('/otp/mobile/submit', 'Api\MerchantController@submitMobileOtp')->name('securepay.submitMobileOtp');
+// email OTP
+Route::post('/otp/email/send', 'Api\MerchantController@sendEmailOtp')->name('securepay.sendEmailOtp');
+Route::post('/otp/email/submit', 'Api\MerchantController@submitEmailOtp')->name('securepay.submitEmailOtp');
+
+////////////////// deposit ///////////////////
+Route::post('/securepay/process', 'Api\MerchantController@index')->name('securepay.process');
+Route::post('/securepay/validate', 'Api\MerchantController@validateVpa')->name('securepay.validate');
+Route::get('/securepay/deposit', 'Api\MerchantController@deposit')->name('securepay.deposit');
+Route::get('/securepay/upi', 'Api\MerchantController@getUpi')->name('securepay.upi');
+
+///////////////// kyc /////////////////
+Route::any('/securepay/kyc', 'MerchantController@kycIndex')->name('securepay.kyc');
+Route::post('/securepay/kyc/process', 'MerchantController@kycProcess')->name('securepay.kyc.process');
+Route::post('/securepay/kyc/response', 'MerchantController@kycResponse')->name('securepay.kyc.response');
+Route::post('/securepay/kyc/manual', 'MerchantController@kycManual')->name('securepay.kyc.manual');
+///////////////// payout /////////////////
+Route::post('/securepay/payout', 'Api\MerchantController@payout')->name('securepay.payout');
+Route::get('/securepay/payout/process', 'Api\MerchantController@addPayout')->name('securepay.payout.add');
+Route::post('/securepay/pan/manual', 'Api\MerchantController@panManual')->name('securepay.pan.manual');
+Route::any('/securepay/pan', 'Api\MerchantController@pan')->name('securepay.pan');
+///////////////// external  /////////////////
+
+//-------------------------------- Merchant(3rd party end) -------------------------------------------//
+Route::post('/deposit/response', 'Api\ClientController@responseDeposit');
+Route::post('/payout/response', 'Api\ClientController@responsePayout');
