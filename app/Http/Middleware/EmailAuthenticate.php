@@ -26,3 +26,4 @@ class EmailAuthenticate
 
        return $next($request);
    }
+}
