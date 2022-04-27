@@ -842,11 +842,12 @@ class MerchantController extends Controller
           return response()->json(['status'=>'fail', 'data' => $json_resp0]);
         }
       }
-var_dump($user->beneficiary_cd);
+
       // if present in DB, make transaction
       $order_id = $user->cust_name . random_int(10000000, 99999999);
       $amount = $user->amount;
       $comment = "test";
+
       $curl = curl_init();
       curl_setopt_array($curl, array(
         CURLOPT_URL => 'https://coinsplashgifts.com/payout/release.php',
@@ -858,9 +859,9 @@ var_dump($user->beneficiary_cd);
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_POSTFIELDS =>'{
+                              "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
                               "ORDER_ID": "' . $order_id . '",
                               "TXN_AMOUNT": "' . $amount . '",
-                              "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
                               "BENE_COMMENT": "' . $comment . '",
                               "TXN_PAYMENT_TYPE": "NEFT"
                               } ',
@@ -874,13 +875,12 @@ var_dump($user->beneficiary_cd);
 
       curl_close($curl);
       $json_resp = json_decode($response);
-var_dump($json_resp);
-var_dump($user->beneficiary_cd);
+
       $payout = new Payout;
       $payout->user_id = $user->id;
       $payout->hash = $json_resp->HASH;
       $payout->status = $json_resp->STATUS;
-      $payout->beneficiary_cd = $user->BENEFICIARY_CD;
+      $payout->beneficiary_cd = $json_resp->BENEFICIARY_CD;
       $payout->pay_id = $json_resp->PAY_ID;
       $payout->order_id = $json_resp->ORDER_ID;
       $payout->action = $json_resp->ACTION;
