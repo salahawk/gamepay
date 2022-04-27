@@ -806,6 +806,7 @@ class MerchantController extends Controller
 
       //   
       if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
+        var_dump("here");
         $url = "https://coinsplashgifts.com/payout/addben.php";
 
         $curl = curl_init();
@@ -838,7 +839,7 @@ class MerchantController extends Controller
         $response = curl_exec($curl);
         curl_close($curl);
         $json_resp0 = json_decode($response);
-var_dump($json_resp0);
+var_dump($json_resp0);var_dump("there");
         if ($json_resp0->STATUS != "Success") {
           return response()->json(['status'=>'fail', 'data' => $json_resp0]);
         }
@@ -935,7 +936,7 @@ var_dump($json_resp0);
       curl_close($curl);
       $json_resp = json_decode($response);
 
-      if (empty($json_resp) || $json_resp->STATUS != "Success") {
+      if (empty($json_resp)) {
         return false;
       } else {
         return true;
