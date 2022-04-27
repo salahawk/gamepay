@@ -451,6 +451,8 @@ class ClientController extends Controller
       // $deposit->pay_id = $request->PAY_ID;
       $deposit->order_id = $request->ORDER_ID;
       $deposit->total_amount = $request->TOTAL_AMOUNT;
+      $deposit->pg_txn_message = $request->PG_TXN_MESSAGE;
+      $deposit->response_message = $request->RESPONSE_MESSAGE;
       $deposit->hash = $request->generateHash;
       // $deposit->cust_name = $request->FIRST_NAME;
       $saved = $deposit->save();
