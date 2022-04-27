@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\Deposit;
 use App\Models\External;
 use App\Models\Payout;
+use App\Models\Merchant;
 
 class MerchantController extends Controller
 {
