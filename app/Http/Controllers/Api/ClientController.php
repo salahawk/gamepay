@@ -988,7 +988,7 @@ var_dump($request->input());
       }
 
       // if present in DB, make transaction
-      $order_id = $user->first_name . random_int(100000, 999999);
+      $order_id =  random_int(10000000, 99999999);
       $amount = $request->amount;
       $comment = "test";
       $curl = curl_init();
