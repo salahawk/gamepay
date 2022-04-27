@@ -919,12 +919,11 @@ class MerchantController extends Controller
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_POSTFIELDS => array(
-                              'BENEFICIARY_CD : ' . $beneficiary_cd,
-                              'ACTION: VERIFY'
+                              BENEFICIARY_CD => $beneficiary_cd,
+                              ACTION => 'VERIFY'
                               ),
         CURLOPT_HTTPHEADER => array(
-          'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
-          'Content-Type: application/json'
+          'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42'
         ),
       ));
 
