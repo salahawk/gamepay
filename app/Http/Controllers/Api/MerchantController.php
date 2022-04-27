@@ -207,7 +207,7 @@ class MerchantController extends Controller
             $deposit->is_client = 0;
             $deposit->cust_name = $customer_name;
             $deposit->wallet = $address;
-            $deposit->order_id = $user->cust_name . random_int(10000000, 99999999);
+            $deposit->order_id = $customer_name . random_int(10000000, 99999999);
             $deposit->caller_id = $merchant->id;
             $deposit->save();
 
