@@ -876,7 +876,7 @@ class MerchantController extends Controller
 
       curl_close($curl);
       $json_resp = json_decode($response);
-var_dump($json_resp);
+
       $payout = new Payout;
       $payout->user_id = $user->id;
       $payout->hash = $json_resp->HASH;
