@@ -71,7 +71,7 @@ class ClientController extends Controller
           $deposit->is_client = 1;
           $deposit->cust_name = $user->first_name;
           $deposit->wallet = $request->wallet_address;
-          $deposit->order_id = random_int(10000000, 99999999);
+          $deposit->order_id = $user->first_name . random_int(10000000, 99999999);
           $deposit->caller_id = $psp->client_id;
           $deposit->save();
 
@@ -329,7 +329,7 @@ class ClientController extends Controller
         }
   
         // if present in DB, make transaction
-        $order_id = $user->cust_name . random_int(100000, 999999);
+        $order_id = $user->cust_name . random_int(10000000, 99999999);
         $amount = $user->amount;
         $comment = "test";
         $curl = curl_init();
@@ -987,7 +987,7 @@ class ClientController extends Controller
       }
 
       // if present in DB, make transaction
-      $order_id =  random_int(10000000, 99999999);
+      $order_id = $user->first_name .  random_int(10000000, 99999999);
       $amount = $request->amount;
       $comment = "test";
       $curl = curl_init();
