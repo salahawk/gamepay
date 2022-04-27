@@ -191,7 +191,7 @@ class MerchantController extends Controller
 
         $user_id = $sample->id;
 
-        $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $SALT;
+        $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $salt;
         $eurl = hash('sha512', $valuecheck);
         $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
         $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
