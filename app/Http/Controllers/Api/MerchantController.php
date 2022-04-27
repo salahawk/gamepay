@@ -158,10 +158,10 @@ class MerchantController extends Controller
           $deposit->save();
 
           // add third party bank calculation
-          $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $salt;
+          $valuecheck = $deposit->order_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $salt;
 		  $eurl = hash('sha512', $valuecheck);
           $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
-          $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
+          $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
           return redirect()->away($url."?encdata=". $encData);
         }
         
@@ -191,11 +191,7 @@ class MerchantController extends Controller
 
         $user_id = $sample->id;
 
-        $valuecheck = $txn_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $salt;
-        $eurl = hash('sha512', $valuecheck);
-        $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
-        $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
-        $awayUrl = $url."?encdata=". $encData;
+        
         // redirect to the verification
         if ($email_status == 'verified' && $mobile_status =="verified" && $kyc_status != 'verified') {
           return redirect()->route('securepay.kyc', ['user_id' => $user_id]);
@@ -214,6 +210,12 @@ class MerchantController extends Controller
             $deposit->order_id = random_int(10000000, 99999999);
             $deposit->caller_id = $merchant->id;
             $deposit->save();
+
+            $valuecheck = $deposit->order_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $salt;
+            $eurl = hash('sha512', $valuecheck);
+            $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
+            $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
+            $awayUrl = $url."?encdata=". $encData;
 
           return redirect()->away($url."?encdata=". $encData);
         }
