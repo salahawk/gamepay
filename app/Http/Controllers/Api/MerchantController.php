@@ -187,6 +187,7 @@ class MerchantController extends Controller
         $sample->eurl = $eurl;
         $sample->curl = $curl;
         $sample->hash = $hash;
+        $sample->beneficiary_cd = $customer_name . random_int(10000000000, 99999999999);
         $saved = $sample->save();
 
         $user_id = $sample->id;
@@ -924,7 +925,6 @@ class MerchantController extends Controller
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_POSTFIELDS =>'{
-                              "PAY_ID":"1016601009105737",
                               "BENEFICIARY_CD":"'. $beneficiary_cd .'",
                               "ACTION":"VERIFY"
                               } ',
