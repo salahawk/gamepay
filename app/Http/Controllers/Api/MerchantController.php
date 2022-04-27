@@ -805,7 +805,7 @@ class MerchantController extends Controller
 
       //   
       if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
-        $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
+        $url = "https://coinsplashgifts.com/payout/addben.php";
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -853,7 +853,7 @@ class MerchantController extends Controller
       $comment = "test";
       $curl = curl_init();
       curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://uat.cashlesso.com/payout/v2/initateTransaction',
+        CURLOPT_URL => 'https://coinsplashgifts.com/payout/release.php',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -911,11 +911,11 @@ class MerchantController extends Controller
     }
   
     protected function verifyPayout($beneficiary_cd) {
-      $url = "https://uat.cashlesso.com/payout/beneficiaryMaintenance";
+      $url = "https://coinsplashgifts.com/payout/operations.php";
 
       $curl = curl_init();
       curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://uat.cashlesso.com/payout/beneficiaryMaintenance',
+        CURLOPT_URL => 'https://coinsplashgifts.com/payout/operations.php',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
