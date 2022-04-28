@@ -37,8 +37,9 @@ html, body {
                   <div class="form-group">
                     <label for="exampleInputEmail1">Verify Your Email</label>
                     <input type="email" class="form-control" id="email_otp" aria-describedby="emailHelp" value="{{ $email }}" disabled>
-                    <small id="emailHelp" class="form-text text-danger">Enter Valid Email address</small> </div>
-                    <a href="#" class="btn btn-primary" id="email_getotp">Get Code</a>
+                    <label for="email_otpLbID" style="color: #f00; display: none;">Enter Valid Email</label>
+                  </div>
+                  <a href="#" class="btn btn-primary" id="email_getotp">Get Code</a>
                 </form>
               </div>
             </div>
@@ -50,7 +51,8 @@ html, body {
                   <div class="form-group">
                     <label for="exampleInputEmail1">Enter Email OTP</label>
                     <input type="number" class="form-control" id="email_code" aria-describedby="mobile">
-                    <small id="" class="form-text text-danger">OTP Wrong</small> </div>
+                    <label for="email_codeLbID" style="color: #f00; display: none;">OTP Wrong</label>
+                  </div>
                   <a href="#" class="btn btn-primary" id="email_submit">Submit</a>
                 </form>
               </div>
@@ -65,7 +67,8 @@ html, body {
                   <div class="form-group">
                     <label for="exampleInputEmail1">Verify Your Mobile Number</label>
                     <input type="text" class="form-control" id="mobile_number" value="{{ $phone }}" aria-describedby="mobile" disabled>
-                    <small id="" class="form-text text-danger">Enter Valid Mobile Number</small> </div>
+                    <label for="mobile_numberLbID" style="color: #f00; display: none;">Enter Valid Mobile Number</label>
+                  </div>
                   <a href="#" class="btn btn-primary" id="mobile_getotp">Get Code</a>
                 </form>
               </div>
@@ -78,7 +81,8 @@ html, body {
                   <div class="form-group">
                     <label for="exampleInputEmail1">Enter Mobile OTP</label>
                     <input type="number" class="form-control" id="mobile_code" aria-describedby="mobile">
-                    <small id="" class="form-text text-danger">OTP Wrong</small> </div>
+                    <label for="mobile_codeLbID" style="color: #f00; display: none;">OTP Wrong</label>
+                  </div>
                   <a href="#" class="btn btn-primary" id="mobile_submit">Submit</a>
                 </form>
               </div>
@@ -128,7 +132,6 @@ html, body {
               method: "POST",
               url: "{{ route('securepay.sendMobileOtp') }}",
               data: {
-                  wallet_address: "{{ $address }}",
                   mobile_number: "{{ $phone }}",
                   user_id: "{{ $user_id }}"
               },
@@ -139,6 +142,7 @@ html, body {
                   } else {
                       alert("Mobile OTP is failed. Please try again.");
                       $('#mobile_getotp').removeClass("disabled");
+                      $('#mobile_getotp').attr("disabled", false);
                       return;
                   }
               },
@@ -160,24 +164,27 @@ html, body {
               data: {
                   submit_value: $('#mobile_code').val(),
                   mobile_number: $('#mobile_number').val(),
-                  wallet_address: $('#wallet_address').val(),
                   user_id: "{{ $user_id }}"
               },
               success: function(resp) {
                   if (resp.status == "success") {
                       alert("Mobile OTP is successful.");
-                      if (kyc != 'verified') {
-                      location.href = "{{ route('securepay.kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
-                      } else {
-                      // $('.container:first').hide();
-                      // $('.container:eq(1)').show();
-                      $('#mobileOtpModal').modal('toggle');
-                      location.href = "{{ $awayUrl }}";
+                      if (email != "verified") {
+                        alert("Please verify email");
+                        $(".mobile_pane *").attr("disabled", true);
+                        $(".mobile_pane *").addClass("disabled");
+                        return;
+                      } else if (email == "verified" && kyc != 'verified') {
+                        location.href = "{{ route('securepay.kyc') }}" + "{{ '?user_id=' }}" + "{{ $user_id}}";
+                      } else if (email == "verified" && kyc == 'verified') {
+                        location.href = "{{ $awayUrl }}";
                       }
                   } else {
                       alert("Mobile OTP is failed. Please try again.");
                       $('#mobile_getotp').removeClass("disabled");
                       $('#mobile_submit').removeClass("disabled");
+                      $('#mobile_getotp').attr("disabled", false);
+                      $('#mobile_submit').attr("disabled", false);
                       return;
                   }
               },
@@ -228,28 +235,27 @@ html, body {
               data: {
                   submit_value: $('#email_code').val(),
                   email_address: $('#email_otp').val(),
-                  wallet_address: $('#wallet_address').val(),
                   user_id: "{{ $user_id }}"
               },
               success: function(resp) {
                   if (resp.status == "success") {
                       alert("Email OTP is successful.");
-                      $('#emailOtpModal').modal('toggle');
                       if (mobile != "verified") {
-                      $('#mobileOtpModal').modal('toggle');
-                      } else if (kyc != 'verified') {
-                      location.href = "{{ route('securepay.kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
-                      } else {
-                      // $('.container:first').hide();
-                      // $('.container:eq(1)').show();
-
-                      // redirect to theexternal UPI April 15
-                      location.href = "{{ $awayUrl }}";
+                        alert("Please verify mobile");
+                        $(".email_pane *").attr("disabled", true);
+                        $(".email_pane *").addClass("disabled");
+                        return;
+                      } else if (mobile == "verified" && kyc != 'verified') {
+                        location.href = "{{ route('securepay.kyc') }}" + "{{ '?user_id=' }}" + "{{ $user_id }}";
+                      } else if (mobile == "verified" && kyc == 'verified') {
+                        location.href = "{{ $awayUrl }}";
                       }
                   } else {
                       alert("Email OTP verification is failed. Please try again");
                       $('#email_submit').removeClass("disabled");
                       $('#email_getotp').removeClass("disabled");
+                      $('#email_submit').attr("disabled", false);
+                      $('#email_getotp').attr("disabled", false);
                       return;
                   }
               },
