@@ -367,12 +367,13 @@ class ClientController extends Controller
         $payout->total_amount = $json_resp->TOTAL_AMOUNT;
         $payout->txn_hash = $request->txn_hash;
         $payout->remarks = $request->remarks;
-        $payout->sender = $request->address;
+        $payout->sender = $request->wallet_address;
         $payout->receiver = $request->receiver;
         $payout->network = $request->network;
-        $payout->currency = $request->crypto;
+        $payout->currency = $request->currecy;
         $payout->inr_value = $request->inr_value;
         $payout->is_external = 0;
+        $payout->pg_txn_message = $request->PG_TXN_MESSAGE;
         $saved = $payout->save();
   
         if ($saved) {
