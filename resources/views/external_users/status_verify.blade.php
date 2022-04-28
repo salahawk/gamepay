@@ -114,9 +114,11 @@ html, body {
   } else if (email == "verified") {
     $(".email_pane *").attr("disabled", true);
     $(".email_pane *").addClass("disabled");
+    $(".email_pane").hide();
   }  else if (mobile == "verified") {
     $(".mobile_pane *").attr("disabled", true);
     $(".mobile_pane *").addClass("disabled");
+    $(".mobile_pane").hide();
   }
 
   $(document).on('click', '#mobile_getotp', function() {
