@@ -35,7 +35,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::post('/kyc/manual', 'Api\ClientController@kycManual');
     Route::post('/deposit', 'Api\ClientController@deposit');
 
-    Route::get('/user', 'Api\ClientController@showUser');
+    Route::get('/profile', 'Api\ClientController@showUser');
     Route::get('/portfolio', 'Api\ClientController@portfolio');
     Route::post('/pan', 'Api\ClientController@savePan');
     Route::post('/payout-process', 'Api\ClientController@processPayout');
