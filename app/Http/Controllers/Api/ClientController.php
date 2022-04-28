@@ -318,7 +318,7 @@ class ClientController extends Controller
           $json_resp0 = json_decode($response0);
   
           if ($json_resp0->STATUS != "Success") {
-            return response()->json(['status'=>'fail', 'data' => $json_resp0]);
+            return response()->json(['status'=>'fail', 'message' => $json_resp0]);
           }
         }
   
@@ -379,7 +379,7 @@ class ClientController extends Controller
         if ($saved) {
             return response()->json(['status' => 'success']);
         } else {
-            return response()->json(['status' => 'false', 'data' => $json_resp]);
+            return response()->json(['status' => 'false', 'message' => $json_resp]);
         }
     }
 
