@@ -159,7 +159,7 @@ class MerchantController extends Controller
 
           // add third party bank calculation
           $valuecheck = $deposit->order_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $salt;
-		  $eurl = hash('sha512', $valuecheck);
+		      $eurl = hash('sha512', $valuecheck);
           $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
           $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
           return redirect()->away($url."?encdata=". $encData);
@@ -215,7 +215,8 @@ class MerchantController extends Controller
             $encData=urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
             $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
             $awayUrl = $url."?encdata=". $encData;
-          return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
+          // return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
+          return view('external_users.status_verify', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
         } else {            
             $deposit = new Deposit;
             $deposit->user_id = $user_id;
