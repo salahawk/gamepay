@@ -170,6 +170,7 @@ html, body {
               },
               success: function(resp) {
                   if (resp.status == "success") {
+                      mobile = "verified";
                       alert("Mobile OTP is successful.");
                       if (email != "verified") {
                         alert("Please verify email");
@@ -241,6 +242,7 @@ html, body {
               },
               success: function(resp) {
                   if (resp.status == "success") {
+                      email = "verified";
                       alert("Email OTP is successful.");
                       if (mobile != "verified") {
                         alert("Please verify mobile");
