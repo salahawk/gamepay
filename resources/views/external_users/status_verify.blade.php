@@ -108,9 +108,9 @@ html, body {
   if (email == "verified" && mobile == "verified" && kyc != "verified") {
     location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + "{{ $user_id }}";
   } else if (email == "verified") {
-    $(".email_pane *").attr("disabled", true);
+    $(".email_pane *").addClass("disabled");
   }  else if (mobile == "verified") {
-    $(".mobile_pane *").attr("disabled", true);
+    $(".mobile_pane *").addClass("disabled");
   }
 
   $(document).on('click', '#mobile_getotp', function() {
