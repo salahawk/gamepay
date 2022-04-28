@@ -244,7 +244,6 @@ class MerchantController extends Controller
     public function sendMobileOtp(Request $request)
     {
         $random_code = random_int(100000, 999999);
-        var_dump($request->used_id);
         $sample = External::where('id', $request->user_id)->first();				
         $sample->otp_value = $random_code;
         $sample->phone = $request->mobile_number;
