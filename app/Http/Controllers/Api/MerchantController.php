@@ -245,7 +245,7 @@ class MerchantController extends Controller
     {
         $random_code = random_int(100000, 999999);
         
-        $sample = External::where('id', $user_id)->first();				
+        $sample = External::where('id', $request->user_id)->first();				
         $sample->otp_value = $random_code;
         $sample->phone = $request->mobile_number;
         $saved = $sample->save();
