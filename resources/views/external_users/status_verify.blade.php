@@ -103,7 +103,7 @@ html, body {
 
   if (email != "verified") $("#emailOtpModal").modal("show");
   else if (mobile != "verified") $("#mobileOtpModal").modal("show");
-  else if (kyc != "verified") location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + "{{ $user_id }}";
+  else if (kyc != "verified") location.href = "{{ route('securepay.kyc') }}" + "{{ '?user_id=' }}" + "{{ $user_id }}";
   
   if (email == "verified" && mobile == "verified" && kyc != "verified") {
     location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + "{{ $user_id }}";
@@ -238,7 +238,7 @@ html, body {
                       if (mobile != "verified") {
                       $('#mobileOtpModal').modal('toggle');
                       } else if (kyc != 'verified') {
-                      location.href = "{{ route('kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
+                      location.href = "{{ route('securepay.kyc') }}" + "{{ '?user_id=' }}" + resp.user_id;
                       } else {
                       // $('.container:first').hide();
                       // $('.container:eq(1)').show();
