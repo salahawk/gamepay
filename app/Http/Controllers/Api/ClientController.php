@@ -243,6 +243,7 @@ class ClientController extends Controller
       $user = auth()->user();
       $user->account_no = $request->account_no;
       $user->ifsc = $request->ifsc;
+      $user->payer_address = $request->payer_address;
 
       $pan_path = "uploads/pan";
       $allowedfileExtension=['png','jpg','jpeg'];
