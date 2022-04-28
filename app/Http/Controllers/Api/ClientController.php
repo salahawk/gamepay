@@ -277,7 +277,7 @@ class ClientController extends Controller
         $ip_string = $request->header('origin');
         $pieces = explode("//", $ip_string);
         $client = Client::where('ip', $pieces[1])->first();
-        $psp = Psp::where('id', $client->id)->first();
+        $psp = Psp::where('client_id', $client->id)->first();
 
         if (empty($client) || empty($psp)) {
           return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
