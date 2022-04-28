@@ -267,18 +267,17 @@ class ClientController extends Controller
     // @RETURN
     // user's all data
     public function processPayout(Request $request) {
-        $user = User::find(auth()->user->id);
+        $user = User::find(auth()->user()->id);
         $payer_address = $user->payer_address; // $payer_address = "9213116078@yesb";
         $ifsc = $user->ifsc; // $ifsc = "ICIC0003168";
         $account_no = $user->account_no; // $account_no = '316805000799';
         // $addahar = $user->addahar?; //$addahar = '640723564873';
-        $pay_id = '1016601009105737';
   
         // choose PSP
         $ip_string = $request->header('origin');
         $pieces = explode("//", $ip_string);
-        $client = Merchant::where('ip', $pieces[1])->first();
-        $psp = Psp::where('client_id', $client->id)->first();
+        $client = Client::where('ip', $pieces[1])->first();
+        $psp = Psp::where('id', $client->id)->first();
 
         if (empty($client) || empty($psp)) {
           return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
@@ -298,30 +297,25 @@ class ClientController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => '{
-                                      "BENEFICIARY_CD":"'. $user->beneficiary_cd .'",
-                                      "BENE_NAME": "' . $user->cust_name . '",
-                                      "CURRENCY_CD": "356",
-                                      "MOBILE_NUMBER": "'. $user->phone .'",
-                                      "EMAIL_ID": "' . $user->email . '",
-                                      "PAYER_ADDRESS": "'. $payer_address .'",
-                                      "BANK_NAME": "YESB",
-                                      "IFSC_CODE": "'. $ifsc .'",
-                                      "BENE_ACCOUNT_NO": "'. $account_no .'",
-                                      "ADDRESS_1": "'. $user->address1 .'",
-                                      "ADDRESS_2": "'. $user->address2 .'",
-                                      "AADHAR_NO": "'. $user->aadhar_no .'",
-                                      "ACTION":"ADD"
-                                      }',
-            CURLOPT_HTTPHEADER => array(
+            CURLOPT_POSTFIELDS => array (
+                          "BENEFICIARY_CD" => $user->beneficiary_cd,
+                          "BENE_NAME" => $user->first_name,
+                          "MOBILE_NUMBER" => $user->mobile,
+                          "EMAIL_ID" => $user->email,
+                          "PAYER_ADDRESS" => $payer_address,
+                          "BANK_NAME" => "YESB",
+                          "IFSC_CODE" => $ifsc,
+                          "BENE_ACCOUNT_NO" => $account_no,
+                          "ACTION" => "ADD",
+            ),
+            CURLOPT_HTTPHEADER => array (
               'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42'
             ),
           ));
 
-          $response = curl_exec($curl);
-
+          $response0 = curl_exec($curl);
           curl_close($curl);
-          $json_resp0 = json_decode($response);
+          $json_resp0 = json_decode($response0);
   
           if ($json_resp0->STATUS != "Success") {
             return response()->json(['status'=>'fail', 'data' => $json_resp0]);
@@ -329,9 +323,9 @@ class ClientController extends Controller
         }
   
         // if present in DB, make transaction
-        $order_id = $user->cust_name . random_int(10000000, 99999999);
-        $amount = $user->amount;
-        $comment = "test";
+        $order_id = $user->first_name . random_int(10000000, 99999999);
+        $amount = $request->amount;
+        $comment = "client payout test";
         $curl = curl_init();
         curl_setopt_array($curl, array(
           CURLOPT_URL => $psp->payout_release_url,
@@ -342,17 +336,15 @@ class ClientController extends Controller
           CURLOPT_FOLLOWLOCATION => true,
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => 'POST',
-          CURLOPT_POSTFIELDS =>'{
-                                "PAY_ID": "'. $pay_id .'",
-                                "ORDER_ID": "' . $order_id . '",
-                                "TXN_AMOUNT": "' . $amount . '",
-                                "BENEFICIARY_CD": "' . $user->beneficiary_cd . '",
-                                "BENE_COMMENT": "' . $comment . '",
-                                "TXN_PAYMENT_TYPE": "NEFT"
-                                } ',
+          CURLOPT_POSTFIELDS => array (
+                      "BENEFICIARY_CD" => $user->beneficiary_cd,
+                      "TXN_AMOUNT" => $amount,
+                      "BENE_COMMENT" => $comment,
+                      "TXN_PAYMENT_TYPE" => "NEFT",
+                      "ORDER_ID" => $order_id,
+          ),
           CURLOPT_HTTPHEADER => array(
             'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
-            'Content-Type: application/json'
           ),
         ));
   
@@ -373,13 +365,13 @@ class ClientController extends Controller
         $payout->response_message = $json_resp->RESPONSE_MESSAGE;
         $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
         $payout->total_amount = $json_resp->TOTAL_AMOUNT;
-        // $payout->txn_hash = $user->txn_hash;
-        $payout->remarks = $user->remarks;
-        $payout->sender = $user->address;
-        $payout->receiver = $user->receiver;
-        $payout->network = $user->network;
-        $payout->currency = $user->crypto;
-        $payout->inr_value = $user->inr_value;
+        $payout->txn_hash = $request->txn_hash;
+        $payout->remarks = $request->remarks;
+        $payout->sender = $request->address;
+        $payout->receiver = $request->receiver;
+        $payout->network = $request->network;
+        $payout->currency = $request->crypto;
+        $payout->inr_value = $request->inr_value;
         $payout->is_external = 0;
         $saved = $payout->save();
   
@@ -487,14 +479,12 @@ class ClientController extends Controller
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS =>'{
-                              "PAY_ID":"1016601009105737",
-                              "BENEFICIARY_CD":"'. $beneficiary_cd .'",
-                              "ACTION":"VERIFY"
-                              } ',
+        CURLOPT_POSTFIELDS => array(
+          'BENEFICIARY_CD' => $beneficiary_cd,
+          'ACTION' => 'VERIFY'
+        ),
         CURLOPT_HTTPHEADER => array(
           'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
-          'Content-Type: application/json'
         ),
       ));
 
