@@ -902,8 +902,8 @@ class MerchantController extends Controller
       $payout->currency = $user->crypto;
       $payout->inr_value = $user->inr_value;
       $payout->is_external = 1;
-      $payout->caller_id = $used_deposit->caller_id;
-      $payout->psp_id = $used_deposit->psp_id;
+      $payout->caller_id = 1; //$used_deposit->caller_id;
+      $payout->psp_id = 1; //$used_deposit->psp_id;
       $saved = $payout->save();
 
       if ($saved) {
