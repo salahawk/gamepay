@@ -80,7 +80,7 @@ class ClientController extends Controller
           // add third party bank calculation
           $valuecheck = $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->mobile."|*".urldecode($deposit->cust_name)."|*" . $client->salt;
 			    $hash = hash('sha512', $valuecheck);
-          $url = $psp->url;
+          $url = $psp->deposit_url;
           $encData=urlencode(base64_encode("firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
           return response()->json(['status' => 'success', 'url' => $url."?encdata=". $encData]);
         }
