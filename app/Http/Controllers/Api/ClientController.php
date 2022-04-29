@@ -73,6 +73,7 @@ class ClientController extends Controller
           $deposit->wallet = $request->wallet_address;
           $deposit->order_id = $user->first_name . random_int(10000000, 99999999);
           $deposit->caller_id = $psp->client_id;
+          $deposit->psp_id = $psp->id;  // have to modify later
           $deposit->save();
 
 
@@ -274,7 +275,7 @@ class ClientController extends Controller
         $account_no = $user->account_no; // $account_no = '316805000799';
         // $addahar = $user->addahar?; //$addahar = '640723564873';
   
-        // choose PSP
+        // choose caller and PSP
         $ip_string = $request->header('origin');
         $pieces = explode("//", $ip_string);
         $client = Client::where('ip', $pieces[1])->first();
@@ -375,6 +376,8 @@ class ClientController extends Controller
         $payout->inr_value = $request->inr_value;
         $payout->is_external = 0;
         $payout->pg_txn_message = $request->PG_TXN_MESSAGE;
+        $payout->caller_id = $client->id;
+        $payout->psp_id = $psp->id;
         $saved = $payout->save();
   
         if ($saved) {

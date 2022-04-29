@@ -18,7 +18,7 @@ class DepositController extends Controller
     }
 
     public function data() {
-        $deposits = Deposit::orderby('created_at', 'desc')->get();
+        $deposits = Deposit::orderby('created_at', 'desc')->select('*');
 
         return DataTables::of($deposits)
             ->addColumn('action', function ($deposit) {
@@ -27,6 +27,9 @@ class DepositController extends Controller
                     return '<a type="button" class = "btn btn-sm btn-danger" href = "' . $updateData_url . '">Manual Mint</a>';
                 else
                     return '<a class = "btn btn-sm btn-success" type="button" disabled>Already minted</a>';
+            })
+            ->addColumn('psp_name', function ($deposit) {
+                return $deposit->psp->name;
             })
             ->make(true);
     }

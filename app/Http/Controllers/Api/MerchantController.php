@@ -74,6 +74,9 @@ class MerchantController extends Controller
         $merchant = Merchant::where('ip', $pieces[1])->first();
         $salt = $merchant->salt;
 
+        // select PSP according to the email and loyalty points
+        // $psp_id = choose_gameway($email, $merchat->loyalty_points);
+
         $hash_string =
             $key .
             '|' .
@@ -155,6 +158,7 @@ class MerchantController extends Controller
           $deposit->wallet = $address;
           $deposit->order_id = $customer_name . random_int(10000000, 99999999);
           $deposit->caller_id = $merchant->id;
+          $deposit->psp_id = 1;  // have to modify later
           $deposit->save();
 
           // add third party bank calculation
@@ -208,6 +212,7 @@ class MerchantController extends Controller
             $deposit->wallet = $address;
             $deposit->order_id = $customer_name . random_int(10000000, 99999999);
             $deposit->caller_id = $merchant->id;
+            $deposit->psp_id = 1;  // have to modify later
             $deposit->save();
 
             $valuecheck = $deposit->order_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $salt;
@@ -229,6 +234,7 @@ class MerchantController extends Controller
             $deposit->wallet = $address;
             $deposit->order_id = $customer_name . random_int(10000000, 99999999);
             $deposit->caller_id = $merchant->id;
+            $deposit->psp_id = 1;  // have to modify later
             $deposit->save();
 
             $valuecheck = $deposit->order_id."|*".$amount."|*".urldecode($email)."|*".$phone."|*".urldecode($customer_name)."|*" . $salt;
@@ -802,6 +808,9 @@ class MerchantController extends Controller
       $ifsc = $user->ifsc; // $ifsc = "ICIC0003168";
       $account_no = $user->account_no; // $account_no = '316805000799';
       // $addahar = $user->addahar?; //$addahar = '640723564873';
+    
+      // choose caller and PSP
+      $used_deposit = Deposit::where('email', $user->email)->where('sender', $user->wallet)->first();
 
       if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
         $url = "https://coinsplashgifts.com/payout/addben.php";
@@ -894,6 +903,8 @@ class MerchantController extends Controller
       $payout->currency = $user->crypto;
       $payout->inr_value = $user->inr_value;
       $payout->is_external = 1;
+      $payout->caller_id = $used_deposit->caller_id;
+      $payout->psp_id = $used_deposit->psp_id;
       $saved = $payout->save();
 
       if ($saved) {
@@ -901,7 +912,6 @@ class MerchantController extends Controller
       } else {
           return response()->json(['status' => 'false', 'data' => $json_resp]);
       }
-
     }
   
     protected function verifyPayout($beneficiary_cd) {

@@ -32,8 +32,11 @@ class ChooseGateway
         $user = External::where('email', $email)->first();
         if (!empty($user)) {
             $user_db_loyalty_points = $user->loyalty_points;
+            $real_company_id = $user->real_company_id;
             $exists_record_flag = 1;
         } else {
+            $real_company_id = -1;
+            $pg_choice = -2;
         }
 
         if ($user_current_loyalty_points > $user_db_loyalty_points) {
@@ -64,7 +67,6 @@ class ChooseGateway
             $user_unique_id,
             $pay_mode,
             $real_company_id,
-            $conn
         );
 
 
@@ -99,13 +101,11 @@ class ChooseGateway
         $time_loyalty_level = get_time_loyalty_level(
             $email,
             $loyalty_points,
-            $conn
         );
 
         $points_loyalty_level = get_points_loyalty_level(
             $email,
             $loyalty_points,
-            $conn,
             0
         );
 
@@ -149,6 +149,8 @@ class ChooseGateway
             $cur_limit = 1;
 
             $cur_lower_bound = 0;
+
+
 
             $cur_upper_bound = 0;
             
@@ -258,7 +260,6 @@ class ChooseGateway
             $user_unique_id,
             $pay_mode,
             $real_company_id,
-            $conn
         );
     
         return $new_pg_choice;
@@ -327,7 +328,6 @@ class ChooseGateway
             $pg_choice,
             $user_unique_id,
             $pay_mode,
-            $conn
         );
     
         if ($disbled_gateway_arr[0]) {
@@ -490,6 +490,7 @@ class ChooseGateway
 
         $result_arr[1] = $pg_choice;
 
+        Psp::where('id', $pg_choice)->where('status', "<>", "live")->get();
         $sql = "SELECT * FROM `tbl_payment_gateways` WHERE id = $pg_choice AND status = 0";
 
         $result = $conn->query($sql);

@@ -102,12 +102,12 @@
                     <table class="table table-bordered" id="dataTable">
                         <thead>
                             <tr>
-                                <th>Order ID</th>
-                                <th>Txn Date</th>
+                                <th>Data and Time</th>
                                 <th>Email</th>
+                                <th>OrderID</th>
                                 <th>Amount</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th>PSP</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -141,12 +141,12 @@
             type: "GET"
         },
         columns: [
-            {data: 'order_id', name: 'order_id'},
-            {data: 'created_date', name: 'created_date'},
+            {data: 'created_at', name: 'created_at'},
             {data: 'email', name: 'email'},
+            {data: 'order_id', name: 'order_id'},
             {data: 'amount', name: 'amount'},
             {data: 'status', name: 'status'},
-            {data: 'action', name: 'action'},
+            {data: 'psp_name', name: 'psp_name'},
         ],
         });
     </script>

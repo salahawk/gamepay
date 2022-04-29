@@ -102,12 +102,11 @@
                     <table class="table table-bordered" id="dataTable">
                         <thead>
                             <tr>
-                                <th>Order ID</th>
+                                <th>Data and Time</th>
                                 <th>Email</th>
-                                <th>Txn hash</th>
+                                <th>Order ID</th>
                                 <th>Amount</th>
                                 <th>Status</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -141,12 +140,11 @@
             type: "GET"
         },
         columns: [
-            {data: 'order_id', name: 'order_id'},
+            {data: 'created_at', name: 'created_at'},    
             {data: 'email', name: 'email'},
-            {data: 'txn_hash', name: 'txn_hash'},
-            {data: 'txn_amount', name: 'txn_amount'},
+            {data: 'order_id', name: 'order_id'},
             {data: 'status', name: 'status'},
-            {data: 'action', name: 'action'},
+            {data: 'txn_amount', name: 'txn_amount'},
         ],
         });
     </script>
