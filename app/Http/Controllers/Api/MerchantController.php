@@ -32,7 +32,7 @@ class MerchantController extends Controller
           'EMAIL' => 'required|email',
           'PHONE' => 'required|numeric',
           'CRYPTO' => 'required|alpha',
-          'NETWORK' => 'required|alpha',
+          'NETWORK' => 'required|alpha|in:BSC, AVAX, ETH, POLYGON',
           'ADDRESS' => 'required',
           'REMARKS' => 'required',
           'KYC_STATUS' => 'required|alpha',
