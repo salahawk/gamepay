@@ -139,7 +139,7 @@ class AuthController extends Controller
         return response()->json(['status'=>'fail', 'message'=>'The given data was invalid.']);
     }
 
-    public function logout(Request $request) {var_dump("sdfsdfsd");
+    public function logout(Request $request) {
       auth()->user()->tokens()->delete();
       return response()->json(['status'=>'success']);
     }
