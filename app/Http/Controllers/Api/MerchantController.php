@@ -755,7 +755,7 @@ class MerchantController extends Controller
                 'PAYER_ADDRESS' => 'required',
                 'AMOUNT' => 'required|numeric|min: 500|max: 50000',
                 'CURRENCY' => 'required|alpha',
-                'NETWORK' => 'required|alpha',
+                'NETWORK' => 'required|alpha|in:BSC, AVAX, ETH, POLYGON',
                 'INR_VALUE' => 'required|numeric',
                 'RECEIVER' => 'required|alpha_num',
                 'SENDER' => 'required|alpha_num',
