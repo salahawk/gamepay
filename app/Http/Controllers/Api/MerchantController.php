@@ -158,6 +158,7 @@ class MerchantController extends Controller
           $deposit->wallet = $address;
           $deposit->order_id = $customer_name . random_int(10000000, 99999999);
           $deposit->caller_id = $merchant->id;
+          $deposit->email = $email;
           $deposit->psp_id = 1;  // have to modify later
           $deposit->save();
 
@@ -212,6 +213,7 @@ class MerchantController extends Controller
             $deposit->wallet = $address;
             $deposit->order_id = $customer_name . random_int(10000000, 99999999);
             $deposit->caller_id = $merchant->id;
+            $deposit->email = $email;
             $deposit->psp_id = 1;  // have to modify later
             $deposit->save();
 
@@ -234,6 +236,7 @@ class MerchantController extends Controller
             $deposit->wallet = $address;
             $deposit->order_id = $customer_name . random_int(10000000, 99999999);
             $deposit->caller_id = $merchant->id;
+            $deposit->email = $email;
             $deposit->psp_id = 1;  // have to modify later
             $deposit->save();
 
