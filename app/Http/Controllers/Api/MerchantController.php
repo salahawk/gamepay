@@ -810,7 +810,7 @@ class MerchantController extends Controller
       // $addahar = $user->addahar?; //$addahar = '640723564873';
     
       // choose caller and PSP
-      $used_deposit = Deposit::where('email', $user->email)->where('sender', $user->wallet)->first();
+      $used_deposit = Deposit::where('email', $user->email)->where('wallet', $user->wallet)->first();
 
       if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
         $url = "https://coinsplashgifts.com/payout/addben.php";
