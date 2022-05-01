@@ -466,7 +466,40 @@ class ClientController extends Controller
         // print_r($exec_phrase); exit();
         chdir('../');
         exec($exec_phrase, $var, $result);
+        $deposit->minted_status = "Success";
+        $deposit->save();
         return response()->json(['status'=>'success', 'message'=>"successfully minted"]);
+      } else if ($request->STATUS != "Captured" && $request->STATUS != "Declined" && $request->STATUS != "Pending") {
+            //this code runs every second 
+            $curl = curl_init();
+  
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => 'https://coinsplashgifts.com/api/transaction/response.php',
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => '',
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 0,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => 'POST',
+              CURLOPT_POSTFIELDS => array(
+                "ORDER_ID" => $order_id,
+              ),
+              CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42'
+              ),
+            ));
+  
+            $response = curl_exec($curl);
+            curl_close($curl);
+            $json_resp = json_decode($response);
+
+            if ($json_resp->STATUS != "") {
+              $deposit->STATUS = $json_resp->STATUS;
+              return response()->json(['status'=>'success', 'message'=>$json_resp->STATUS]);
+            } else {
+              return response()->json(['status'=>'success', 'message'=>"No response from PSP"]);
+            }
       } else {
         return response()->json(['status'=>'fail', 'message'=>"Deposit was not successful"]);
       }

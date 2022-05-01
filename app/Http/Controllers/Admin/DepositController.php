@@ -34,6 +34,28 @@ class DepositController extends Controller
             ->make(true);
     }
     
+    public function missedDeposit() {
+        return view("admin.deposits.missed");
+    }
+
+    public function dataMissed() {
+        $deposits = Deposit::where('status', 'Captured')
+                            ->where('minted_status', "<>", "success")
+                            ->orderby('created_at', 'desc')
+                            ->select('*');
+
+        return DataTables::of($deposits)
+            ->addColumn('action', function ($deposit) {
+                $updateData_url = route('mint-manual', ['id' => $deposit->id, 'wallet' => $deposit->wallet]);
+                return '<a type="button" class = "btn btn-sm btn-danger" href = "' . $updateData_url . '">Manual Mint</a>';
+            })
+            ->addColumn('psp_name', function ($deposit) {
+                return $deposit->psp->name;
+            })
+            ->make(true);
+    }
+
+
     public function activationIndex() {
         $merchantKey = config('app.merchantKey');
         $merchantId = config('app.merchantId');

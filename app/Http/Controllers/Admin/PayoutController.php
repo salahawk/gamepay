@@ -35,6 +35,27 @@ class PayoutController extends Controller
             ->make(true);
     }
 
+    public function missedPayout() {
+        return view("admin.payouts.missed");
+    }
+
+    public function dataMissed() {
+        $payouts = Payout::where('status', 'Captured')
+                            ->where('minted_status', "<>", "success")
+                            ->orderby('created_at', 'desc')
+                            ->select('*');
+
+        return DataTables::of($payouts)
+            ->addColumn('action', function ($payout) {
+                $updateData_url = route('mint-manual', ['id' => $payout->id, 'wallet' => $payout->wallet]);
+                return '<a type="button" class = "btn btn-sm btn-danger" href = "' . $updateData_url . '">Manual Mint</a>';
+            })
+            ->addColumn('psp_name', function ($payout) {
+                return $payout->psp->name;
+            })
+            ->make(true);
+    }
+
     public function process(Request $request) {
         
         // if present in DB, make transaction

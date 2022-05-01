@@ -71,12 +71,15 @@ Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify')
 //-------------------------------- Admin -------------------------------------------//
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], function() {
     Route::get('deposits', 'DepositController@index')->name('deposits');
+    Route::get('deposits/data', 'DepositController@data')->name('deposits.data');
+    Route::get('deposits/missed', 'DepositController@missedDeposit')->name('deposits.missed');
+    Route::get('deposits/missed/data', 'DepositController@dataMissed')->name('deposits.missed.data');
+
+
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
     Route::get('success', 'DepositController@successIndex')->name('success');
     Route::get('pending', 'DepositController@pendingIndex')->name('pending');
-    Route::get('activation', 'DepositController@activationIndex')->name('activation');
-
-    Route::get('deposits/data', 'DepositController@data')->name('deposits.data');
+    Route::get('activation', 'DepositController@activationIndex')->name('activation'); 
     Route::get('success/data', 'DepositController@successData')->name('success.data');
     Route::get('pending/data', 'DepositController@pendingData')->name('pending.data');
     Route::get('activation/data', 'DepositController@activationData')->name('activation.data');
@@ -84,6 +87,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
 
     Route::get('payouts', 'PayoutController@index')->name('payouts');
     Route::get('payouts/data', 'PayoutController@data')->name('payouts.data');
+    Route::get('payouts/missed', 'PayoutController@missedPayout')->name('payouts.missed');
+    Route::get('payouts/missed/data', 'PayoutController@dataMissed')->name('payouts.missed.data');
+
+
     Route::get('payouts/process', 'PayoutController@process')->name('payouts.process');
     Route::get('payouts/success', 'PayoutController@success')->name('payouts.success');
     Route::get('payouts/pending', 'PayoutController@pending')->name('payouts.pending');

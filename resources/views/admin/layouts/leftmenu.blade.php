@@ -12,11 +12,7 @@
         <a href="{{ route('admin.deposits') }}">Deposits</a>
         <ul class="side-nav-dropdown">
             <li><a href="{{ route('admin.deposits') }}">View All Deposit</a></li>
-            <li><a href="{{ route('admin.success') }}">View Success</a></li>
-            <li><a href="{{ route('admin.pending') }}">View Failure / Initiated</a></li>
-            <li><a href="#">Check Status</a></li>
-            <li><a href="#">Two Days Missed Deposit</a></li>
-            <li><a href="#">View Missed Deposit</a></li>
+            <li><a href="{{ route('admin.deposits.missed') }}">View Missed Deposits</a></li>
         </ul>
     </li>
     <li class="arr">
@@ -24,11 +20,7 @@
         <a href="{{ route('admin.payouts') }}">Payouts</a>
         <ul class="side-nav-dropdown">
             <li><a href="{{ route('admin.payouts') }}">View All Payout</a></li>
-            <li><a href="{{ route('admin.payouts.success') }}">View Success</a></li>
-            <li><a href="{{ route('admin.payouts.pending') }}">View Failure / Initiated</a></li>
-            <li><a href="#">Check Status</a></li>
-            <li><a href="#">Two Days Missed Deposit</a></li>
-            <li><a href="#">View Missed Deposit</a></li>
+            <li><a href="{{ route('admin.payouts.missed') }}">View Missed Payouts</a></li>
         </ul>
     </li>
     {{-- <li class="arr"><i class="fa fa-users fa-fw"></i><a href="#">Transactions</a>
@@ -38,6 +30,11 @@
         </ul>
     </li> --}}
     <li class="arr"><i class="fa fa-arrow-up fa-fw"></i><a href="{{ route('admin.activation') }}">Users</a>
+        <ul class="side-nav-dropdown">
+            <li><a href="{{ route('admin.activation') }}">Activation</a></li>
+        </ul>
+    </li>
+    <li class="arr"><i class="fa fa-arrow-up fa-fw"></i><a href="{{ route('admin.activation') }}">PSP</a>
         <ul class="side-nav-dropdown">
             <li><a href="{{ route('admin.activation') }}">Activation</a></li>
         </ul>
