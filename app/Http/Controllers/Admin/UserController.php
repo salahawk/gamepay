@@ -24,6 +24,8 @@ class UserController extends Controller
             ->addColumn('kyc_manual', function ($user) {
                 $kyc_approve_url = route('admin.users.approve', ['id' => $user->id, 'type'=>'kyc', 'approve' => 1]);
                 $kyc_reject_url = route('admin.users.approve', ['id' => $user->id, 'type'=>'kyc', 'approve' => 0]);
+                if ($user->kyc_type == "veriff") 
+                    return "Tried by veriff.com";
                 if ($user->kyc_status == "verified" || $user->kyc_status == "rejected")
                     return $user->kyc_status;
                 else
