@@ -256,7 +256,7 @@ class ClientController extends Controller
 
         $user->pan = $pan_name;
         $user->save();
-        return response()->json(['status' => 'success']);
+        return response()->json(['status' => 'success', 'user' => $user]);
       } else {
         return response()->json(['status' => 'fail', 'message' => 'File types are not allowed image files']);
       }

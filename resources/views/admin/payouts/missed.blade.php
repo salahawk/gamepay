@@ -138,8 +138,11 @@
         processing: true,
         serverSide: true,
         ajax: {
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
             url: "{{ route('admin.payouts.missed.data') }}",
-            type: "GET"
+            type: "POST"
         },
         columns: [
             {data: 'created_at', name: 'created_at'},

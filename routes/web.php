@@ -71,9 +71,9 @@ Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify')
 //-------------------------------- Admin -------------------------------------------//
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], function() {
     Route::get('deposits', 'DepositController@index')->name('deposits');
-    Route::get('deposits/data', 'DepositController@data')->name('deposits.data');
+    Route::post('deposits/data', 'DepositController@data')->name('deposits.data');
     Route::get('deposits/missed', 'DepositController@missedDeposit')->name('deposits.missed');
-    Route::get('deposits/missed/data', 'DepositController@dataMissed')->name('deposits.missed.data');
+    Route::post('deposits/missed/data', 'DepositController@dataMissed')->name('deposits.missed.data');
 
 
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
@@ -86,14 +86,18 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
     Route::get('activation/updateData/{id}', 'DepositController@activationUpdateData')->name('activation.updateData');
 
     Route::get('payouts', 'PayoutController@index')->name('payouts');
-    Route::get('payouts/data', 'PayoutController@data')->name('payouts.data');
+    Route::post('payouts/data', 'PayoutController@data')->name('payouts.data');
     Route::get('payouts/missed', 'PayoutController@missedPayout')->name('payouts.missed');
-    Route::get('payouts/missed/data', 'PayoutController@dataMissed')->name('payouts.missed.data');
+    Route::post('payouts/missed/data', 'PayoutController@dataMissed')->name('payouts.missed.data');
 
 
     Route::get('payouts/process', 'PayoutController@process')->name('payouts.process');
     Route::get('payouts/success', 'PayoutController@success')->name('payouts.success');
     Route::get('payouts/pending', 'PayoutController@pending')->name('payouts.pending');
+
+    Route::get('users', 'UserController@index')->name('users');
+    Route::post('users/data', 'UserController@data')->name('users.data');
+    Route::get('users/approve', 'UserController@approve')->name('users.approve');
 });
 //-------------------------------- Admin end -------------------------------------------//
 

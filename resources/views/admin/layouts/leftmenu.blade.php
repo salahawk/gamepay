@@ -29,9 +29,9 @@
             <li><a href="#">View Txn Summary</a></li>
         </ul>
     </li> --}}
-    <li class="arr"><i class="fa fa-arrow-up fa-fw"></i><a href="{{ route('admin.activation') }}">Users</a>
+    <li class="arr"><i class="fa fa-arrow-up fa-fw"></i><a href="{{ route('admin.users') }}">Users</a>
         <ul class="side-nav-dropdown">
-            <li><a href="{{ route('admin.activation') }}">Activation</a></li>
+            <li><a href="{{ route('admin.users') }}">Users Verification</a></li>
         </ul>
     </li>
     <li class="arr"><i class="fa fa-arrow-up fa-fw"></i><a href="{{ route('admin.activation') }}">PSP</a>

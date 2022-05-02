@@ -102,13 +102,15 @@
                     <table class="table table-bordered" id="dataTable">
                         <thead>
                             <tr>
-                                <th>Data and Time</th>
                                 <th>Email</th>
-                                <th>OrderID</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>PSP</th>
-                                <th>Action</th>
+                                <th>KYC Status</th>
+                                <th>Email Status</th>
+                                <th>Mobile Status</th>
+                                <th>Account No</th>
+                                <th>IFSC</th>
+                                <th>Payer Address</th>
+                                <th>KYC Image</th>
+                                <th>Pan Image</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -135,24 +137,25 @@
     {{-- <script src="{{ asset('js/pages/datatables-demo.js') }}"></script> --}}
     <script>
         var table = $('#dataTable').DataTable({
-        
         processing: true,
         serverSide: true,
         ajax: {
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            url: "{{ route('admin.deposits.missed.data') }}",
+            url: "{{ route('admin.users.data') }}",
             type: "POST"
         },
         columns: [
-            {data: 'created_at', name: 'created_at'},
             {data: 'email', name: 'email'},
-            {data: 'order_id', name: 'order_id'},
-            {data: 'amount', name: 'amount'},
-            {data: 'status', name: 'status'},
-            {data: 'psp_name', name: 'psp_name'},
-            {data: 'action', name: 'action'},
+            {data: 'kyc_status', name: 'kyc_status'},
+            {data: 'email_status', name: 'email_status'},
+            {data: 'mobile_status', name: 'mobile_status'},
+            {data: 'account_no', name: 'account_no'},
+            {data: 'ifsc', name: 'ifsc'},
+            {data: 'payer_address', name: 'payer_address'},
+            {data: 'kyc_manual', name: 'kyc_manual'},
+            {data: 'pan_approve', name: 'pan_approve'},
         ],
         });
     </script>
