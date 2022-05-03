@@ -767,7 +767,7 @@ class MerchantController extends Controller
                 'INR_VALUE' => 'required|numeric',
                 'RECEIVER' => 'required|alpha_num|between:30,42',
                 'SENDER' => 'required|alpha_num|between:30,42',
-                'TXN_HASH' => 'required|between:0,42',
+                'TXN_HASH' => 'required|between:0,60',
                 'REMARKS' => 'required|between:0,18',
       ];
 
