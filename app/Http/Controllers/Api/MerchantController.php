@@ -49,6 +49,11 @@ class MerchantController extends Controller
         if ($validator->fails()) {
             return response()->json(['status'=> 'fail', 'error'=> $validator->errors()]);
         }
+        
+        if (!$this->isAddress($request->ADDRESS)) {
+            return response()->json(['status'=>'fail', 'error'=> 'Invalid wallet address']);
+        }
+
         // validate hash
         $key = $request->KEY;
         $txn_id = $request->TXNID;
@@ -772,6 +777,13 @@ class MerchantController extends Controller
           return response()->json(['status'=> 'fail', 'error'=> $validator->errors()]);
       }
         
+      if (!$this->isAddress($request->RECEIVER)) {
+            return response()->json(['status'=>'fail', 'error'=> 'Invalid receiver wallet address']);
+        }
+
+        if (!$this->isAddress($request->SENDER)) {
+            return response()->json(['status'=>'fail', 'error'=> 'Invalid sender wallet address']);
+        }
 
         $user = External::where('email', $request->EMAIL)->first(); 
         if (empty($user)) {
