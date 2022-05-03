@@ -30,7 +30,7 @@ class MerchantController extends Controller
           'AMOUNT' => 'required|numeric|min: 500|max: 50000',
           'CUSTOMER_NAME' => 'bail|required|alpha|between:2,40',
           'EMAIL' => 'required|email',
-          'PHONE' => 'required|numeric|between:10,12',
+          'PHONE' => 'required|numeric|digits_between:10,12',
           'CRYPTO' => 'required|alpha|in:USDT,BTC,GAMERE',
           'NETWORK' => 'required|alpha|in:BSC,AVAX,ETH,POLYGON',
           'ADDRESS' => 'required|alpha_num|between:30,42',
