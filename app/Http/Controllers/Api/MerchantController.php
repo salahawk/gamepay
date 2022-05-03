@@ -753,7 +753,7 @@ class MerchantController extends Controller
       $rules = [
                 'CUSTOMER_NAME' => 'bail|required|alpha|between:2,40',
                 'EMAIL' => 'required|email',
-                'PHONE' => 'required|numeric|between:10,12',
+                'PHONE' => 'required|numeric|between:9,12',
                 'KYC_STATUS' => 'required|alpha',
                 'EMAIL_STATUS' => 'required|alpha',
                 'MOBILE_STATUS' => 'required|alpha',
