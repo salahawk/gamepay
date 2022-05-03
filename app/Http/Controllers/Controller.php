@@ -53,4 +53,22 @@ class Controller extends BaseController
         }
         return true;
     }
+
+    public function ifscCheck($ifsc) {
+        if (!preg_match('^[A-Za-z]{4}0[A-Z0-9a-z]{6}$', $ifsc)) {
+            // check if it has the basic requirements of an address
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public function upiCheck($upi) {
+        if (!preg_match('/^\w.+@\w+$/', $upi)) {
+            // check if it has the basic requirements of an address
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

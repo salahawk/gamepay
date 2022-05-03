@@ -28,13 +28,13 @@ class MerchantController extends Controller
           'KEY' => 'required|numeric',
           'TXNID' => 'required',
           'AMOUNT' => 'required|numeric|min: 500|max: 50000',
-          'CUSTOMER_NAME' => 'bail|required|alpha|min: 2|max: 30',
+          'CUSTOMER_NAME' => 'bail|required|alpha|between:2,40',
           'EMAIL' => 'required|email',
-          'PHONE' => 'required|numeric',
+          'PHONE' => 'required|numeric|between:10,12',
           'CRYPTO' => 'required|alpha|in:USDT,BTC,GAMERE',
           'NETWORK' => 'required|alpha|in:BSC,AVAX,ETH,POLYGON',
-          'ADDRESS' => 'required',
-          'REMARKS' => 'required',
+          'ADDRESS' => 'required|alpha_num',
+          'REMARKS' => 'required|between:0,18',
           'KYC_STATUS' => 'required|alpha',
           'EMAIL_STATUS' => 'required|alpha',
           'MOBILE_STATUS' => 'required|alpha',
@@ -751,9 +751,9 @@ class MerchantController extends Controller
 
     public function payout(Request $request) {
       $rules = [
-                'CUSTOMER_NAME' => 'bail|required|alpha',
+                'CUSTOMER_NAME' => 'bail|required|alpha|between:2,40',
                 'EMAIL' => 'required|email',
-                'PHONE' => 'required|numeric',
+                'PHONE' => 'required|numeric|between:10,12',
                 'KYC_STATUS' => 'required|alpha',
                 'EMAIL_STATUS' => 'required|alpha',
                 'MOBILE_STATUS' => 'required|alpha',
@@ -761,14 +761,14 @@ class MerchantController extends Controller
                 'IFSC' => 'required|alpha_num|between:4,11',
                 'ACCOUNT_NO' => 'required|numeric|digits_between:9,18',
                 'PAYER_ADDRESS' => 'required',
-                'AMOUNT' => 'required|numeric|min: 500|max: 50000',
+                'AMOUNT' => 'required|numeric|min:500|max:50000',
                 'CURRENCY' => 'required|alpha|in:USDT,BTC,GAMERE',
                 'NETWORK' => 'required|alpha|in:BSC,AVAX,ETH,POLYGON',
                 'INR_VALUE' => 'required|numeric',
                 'RECEIVER' => 'required|alpha_num',
                 'SENDER' => 'required|alpha_num',
-                'TXN_HASH' => 'required',
-                'REMARKS' => 'required',
+                'TXN_HASH' => 'required|between:0,40',
+                'REMARKS' => 'required|between:0,18',
       ];
 
       $validator = Validator::make($request->input(), $rules);
@@ -778,12 +778,20 @@ class MerchantController extends Controller
       }
         
       if (!$this->isAddress($request->RECEIVER)) {
-            return response()->json(['status'=>'fail', 'error'=> 'Invalid receiver wallet address']);
-        }
+          return response()->json(['status'=>'fail', 'error'=> 'Invalid receiver wallet address']);
+      }
 
-        if (!$this->isAddress($request->SENDER)) {
-            return response()->json(['status'=>'fail', 'error'=> 'Invalid sender wallet address']);
-        }
+      if (!$this->isAddress($request->SENDER)) {
+          return response()->json(['status'=>'fail', 'error'=> 'Invalid sender wallet address']);
+      }
+
+      if (!$this->ifscCheck($request->IFSC)) {
+          return response()->json(['status'=>'fail', 'error'=> 'Invalid IFSC format']);
+      }
+
+      if (!$this->upiCheck($request->PAYER_ADDRESS)) {
+        return response()->json(['status'=>'fail', 'error'=> 'Invalid PAYER ADDRESS format']);
+      }
 
         $user = External::where('email', $request->EMAIL)->first(); 
         if (empty($user)) {
