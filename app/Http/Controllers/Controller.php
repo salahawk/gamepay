@@ -55,7 +55,7 @@ class Controller extends BaseController
     }
 
     public function ifscCheck($ifsc) {
-        if (!preg_match('^[A-Za-z]{4}0[A-Z0-9a-z]{6}$', $ifsc)) {
+        if (!preg_match('/^[A-Za-z]{4}0[A-Z0-9a-z]{6}$/', $ifsc)) {
             // check if it has the basic requirements of an address
             return false;
         } else {
