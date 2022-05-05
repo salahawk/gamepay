@@ -19,7 +19,7 @@ use App\Models\Client;
 
 class AuthController extends Controller
 {
-    public function signup(Request $request) { return response()->json(['abc'=>'abc']);
+    public function signup(Request $request) {
       $test = User::where('email', $request->email)->where('email_status', '<>', 'verified')->first();
       if (!empty($test)) {
         $test->delete();
