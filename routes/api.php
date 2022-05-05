@@ -21,14 +21,15 @@ Route::post('register', 'Api\AuthController@signup');
 Route::get('register/verify/{client_id}/{token}', 'Api\AuthController@verifyEmail')->name('api.email.verify');
 Route::post('login', 'Api\AuthController@login');
 Route::get('logout', 'Api\AuthController@logout')->middleware('auth:sanctum');
+Route::post('mobile/verify', 'Api\ClientController@submitMobileOtp');
 
 Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     // Route::apiResource('projects', 'ProjectsApiController');
     // Route::apiResource('teams', 'TeamApiController');
 
     // mobile OTP
-    Route::post('/otp-mobile/send', 'Api\ClientController@sendMobileOtp');
-    Route::post('/otp-mobile/check', 'Api\ClientController@submitMobileOtp');
+    // Route::post('/otp-mobile/send', 'Api\ClientController@sendMobileOtp');
+    // Route::post('/otp-mobile/check', 'Api\ClientController@submitMobileOtp');
     // email OTP
     // Route::post('/otp-email/send', 'Api\ClientController@sendEmailOtp');
     // Route::post('/otp-email/check', 'Api\ClientController@submitEmailOtp');

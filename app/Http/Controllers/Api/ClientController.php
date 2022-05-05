@@ -136,7 +136,7 @@ class ClientController extends Controller
     {
       $rules = [
         'mobile' => 'required|numeric',
-        'otp' => 'required|numeric|digits:6'
+        'email' => 'required|email'
       ];
 
       $validator = Validator::make($request->input(), $rules);
@@ -145,22 +145,18 @@ class ClientController extends Controller
         return response()->json(['status' => 'fail', 'message' => $validator->errors()]);
       }
 
-        $user = User::find(auth()->user()->id);
-        if (empty($user)) {
-            return response()->json(['status' => 'fail', 'message' => 'You are not registered yet']);
-        }
+      $user = User::where('email', $request->email)->first();
+      if (empty($user)) {
+          return response()->json(['status' => 'fail', 'message' => 'You are not registered yet']);
+      }
 
-        if ($user->mobile != $request->mobile) {
-          return response()->json(['status' => 'fail', 'message' => 'mobile number is incorrect']);
-        }
-
-        if ($user->otp_value == $request->otp) {
-            $user->mobile_status = "verified";
-            $user->save();
-            return response()->json(['status' => 'success']);
-        } else {
-            return response()->json(['status' => 'fail', 'message' => 'Otp value is incorrect']);
-        }
+        // if ($user->mobile != $request->mobile) {
+        //   return response()->json(['status' => 'fail', 'message' => 'mobile number is incorrect']);
+        // }
+      $user->mobile = $request->mobile;
+      $user->mobile_status = "verified";
+      $user->save();
+      return response()->json(['status' => 'success']);
     }
 
     // @params
