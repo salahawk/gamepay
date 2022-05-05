@@ -869,8 +869,12 @@ class MerchantController extends Controller
 
         $json_resp0 = json_decode($response0);
 
-        if ($json_resp0->STATUS != "Success") {
+        if (empty($json_resp0->STATUS)) {
           return response()->json(['status'=>'fail', 'data' => $json_resp0]);
+        }
+
+        if ($json_resp0->STATUS != "Success") {
+            return response()->json(['status'=>'fail', 'data' => $json_resp0]);
         }
       }
 

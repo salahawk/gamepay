@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 Route::post('register', 'Api\AuthController@signup');
-Route::get('register/verify/{client_id}/{token}', 'Api\AuthController@verifyEmail')->name('api.email.verify');
+// Route::get('register/verify/{client_id}/{token}', 'Api\AuthController@verifyEmail')->name('api.email.verify');
 Route::post('login', 'Api\AuthController@login');
 Route::get('logout', 'Api\AuthController@logout')->middleware('auth:sanctum');
 Route::post('mobile/verify', 'Api\ClientController@submitMobileOtp');
