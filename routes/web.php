@@ -15,21 +15,21 @@ use Illuminate\Support\Facades\Route;
 
 //-------------------------------- Direct -------------------------------------------//
 // Authentication
-Route::get('/', 'AuthController@index')->name('index');
-Route::post('/user/signup', 'AuthController@signup')->name('signup');
-Route::post('/user/login', 'AuthController@login')->name('login');
-Route::get('/user/logout', 'AuthController@logout')->name('logout');
-Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify'); 
+// Route::get('/', 'AuthController@index')->name('index');
+// Route::post('/user/signup', 'AuthController@signup')->name('signup');
+// Route::post('/user/login', 'AuthController@login')->name('login');
+// Route::get('/user/logout', 'AuthController@logout')->name('logout');
+// Route::get('/user/verify/{token}', 'AuthController@verifyEmail')->name('verify'); 
 
 // Route::group(['middleware' => 'auth'], function() {
-    Route::get('/user/check', 'DirectUserController@checkUser')->name('user-check');
+    // Route::get('/user/check', 'DirectUserController@checkUser')->name('user-check');
 
     // // mobile OTP
-    Route::post('/otp/mobile/send', 'DirectUserController@sendMobileOtp')->name('send-mobile-otp');
-    Route::post('/otp/mobile/submit', 'DirectUserController@submitMobileOtp')->name('submit-mobile-otp');
+    // Route::post('/otp/mobile/send', 'DirectUserController@sendMobileOtp')->name('send-mobile-otp');
+    // Route::post('/otp/mobile/submit', 'DirectUserController@submitMobileOtp')->name('submit-mobile-otp');
     // // email OTP
-    Route::post('/otp/email/send', 'DirectUserController@sendEmailOtp')->name('send-email-otp');
-    Route::post('/otp/email/submit', 'DirectUserController@submitEmailOtp')->name('submit-email-otp');
+    // Route::post('/otp/email/send', 'DirectUserController@sendEmailOtp')->name('send-email-otp');
+    // Route::post('/otp/email/submit', 'DirectUserController@submitEmailOtp')->name('submit-email-otp');
     // // kyc
     Route::any('/kyc', 'DirectUserController@kycIndex')->name('kyc');
     Route::post('/kyc/process', 'DirectUserController@kycProcess')->name('kyc-process');
@@ -101,4 +101,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
 });
 //-------------------------------- Admin end -------------------------------------------//
 
+
+
+
+//-------------------------------- Gamepay -------------------------------------------//
+Route::get('/', 'GamepayController@index')->name('home');
+Route::post('merchant/add', 'GamepayController@addMerchant')->name('merchant.add');
+Route::get('terms', 'GamepayController@terms')->name('terms');
+//-------------------------------- Gamepay end -------------------------------------------//
 
