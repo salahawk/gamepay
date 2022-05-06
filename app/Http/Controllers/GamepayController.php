@@ -20,8 +20,8 @@ class GamepayController extends Controller
   public function addMerchant(Request $request) {
     $rules = [
         'name' => 'required|alpha',
-        'mobile' => 'required',
-        'email' => 'required|email'
+        'mobile' => 'required|unique:merchants',
+        'email' => 'required|email|unique:merchants'
     ];
 
     $validator = Validator::make($request->input(), $rules);
