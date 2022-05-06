@@ -89,7 +89,6 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>URL</th>
                                 <th>IP</th>
                                 <th>Created Date</th>
                             </tr>
@@ -129,7 +128,6 @@
         },
         columns: [
             {data: 'name', name: 'name'},
-            {data: 'url', name: 'url'},
             {data: 'ip', name: 'ip'},
             {data: 'created_at', name: 'created_at'},
         ],

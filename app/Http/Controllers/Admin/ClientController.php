@@ -28,7 +28,7 @@ class ClientController extends Controller
     
     public function store(Request $request) {
       $rules = [
-          'name' => 'required|alpha',
+          'name' => 'required|alpha_num',
           'ip' => 'required|unique:merchants',
       ];
 
@@ -41,6 +41,21 @@ class ClientController extends Controller
       $client = new Client;
       $client->name = $request->name;
       $client->ip = $request->ip;
+
+      $key = random_int(10000000, 99999999);
+      $sample = Client::where('key', $key)->first();
+      if (!empty($sample)) {
+        $key = random_int(10000000, 99999999);
+      }
+
+      $salt = substr($request->name, 0, 3) . random_int(100000,999999);
+      $sample = Client::where('salt', $salt)->first();
+      if (!empty($sample)) {
+        $salt = substr($request->name, 0, 3) . random_int(100000,999999);
+      }
+      
+      $client->key = $key;
+      $client->salt = $salt;
       $client->save();
 
       return redirect()->route('admin.clients');
