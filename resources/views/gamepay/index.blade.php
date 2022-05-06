@@ -90,7 +90,7 @@
             <input type="email" class="form-control py-3" placeholder="Email*" required name="email">
           </div>
           <div class="form-group">
-            <input type="tel" class="form-control py-3" placeholder="Mobile number*" required name="mobile">
+            <input type="tel" class="form-control py-3" placeholder="Mobile number*" required name="mobile" maxlength="12" minlength="10">
           </div>
           <div class="form-group">
             <input type="submit" class="btn btn-primary btn-lg btn-block mb-4  btn-shadow-blue" value="Submit">
