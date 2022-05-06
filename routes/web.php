@@ -98,6 +98,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
     Route::get('users', 'UserController@index')->name('users');
     Route::post('users/data', 'UserController@data')->name('users.data');
     Route::get('users/approve', 'UserController@approve')->name('users.approve');
+
+    Route::get('clients', 'ClientController@index')->name('clients');
+    Route::post('clients/data', 'ClientController@data')->name('clients.data');
+    Route::post('clients/store', 'ClientController@store')->name('clients.store');
 });
 //-------------------------------- Admin end -------------------------------------------//
 

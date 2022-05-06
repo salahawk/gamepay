@@ -39,6 +39,12 @@
             <li><a href="{{ route('admin.activation') }}">Activation</a></li>
         </ul>
     </li>
+    <li class="arr"><i class="fa fa-arrow-up fa-fw"></i><a href="{{ route('admin.clients') }}">Clients</a>
+        <ul class="side-nav-dropdown">
+            <li><a href="{{ route('admin.clients') }}">Users</a></li>
+        </ul>
+    </li>
+
 </ul>
 
 
