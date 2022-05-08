@@ -16,6 +16,7 @@ use App\Models\Deposit;
 use App\Models\External;
 use App\Models\Payout;
 use App\Models\Merchant;
+use App\Models\Verification;
 
 class MerchantController extends Controller
 {
@@ -74,9 +75,15 @@ class MerchantController extends Controller
         $hash = $request->HASH;
 
         // select PSP for merchant
-        $ip_string = $request->header('origin');
-        $pieces = explode("//", $ip_string);
-        $merchant = Merchant::where('ip', $pieces[1])->first();
+        // $ip_string = $request->header('origin');
+        // $pieces = explode("//", $ip_string);
+        // $merchant = Merchant::where('ip', $pieces[1])->first();
+        // $salt = $merchant->salt;
+
+        $merchant = Merchant::where('key', $key)->first();
+        if (empty($merchant)) {
+            return response()->json(['status' => 'fail', 'message' => 'merchant key is not registered']);
+        }
         $salt = $merchant->salt;
 
         // select PSP according to the email and loyalty points
@@ -314,14 +321,14 @@ class MerchantController extends Controller
         	return response()->json(['status' => 'fail']);
 				}
 
-        Mail::send('merchants.email-otp', $data, function ($message) use (
-            $email
-        ) {
-            $message
-                ->to($email, 'GAMERE')
-                ->subject('GAMERE email confirming request');
-            $message->from('JAX@gamepay.com', 'GAMERE');
-        });
+        // Mail::send('merchants.email-otp', $data, function ($message) use (
+        //     $email
+        // ) {
+        //     $message
+        //         ->to($email, 'GAMERE')
+        //         ->subject('GAMERE email confirming request');
+        //     $message->from('JAX@gamepay.com', 'GAMERE');
+        // });
 
         $aUser->email = $email;
         $aUser->otp_value = $random_code;
@@ -526,7 +533,7 @@ class MerchantController extends Controller
 
     public function upiResponse(Request $request)
     {
-        $aDeposit = Deposit::where('order_id', $reqeust->ORDER_ID)->first();
+        $aDeposit = Deposit::where('order_id', $request->ORDER_ID)->first();
         $aDeposit->status = $request->STATUS;
         $aDeposit->auto_refund_eligible = $request->AUTO_REFUND_ELIGIBLE;
         $aDeposit->status = $request->STATUS;
