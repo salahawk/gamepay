@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 use App\Models\User;
 use App\Models\Merchant;
@@ -36,16 +37,16 @@ class GamepayController extends Controller
     $merchant->email = $request->email;
 
     // key and salt generation
-    $key = random_int(10000000, 99999999);
+    $key = Str::random(24);
     $sample = Merchant::where('key', $key)->first();
     if (!empty($sample)) {
-      $key = random_int(10000000, 99999999);
+      $key = Str::random(24);
     }
 
-    $salt = $request->name . random_int(100000,999999);
+    $salt = Str::random(64);
     $sample = Merchant::where('salt', $salt)->first();
     if (!empty($sample)) {
-      $salt = $request->name . random_int(100000,999999);
+      $salt = Str::random(64);
     }
 
     $merchant->key = $key;
