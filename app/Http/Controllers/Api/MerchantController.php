@@ -26,7 +26,7 @@ class MerchantController extends Controller
         $salt = '';
 
         $rules = [
-          'KEY' => 'required|numeric',
+          'KEY' => 'required',
           'TXNID' => 'required',
           'AMOUNT' => 'required|numeric|min: 500|max: 50000',
           'CUSTOMER_NAME' => 'bail|required|alpha|between:2,40',
