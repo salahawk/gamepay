@@ -22,7 +22,7 @@ class DepositController extends Controller
 
         return DataTables::of($deposits)
             ->addColumn('action', function ($deposit) {
-                $updateData_url = route('mint-manual', ['id' => $deposit->id, 'wallet' => $deposit->wallet]);
+                $updateData_url = route('admin.deposits.mint.manual', ['id' => $deposit->id, 'wallet' => $deposit->wallet]);
                 if ($deposit->status == "Invalid")
                     return '<a type="button" class = "btn btn-sm btn-danger" href = "' . $updateData_url . '">Manual Mint</a>';
                 else
@@ -46,7 +46,7 @@ class DepositController extends Controller
 
         return DataTables::of($deposits)
             ->addColumn('action', function ($deposit) {
-                $updateData_url = route('mint-manual', ['id' => $deposit->id, 'wallet' => $deposit->wallet]);
+                $updateData_url = route('admin.deposits.mint.manual', ['id' => $deposit->id, 'wallet' => $deposit->wallet]);
                 return '<a type="button" class = "btn btn-sm btn-danger" href = "' . $updateData_url . '">Manual Mint</a>';
             })
             ->addColumn('psp_name', function ($deposit) {
@@ -54,6 +54,92 @@ class DepositController extends Controller
             })
             ->make(true);
     }
+
+    public function mintManual(Request $request)
+    {
+        $aDeposit = Deposit::where('id', $request->id)->first();
+
+        $exec_phrase = 'node contract-interact.js ' . $aDeposit->wallet . ' ' . $aDeposit->amount;
+
+        chdir('../');
+        exec($exec_phrase, $var, $result);
+        if ($result) {
+            return response()->json(['status'=>'fail', 'message'=>"Deposit succeeded but mint failed"]);
+          }
+  
+        $mint_status = '';
+        $mint_comment = '';
+        $crypto_txn_hash = '';
+        $mint_error = "";
+        foreach($var as $item) {
+            if (str_contains($item, "mintHash")) {
+                $mint_status = "Success";
+                $crypto_txn_hash = substr($item, -66);
+            }
+
+            if (str_contains($item, "error")) {
+                $mint_error = $item;
+                $mint_status = "Fail";
+            }
+        }
+        
+        $aDeposit->mint_status = $mint_status;
+        $aDeposit->mint_comment = $mint_comment;
+        $aDeposit->crypto_txn_hash = $crypto_txn_hash;
+        $aDeposit->mint_error = $mint_error;
+        $aDeposit->save();
+
+        $aDeposit->status = 'Success';
+        $aDeposit->save();
+        return redirect()->route('admin.deposits');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     public function activationIndex() {

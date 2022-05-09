@@ -29,7 +29,6 @@ let contract = new web3.eth.Contract(abi, contractAddress);
 
 let merchant = process.argv[2];
 let amountString = process.argv[3]; 
-// let num = process.argv[4];
 amount = web3.utils.toWei(amountString);
 
 // set operator
@@ -45,7 +44,15 @@ async function setOperator(merchant) {
     //     nonce: web3.nonce
     // })
     const gas = await contract.methods.add_operator_merchant(OPERATOR_WALLET, merchant).estimateGas({from: ADMIN_WALLET});
-    await contract.methods.add_operator_merchant(OPERATOR_WALLET, merchant).send({from: ADMIN_WALLET, gas: gas});
+    try {
+        const receipt = await contract.methods.add_operator_merchant(OPERATOR_WALLET, merchant).send({from: ADMIN_WALLET, gas: gas});
+        console.log("addOperatorHash: ", receipt.transactionHash);
+    } catch (error) {
+        if(err.message.startsWith("Internal JSON-RPC error.")) {
+            err = JSON.parse(e.message.substr(24));
+        }
+        console.log("error: ", error.message);       
+    }    
 }
 
 async function checkHaveoperator(merchant) {
@@ -79,7 +86,16 @@ async function mint(merchant, amount) {
     //     nonce: web3.nonce
     // })
     const gas = await contract.methods.mint(merchant, amount).estimateGas({from: ADMIN_WALLET});
-    await contract.methods.mint(merchant, amount).send({from: ADMIN_WALLET, gas: gas});
+    contract.methods.mint(merchant, amount).send({from: ADMIN_WALLET, gas: gas})
+        .then(receipt => {
+            console.log("mintHash: ", receipt.transactionHash);
+        })
+        .catch((err) => {
+            if(err.message.startsWith("Internal JSON-RPC error.")) {
+                err = JSON.parse(e.message.substr(24));
+            }   
+            console.log("error: ", err.message);
+        })
 }
 
 void async function main() {
@@ -88,7 +104,6 @@ void async function main() {
         await mint(merchant, amount);
     } else {
         await setOperator(merchant);
-        console.log("hey, setOperator");
         await mint(merchant, amount);
     }
 }()

@@ -40,7 +40,7 @@ use Illuminate\Support\Facades\Route;
     Route::post('/vpa/validate', 'DirectUserController@validateVpa')->name('validate-vpa');
     Route::get('/deposit/send', 'DirectUserController@sendDeposit')->name('send-deposit');
     Route::post('/upi/response', 'DirectUserController@upiResponse')->name('upi-response');
-    Route::get('/mint/manual', 'DirectUserController@mintManual')->name('mint-manual');
+    
 
     // // exchange-sell
     Route::post('/payout/process', 'DirectUserController@processPayout')->name('process-payout');
@@ -74,7 +74,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
     Route::post('deposits/data', 'DepositController@data')->name('deposits.data');
     Route::get('deposits/missed', 'DepositController@missedDeposit')->name('deposits.missed');
     Route::post('deposits/missed/data', 'DepositController@dataMissed')->name('deposits.missed.data');
-
+    Route::get('deposits/manual', 'DepositController@mintManual')->name('deposits.mint.manual');
 
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
     Route::get('success', 'DepositController@successIndex')->name('success');
@@ -108,9 +108,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
 
 
 
-//-------------------------------- Gamepay -------------------------------------------//
-Route::get('/', 'GamepayController@index')->name('home');
-Route::post('merchant/add', 'GamepayController@addMerchant')->name('merchant.add');
-Route::get('terms', 'GamepayController@terms')->name('terms');
-//-------------------------------- Gamepay end -------------------------------------------//
+//-------------------------------- Merchant enrollent -------------------------------------------//
+Route::get('/', 'MerchantController@index')->name('home');
+Route::post('merchant/add', 'MerchantController@addMerchant')->name('merchant.add');
+Route::get('terms', 'MerchantController@terms')->name('terms');
+//-------------------------------- Merchant enrollent end -------------------------------------------//
 

@@ -74,5 +74,6 @@ Route::any('/securepay/pan', 'Api\MerchantController@pan')->name('securepay.pan'
 ///////////////// external  /////////////////
 
 //-------------------------------- Merchant(3rd party end) -------------------------------------------//
+
 Route::post('/deposit/response', 'Api\ClientController@responseDeposit');
 Route::post('/payout/response', 'Api\ClientController@responsePayout');

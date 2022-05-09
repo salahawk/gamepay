@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Merchant;
 
-class GamepayController extends Controller
+class MerchantController extends Controller
 {
   public function index() {
     return view('gamepay.index');

@@ -87,79 +87,6 @@ class ClientController extends Controller
     }
 
     // @params
-    // mobile - mobile number
-    // @response
-    // status
-    // data
-    public function sendMobileOtp(Request $request)
-    {
-      $rules = [
-        'mobile' => 'required|numeric',
-      ];
-
-      $validator = Validator::make($request->input(), $rules);
-
-      if ($validator->fails()) {
-        return response()->json(['status' => 'fail', 'error' => $validator->errors()]);
-      }
-      
-      $random_code = random_int(100000, 999999);
-      $user = User::find(auth()->user()->id);
-      $user->mobile = $request->mobile;
-      $user->otp_value = $random_code;
-      $user->save();
-
-      $text = 'Sending the mobile verification code: ' . $random_code;
-      $otp_data['phone'] = $request->mobile;
-      $otp_data['text'] = $text;
-      $this->sendSMS($otp_data);
-
-      return response()->json(['status' => 'success', 'data' => $request->mobile]);
-    }
-
-    protected function sendSMS($data)
-    {
-        $sid = env('TWILIO_SID');
-        $token = env('TWILIO_TOKEN');
-
-        $client = new Twiliio($sid, $token);
-        return $client->messages->create($data['phone'], [
-            'from' => env('TWILIO_NUMBER'),
-            'body' => $data['text'],
-        ]);
-    }
-
-    // @params
-    // mobile - mobile number
-    // otp - otp value
-    public function submitMobileOtp(Request $request)
-    {
-      $rules = [
-        'mobile' => 'required|numeric',
-        'email' => 'required|email'
-      ];
-
-      $validator = Validator::make($request->input(), $rules);
-
-      if ($validator->fails()) {
-        return response()->json(['status' => 'fail', 'message' => $validator->errors()]);
-      }
-
-      $user = User::where('email', $request->email)->first();
-      if (empty($user)) {
-          return response()->json(['status' => 'fail', 'message' => 'You are not registered yet']);
-      }
-
-        // if ($user->mobile != $request->mobile) {
-        //   return response()->json(['status' => 'fail', 'message' => 'mobile number is incorrect']);
-        // }
-      $user->mobile = $request->mobile;
-      $user->mobile_status = "verified";
-      $user->save();
-      return response()->json(['status' => 'success']);
-    }
-
-    // @params
     // front - front image file
     // back - back image file
 		public function kycManual(Request $request) {
@@ -338,7 +265,7 @@ class ClientController extends Controller
                       "BENEFICIARY_CD" => $user->beneficiary_cd,
                       "TXN_AMOUNT" => $amount,
                       "BENE_COMMENT" => $comment,
-                      "TXN_PAYMENT_TYPE" => "NEFT",
+                      "TXN_PAYMENT_TYPE" => "UPI",
                       "ORDER_ID" => $order_id,
           ),
           CURLOPT_HTTPHEADER => array(
@@ -410,7 +337,6 @@ class ClientController extends Controller
     // @return
     // status
     public function responseDeposit(Request $request) {
-      $salt = '';
       $deposit = Deposit::where('order_id', $request->ORDER_ID)->first();
 
       if (empty($deposit)) {
@@ -421,17 +347,17 @@ class ClientController extends Controller
         $salt = $client->salt;
       } else {
         $merchant = Merchant::where('id', $deposit->caller_id)->first();
-        $salt = $merchant->salt;
+        $salt = $merchant->salt; 
       }
       
       // hash generation check
-      $hash_string = "|". $request->ORDER_ID . "|" . $request->AMOUNT . "|" . $request->FIRST_NAME . "|" . $request->CUST_EMAIL . "|" . $request->STATUS . "|";
-      $hash_string .= $salt;
+      $hash_string = $request->KEY . "|". $request->ORDER_ID . "|" . $request->AMOUNT . "|" . $request->FIRST_NAME . "|" . $request->CUST_EMAIL . "|" . $request->STATUS . "|";
+      $hash_string .= env('PSP_SALT');
       $hash = hash("sha512", $hash_string);
 
       if ($hash != $request->generateHash) {
         return response()->json(['status' => 'fail', "message" => 'hash is wrong']);
-      }
+      }                                                                                                                                                                                     
 
       $deposit->created_date = $request->RESPONSE_DATE_TIME;
       $deposit->phone = $request->CUST_PHONE;
@@ -459,11 +385,34 @@ class ClientController extends Controller
         $exec_phrase =
             'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
 
-        // print_r($exec_phrase); exit();
         chdir('../');
         exec($exec_phrase, $var, $result);
-        $deposit->minted_status = "Success";
+        if ($result) {
+          return response()->json(['status'=>'fail', 'message'=>"Deposit succeeded but mint failed"]);
+        }
+
+        $mint_status = '';
+        $mint_comment = '';
+        $crypto_txn_hash = '';
+        $mint_error = "";
+        foreach($var as $item) {
+          if (str_contains($item, "mintHash")) {
+            $mint_status = "Success";
+            $crypto_txn_hash = substr($item, -66);
+          }
+
+          if (str_contains($item, "error")) {
+            $mint_error = $item;
+            $mint_status = "Fail";
+          }
+        }
+        
+        $deposit->mint_status = $mint_status;
+        $deposit->mint_comment = $mint_comment;
+        $deposit->crypto_txn_hash = $crypto_txn_hash;
+        $deposit->mint_error = $mint_error;
         $deposit->save();
+
         return response()->json(['status'=>'success', 'message'=>"successfully minted"]);
       } else if ($request->STATUS != "Captured" && $request->STATUS != "Declined" && $request->STATUS != "Pending") {
             //this code runs every second 
@@ -479,7 +428,7 @@ class ClientController extends Controller
               CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
               CURLOPT_CUSTOMREQUEST => 'POST',
               CURLOPT_POSTFIELDS => array(
-                "ORDER_ID" => $order_id,
+                "ORDER_ID" => $request->ORDER_ID,
               ),
               CURLOPT_HTTPHEADER => array(
                 'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42'
@@ -532,6 +481,88 @@ class ClientController extends Controller
       } else {
         return true;
       }
+    }
+
+
+
+
+
+
+
+
+
+
+    // @params
+    // mobile - mobile number
+    // @response
+    // status
+    // data
+    public function sendMobileOtp(Request $request)
+    {
+      $rules = [
+        'mobile' => 'required|numeric',
+      ];
+
+      $validator = Validator::make($request->input(), $rules);
+
+      if ($validator->fails()) {
+        return response()->json(['status' => 'fail', 'error' => $validator->errors()]);
+      }
+      
+      $random_code = random_int(100000, 999999);
+      $user = User::find(auth()->user()->id);
+      $user->mobile = $request->mobile;
+      $user->otp_value = $random_code;
+      $user->save();
+
+      $text = 'Sending the mobile verification code: ' . $random_code;
+      $otp_data['phone'] = $request->mobile;
+      $otp_data['text'] = $text;
+      $this->sendSMS($otp_data);
+
+      return response()->json(['status' => 'success', 'data' => $request->mobile]);
+    }
+
+    protected function sendSMS($data)
+    {
+        $sid = env('TWILIO_SID');
+        $token = env('TWILIO_TOKEN');
+
+        $client = new Twiliio($sid, $token);
+        return $client->messages->create($data['phone'], [
+            'from' => env('TWILIO_NUMBER'),
+            'body' => $data['text'],
+        ]);
+    }
+
+    // @params
+    // mobile - mobile number
+    // otp - otp value
+    public function submitMobileOtp(Request $request)
+    {
+      $rules = [
+        'mobile' => 'required|numeric',
+        'email' => 'required|email'
+      ];
+
+      $validator = Validator::make($request->input(), $rules);
+
+      if ($validator->fails()) {
+        return response()->json(['status' => 'fail', 'message' => $validator->errors()]);
+      }
+
+      $user = User::where('email', $request->email)->first();
+      if (empty($user)) {
+          return response()->json(['status' => 'fail', 'message' => 'You are not registered yet']);
+      }
+
+        // if ($user->mobile != $request->mobile) {
+        //   return response()->json(['status' => 'fail', 'message' => 'mobile number is incorrect']);
+        // }
+      $user->mobile = $request->mobile;
+      $user->mobile_status = "verified";
+      $user->save();
+      return response()->json(['status' => 'success']);
     }
 
 
