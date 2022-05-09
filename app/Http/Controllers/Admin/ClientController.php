@@ -12,6 +12,7 @@ use App\Models\Client;
 use Yajra\DataTables\DataTables;
 use Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class ClientController extends Controller
 {
@@ -42,16 +43,16 @@ class ClientController extends Controller
       $client->name = $request->name;
       $client->ip = $request->ip;
 
-      $key = random_int(10000000, 99999999);
+      $key = Str::random(32);
       $sample = Client::where('key', $key)->first();
       if (!empty($sample)) {
-        $key = random_int(10000000, 99999999);
+        $key = Str::random(32);
       }
 
-      $salt = substr($request->name, 0, 3) . random_int(100000,999999);
+      $salt = Str::random(48);
       $sample = Client::where('salt', $salt)->first();
       if (!empty($sample)) {
-        $salt = substr($request->name, 0, 3) . random_int(100000,999999);
+        $salt = Str::random(48);
       }
       
       $client->key = $key;
