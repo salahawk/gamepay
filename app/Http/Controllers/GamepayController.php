@@ -37,16 +37,16 @@ class GamepayController extends Controller
     $merchant->email = $request->email;
 
     // key and salt generation
-    $key = Str::random(24);
+    $key = Str::random(32);
     $sample = Merchant::where('key', $key)->first();
     if (!empty($sample)) {
-      $key = Str::random(24);
+      $key = Str::random(32);
     }
 
-    $salt = Str::random(64);
+    $salt = Str::random(48);
     $sample = Merchant::where('salt', $salt)->first();
     if (!empty($sample)) {
-      $salt = Str::random(64);
+      $salt = Str::random(48);
     }
 
     $merchant->key = $key;
