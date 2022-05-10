@@ -492,7 +492,7 @@ class MerchantController extends Controller
       $txn_hash .
       '|' .
       $salt;
-
+    print_r($hash_string); exit();
     $hash_value = hash('sha256', $hash_string);
 
     if ($hash != $hash_value) {
