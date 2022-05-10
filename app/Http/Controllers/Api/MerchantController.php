@@ -256,7 +256,7 @@ class MerchantController extends Controller
       $deposit->psp_id = 1;  // have to modify later
       $deposit->save();
 
-      $valuecheck = $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
+      $valuecheck = $psp_key . "|*" .$deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
