@@ -178,9 +178,7 @@ class MerchantController extends Controller
       // add third party bank calculation
       
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
-      print_r("value: " . $valuecheck);
       $eurl = hash('sha512', $valuecheck);
-      print_r("hash value: " . $eurl); exit();
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php'; // have to modify later based on routing logic
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
       return redirect()->away($url . "?encdata=" . $encData);
@@ -235,9 +233,7 @@ class MerchantController extends Controller
       $deposit->save();
 
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
-      print_r("value: " . $valuecheck);
       $eurl = hash('sha512', $valuecheck);
-      print_r("hash value: " . $eurl); exit();
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
       $awayUrl = $url . "?encdata=" . $encData;
@@ -261,9 +257,7 @@ class MerchantController extends Controller
       $deposit->save();
 
       $valuecheck = $psp_key . "|*" .$deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
-      print_r("value: " . $valuecheck);
       $eurl = hash('sha512', $valuecheck);
-      print_r("hash value: " . $eurl); exit();
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
       $awayUrl = $url . "?encdata=" . $encData;
