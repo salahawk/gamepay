@@ -177,7 +177,7 @@ class MerchantController extends Controller
 
       // add third party bank calculation
       
-      $valuecheck = $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
+      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
       print_r("value: " . $valuecheck);
       $eurl = hash('sha512', $valuecheck);
       print_r("hash value: " . $eurl); exit();
@@ -234,7 +234,7 @@ class MerchantController extends Controller
       $deposit->psp_id = 1;  // have to modify later
       $deposit->save();
 
-      $valuecheck = $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
+      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
       print_r("value: " . $valuecheck);
       $eurl = hash('sha512', $valuecheck);
       print_r("hash value: " . $eurl); exit();
