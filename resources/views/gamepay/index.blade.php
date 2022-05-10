@@ -102,7 +102,7 @@
     </div>
   </div>
 </section>
-<section class="pb_section bg-light pb_slant-white">
+<!-- <section class="pb_section bg-light pb_slant-white">
   <div class="container">
     <div class="row d-flex">
       <div class="col-lg-4 mb-5 my-auto"> <img src="{{asset('assets/img/gamepay/banner1.png')}}" alt="" class="img-fluid mb-5 mb-md-0"> </div>
@@ -128,7 +128,7 @@
       </div>
     </div>
   </div>
-</section>
+</section> -->
 <section class="pb_section pb_slant-white pb_pb-220">
   <div class="container">
     <div class="row d-flex">
