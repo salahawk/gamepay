@@ -30,6 +30,7 @@ class ClientController extends Controller
     // inr_value - inr value
     public function deposit(Request $request)
     {
+        $psp_key = env("PSP_KEY");
         $user = User::find(auth()->user()->id);
         
         if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
@@ -78,10 +79,10 @@ class ClientController extends Controller
 
 
           // add third party bank calculation
-          $valuecheck = $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->mobile."|*".urldecode($deposit->cust_name)."|*" . $client->salt;
+          $valuecheck = $psp_key . "|*" . $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->mobile."|*".urldecode($deposit->cust_name)."|*" . env('PSP_SALT');
 			    $hash = hash('sha512', $valuecheck);
           $url = $psp->deposit_url;
-          $encData=urlencode(base64_encode("firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
+          $encData=urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
           return response()->json(['status' => 'success', 'url' => $url."?encdata=". $encData]);
         }
     }
