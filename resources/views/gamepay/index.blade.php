@@ -27,7 +27,7 @@
         <h2 class="heading mb-3 greentxt font-weight-bold">Aссеpt Digital Payments!</h2>
         <div class="sub-heading">
           <p class="mb-4 textgrey font-weight-bold">Aссеpt, Exсhаngе, Sеnd and Store Digital Payments</p>
-          <p class="mb-5 textgrey"><a class="btn btn-success btn-lg font-weight-bold" href="#"><span>Get started</span></a></p>
+          <p class="mb-5 textgrey"><a class="btn btn-success btn-lg font-weight-bold" href="#merchant-add"><span>Get started</span></a></p>
         </div>
       </div>
       <div class="col-md-6 relative align-self-center order-1  order-md-2"> <img src="{{asset('assets/img/gamepay/banner.png')}}" class="img-fluid" /></div>
@@ -76,7 +76,7 @@
     </div>
   </div>
 </section>
-<section class="pb_section pb_slant-light pb_pb-220">
+<section class="pb_section pb_slant-light pb_pb-220" id="merchant-add">
   <div class="container">
     <div class="row justify-content-center mb-1">
       <div class="col-md-6 text-center mb-5">
