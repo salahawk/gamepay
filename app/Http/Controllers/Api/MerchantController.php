@@ -374,52 +374,52 @@ class MerchantController extends Controller
 
   public function payout(Request $request)
   {
-    // $rules = [
-    //   'CUSTOMER_NAME' => 'bail|required|alpha|between:2,40',
-    //   'EMAIL' => 'required|email',
-    //   'PHONE' => 'required|numeric|digits_between:9,12',
-    //   'KYC_STATUS' => 'required|alpha',
-    //   'EMAIL_STATUS' => 'required|alpha',
-    //   'MOBILE_STATUS' => 'required|alpha',
-    //   'PAN_STATUS' => 'required|alpha',
-    //   'AMOUNT' => 'required|numeric|min:500|max:50000',
-    //   'CURRENCY' => 'required|alpha|in:USDT,BTC,GAMERE',
-    //   'NETWORK' => 'required|alpha|in:BSC,AVAX,ETH,POLYGON',
-    //   'INR_VALUE' => 'required|numeric',
-    //   'RECEIVER' => 'required|alpha_num|between:30,42',
-    //   'SENDER' => 'required|alpha_num|between:30,42',
-    //   'TXN_HASH' => 'required|between:0,60',
-    //   'REMARKS' => 'required|between:0,18',
-    //   'HASH' => 'required'
-    // ];
+    $rules = [
+      'CUSTOMER_NAME' => 'bail|required|alpha|between:2,40',
+      'EMAIL' => 'required|email',
+      'PHONE' => 'required|numeric|digits_between:9,12',
+      'KYC_STATUS' => 'required|alpha',
+      'EMAIL_STATUS' => 'required|alpha',
+      'MOBILE_STATUS' => 'required|alpha',
+      'PAN_STATUS' => 'required|alpha',
+      'AMOUNT' => 'required|numeric|min:500|max:50000',
+      'CURRENCY' => 'required|alpha|in:USDT,BTC,GAMERE',
+      'NETWORK' => 'required|alpha|in:BSC,AVAX,ETH,POLYGON',
+      'INR_VALUE' => 'required|numeric',
+      'RECEIVER' => 'required|alpha_num|between:30,42',
+      'SENDER' => 'required|alpha_num|between:30,42',
+      'TXN_HASH' => 'required|between:0,60',
+      'REMARKS' => 'required|between:0,18',
+      'HASH' => 'required'
+    ];
 
-    // $validator = Validator::make($request->input(), $rules);
+    $validator = Validator::make($request->input(), $rules);
 
-    // if ($validator->fails()) {
-    //   return response()->json(['status' => 'fail', 'error' => $validator->errors()]);
-    // }
+    if ($validator->fails()) {
+      return response()->json(['status' => 'fail', 'error' => $validator->errors()]);
+    }
 
-    // if (!$request->PAYER_ADDRESS && !$request->IFSC && !$request->ACCOUNT_NO) {
-    //   return response()->json(['status' => 'fail', 'error' => 'Request should have payer_address,  or ifsc and account number']);
-    // } else if (!$request->PAYER_ADDRESS && (!$request->IFSC || !$request->ACCOUNT_NO)) {
-    //   return response()->json(['status' => 'fail', 'error' => 'Request should have payer_address,  or ifsc and account number']);
-    // }
+    if (!$request->PAYER_ADDRESS && !$request->IFSC && !$request->ACCOUNT_NO) {
+      return response()->json(['status' => 'fail', 'error' => 'Request should have payer_address,  or ifsc and account number']);
+    } else if (!$request->PAYER_ADDRESS && (!$request->IFSC || !$request->ACCOUNT_NO)) {
+      return response()->json(['status' => 'fail', 'error' => 'Request should have payer_address,  or ifsc and account number']);
+    }
 
-    // if (!$this->isAddress($request->RECEIVER)) {
-    //   return response()->json(['status' => 'fail', 'error' => 'Invalid receiver wallet address']);
-    // }
+    if (!$this->isAddress($request->RECEIVER)) {
+      return response()->json(['status' => 'fail', 'error' => 'Invalid receiver wallet address']);
+    }
 
-    // if (!$this->isAddress($request->SENDER)) {
-    //   return response()->json(['status' => 'fail', 'error' => 'Invalid sender wallet address']);
-    // }
+    if (!$this->isAddress($request->SENDER)) {
+      return response()->json(['status' => 'fail', 'error' => 'Invalid sender wallet address']);
+    }
 
-    // if (!empty($request->IFSC) && !$this->ifscCheck($request->IFSC)) {
-    //   return response()->json(['status' => 'fail', 'error' => 'Invalid IFSC format']);
-    // }
+    if (!empty($request->IFSC) && !$this->ifscCheck($request->IFSC)) {
+      return response()->json(['status' => 'fail', 'error' => 'Invalid IFSC format']);
+    }
 
-    // if (!empty($request->PAYER_ADDRESS) && !$this->upiCheck($request->PAYER_ADDRESS)) {
-    //   return response()->json(['status' => 'fail', 'error' => 'Invalid PAYER ADDRESS format']);
-    // }
+    if (!empty($request->PAYER_ADDRESS) && !$this->upiCheck($request->PAYER_ADDRESS)) {
+      return response()->json(['status' => 'fail', 'error' => 'Invalid PAYER ADDRESS format']);
+    }
 
     // hash check
     $key = $request->KEY;
