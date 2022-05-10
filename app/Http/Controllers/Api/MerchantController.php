@@ -492,9 +492,9 @@ class MerchantController extends Controller
       $txn_hash .
       '|' .
       $salt;
-    print_r($hash_string);
+    // print_r($hash_string);
     $hash_value = hash('sha256', $hash_string);
-    print_r($hash_value); 
+    // print_r($hash_value); 
     if ($hash != $hash_value) {
       return response()->json(['status' => 'fail', 'error' => 'Hash error']);
     }
