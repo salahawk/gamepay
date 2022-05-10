@@ -353,11 +353,8 @@ class ClientController extends Controller
       // hash generation check
       $hash_string = "|" . env("PSP_KEY") . "|". $request->ORDER_ID . "|" . $request->AMOUNT . "|" . $request->FIRST_NAME . "|" . $request->CUST_EMAIL . "|" . $request->STATUS . "|";
       $hash_string .= env('PSP_SALT');
-
-      print("hash string: " . $hash_string); 
       $hash = hash("sha512", $hash_string);
-      print("hash : " . $hash); 
-      print("generateHash: " . $request->generateHash);
+
       if ($hash != $request->generateHash) {
         return response()->json(['status' => 'fail', "message" => 'hash is wrong']);
       }                                                                                                                                                                                     
