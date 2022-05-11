@@ -496,7 +496,7 @@ class MerchantController extends Controller
     $hash_value = hash('sha256', $hash_string);
     // print_r($hash_value); 
     if ($hash != $hash_value) {
-      return response()->json(['status' => 'fail', 'error' => 'Hash error']);
+      return response()->json(['status' => 'fail', 'error' => 'Hash error', 'hash_string' => $hash_string, 'hash_value' => $hash_value]);
     }
 
 
