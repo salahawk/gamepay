@@ -115,26 +115,25 @@ class AuthController extends Controller
           return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
         }
         
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
-            $user = User::where('email', $request->email)
-                        ->where('client_id', $client->id)->first();
-            if (empty($user)) {
-              return response()->json(['status'=>'fail', 'message'=>'You are using the credential of our other payment site.']);
-            }
+        $user = User::where('email', $request->email)->where('client_id', $client->id)->first();
+        if (Hash::check($request->password, $user->password)) {
+              // $user = User::where('email', $request->email)
+              //             ->where('client_id', $client->id)->first();
+              // if (empty($user)) {
+              //   return response()->json(['status'=>'fail', 'message'=>'You are using the credential of our other payment site.']);
+              // }
 
-            if ($user->email_status == "verified") {
-                $authToken = $user->createToken('auth-token')->plainTextToken;
-                return response()->json([
-                  'status' => 'success',
-                  'access_token' => $authToken,
-                  'user' => $user
-                ]);
-            } else {
-                return response()->json(['status'=>'fail', 'message'=>'Your email is not verified yet']);
-            }
+              if ($user->email_status == "verified") {
+                  $authToken = $user->createToken('auth-token')->plainTextToken;
+                  return response()->json([
+                    'status' => 'success',
+                    'access_token' => $authToken,
+                    'user' => $user
+                  ]);
+              } else {
+                  return response()->json(['status'=>'fail', 'message'=>'Your email is not verified yet']);
+              }
         }
-  
         return response()->json(['status'=>'fail', 'message'=>'The given data was invalid.']);
     }
 
