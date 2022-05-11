@@ -20,17 +20,13 @@ use App\Models\Client;
 class AuthController extends Controller
 {
     public function signup(Request $request) {
-      $test = User::where('email', $request->email)->where('email_status', '<>', 'verified')->first();
-      if (!empty($test)) {
-        $test->delete();
-      }
-
       $rules = [
         'firstname' => 'required',
         'lastname' => 'required',
         'email' => 'required|email|unique:users',
         'mobile' => 'required|numeric|unique:users',
         'password' => 'required',
+        'client' => 'required'
       ];
 
       $validator = Validator::make($request->input(), $rules);
@@ -44,7 +40,7 @@ class AuthController extends Controller
         return response()->json(['status' => 'fail', 'error' => $message]);
       }
 
-      $ip_string = $request->header('origin');
+      $ip_string = $request->client;
       $pieces = explode("//", $ip_string);
       $client = Client::where('ip', $pieces[1])->first();
 
@@ -52,6 +48,14 @@ class AuthController extends Controller
         return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
       }
 
+      $test = User::where('email', $request->email)
+                  ->where('email_status', '<>', 'verified')
+                  ->where('client_id', $client->id)->first();
+
+      if (!empty($test)) {
+        $test->delete();
+      }
+      
       $user = new User;
       $user->first_name = $request->firstname;
       $user->last_name = $request->lastname;
