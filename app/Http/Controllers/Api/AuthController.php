@@ -117,7 +117,7 @@ class AuthController extends Controller
             $user = User::where('email', $request->email)
                         ->where('client_id', $client->id)->first();
             if (empty($user)) {
-              return response()->json(['status'=>'fail', 'message'=>'You are using the credential of our other payment site.', "data"=>$pieces[1]]);
+              return response()->json(['status'=>'fail', 'message'=>'You are using the credential of our other payment site.']);
             }
 
             if ($user->email_status == "verified") {
