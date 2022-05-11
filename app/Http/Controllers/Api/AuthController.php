@@ -23,8 +23,8 @@ class AuthController extends Controller
       $rules = [
         'firstname' => 'required',
         'lastname' => 'required',
-        'email' => 'required|email|unique:users',
-        'mobile' => 'required|numeric|unique:users',
+        'email' => 'required|email',
+        'mobile' => 'required|numeric',
         'password' => 'required',
         'client' => 'required'
       ];
@@ -43,17 +43,16 @@ class AuthController extends Controller
       $ip_string = $request->client;
       $pieces = explode("//", $ip_string);
       $client = Client::where('ip', trim($pieces[1], "/"))->first();
-print_r($client->id); exit();
+
       if (empty($client)) {
         return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
       }
 
       $test = User::where('email', $request->email)
-                  ->where('email_status', '<>', 'verified')
                   ->where('client_id', $client->id)->first();
 
       if (!empty($test)) {
-        $test->delete();
+        return response()->json(['status'=>'fail', 'message'=>'Your email has already registered!']);
       }
       
       $user = new User;
