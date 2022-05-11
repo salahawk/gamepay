@@ -642,7 +642,7 @@ class MerchantController extends Controller
     $payout->txn_amount = $json_resp->TXN_AMOUNT;
     $payout->response_message = $json_resp->RESPONSE_MESSAGE;
     $payout->txn_payment_type = $json_resp->TXN_PAYMENT_TYPE;
-    if ($json_resp->TOTAL_AMOUNT) {
+    if (!empty($json_resp->TOTAL_AMOUNT)) {
       $payout->total_amount = $json_resp->TOTAL_AMOUNT;
     }
     $payout->txn_hash = $user->txn_hash;
