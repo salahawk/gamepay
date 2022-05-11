@@ -42,7 +42,7 @@ class AuthController extends Controller
 
       $ip_string = $request->client;
       $pieces = explode("//", $ip_string);
-      $client = Client::where('ip', $pieces[1])->first();
+      $client = Client::where('ip', trim($pieces[1], "/"))->first();
 
       if (empty($client)) {
         return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
