@@ -44,7 +44,13 @@ class AuthController extends Controller
         return response()->json(['status' => 'fail', 'error' => $message]);
       }
 
-      // $email_token = Str::random(64);
+      $ip_string = $request->header('origin');
+      $pieces = explode("//", $ip_string);
+      $client = Client::where('ip', $pieces[1])->first();
+
+      if (empty($client)) {
+        return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
+      }
 
       $user = new User;
       $user->first_name = $request->firstname;
@@ -54,6 +60,7 @@ class AuthController extends Controller
       $user->password = $request->password;
       $user->email_status = "verified";
       $user->beneficiary_cd = $request->firstname . random_int(10000000, 99999999);
+      $user->client_id = $client->id;
       $saved = $user->save();
 
       // $ip_string = $request->header('origin');
@@ -77,7 +84,70 @@ class AuthController extends Controller
       //   });
 
       return response()->json(['status'=>'success', 'message'=>'Registration to Gamepay is successful!']);      
+    }    
+
+    public function login(Request $request)
+    {
+        $rules = [
+          'email' => 'required|email',
+          'password' => 'required',
+        ];
+  
+        $validator = Validator::make($request->input(), $rules);
+  
+        if ($validator->fails()) {
+          $message = '';
+          $errors = json_decode($validator->errors());
+          foreach($errors as $key => $value) {
+              $message .= $value[0] . '\n';
+          }
+          return response()->json(['status' => 'fail', 'message' => $message]);
+        }
+
+        $ip_string = $request->header('origin');
+        $pieces = explode("//", $ip_string);
+        $client = Client::where('ip', $pieces[1])->first();
+
+        if (empty($client)) {
+          return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
+        }
+        
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            $user = User::where('email', $request->email)
+                        ->where('client_id', $client->id)->first();
+            if (empty($user)) {
+              return response()->json(['status'=>'fail', 'message'=>'You are using the credential of our other payment site.']);
+            }
+
+            if ($user->email_status == "verified") {
+                $authToken = $user->createToken('auth-token')->plainTextToken;
+                return response()->json([
+                  'status' => 'success',
+                  'access_token' => $authToken,
+                  'user' => $user
+                ]);
+            } else {
+                return response()->json(['status'=>'fail', 'message'=>'Your email is not verified yet']);
+            }
+        }
+  
+        return response()->json(['status'=>'fail', 'message'=>'The given data was invalid.']);
     }
+
+    public function logout(Request $request) {
+      auth()->user()->tokens()->delete();
+      return response()->json(['status'=>'success']);
+    }
+
+
+
+
+
+
+
+
+
 
     public function verifyEmail($client_id, $token)
     {
@@ -98,48 +168,6 @@ class AuthController extends Controller
         }
   
         return response()->json(['message'=> $message]);
-    }
-
-    public function login(Request $request)
-    {
-        $rules = [
-          'email' => 'required|email',
-          'password' => 'required',
-        ];
-  
-        $validator = Validator::make($request->input(), $rules);
-  
-        if ($validator->fails()) {
-          $message = '';
-          $errors = json_decode($validator->errors());
-          foreach($errors as $key => $value) {
-              $message .= $value[0] . '\n';
-          }
-          return response()->json(['status' => 'fail', 'message' => $message]);
-        }
-
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
-            $user = User::where('email', $request->email)->first();
-            
-            if ($user->email_status == "verified") {
-                $authToken = $user->createToken('auth-token')->plainTextToken;
-                return response()->json([
-                  'status' => 'success',
-                  'access_token' => $authToken,
-                  'user' => $user
-                ]);
-            } else {
-                return response()->json(['status'=>'fail', 'message'=>'Your email is not verified yet']);
-            }
-        }
-  
-        return response()->json(['status'=>'fail', 'message'=>'The given data was invalid.']);
-    }
-
-    public function logout(Request $request) {
-      auth()->user()->tokens()->delete();
-      return response()->json(['status'=>'success']);
     }
 }
  

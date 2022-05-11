@@ -141,12 +141,16 @@ class ClientController extends Controller
     // @RETURN
     // user's all data
     public function portfolio() {
+      // $this->calculatePortfolio(auth()->user()->id);
       $total = 0;
       $deposits = Deposit::where('user_id', auth()->user()->id)->where('is_client', 1)->get();
       $payouts = Payout::where('user_id', auth()->user()->id)->where('is_external', 0)->get();
       return response()->json(['status' => 'success', 'deposits' => $deposits, 'payouts' => $payouts, 'total'=> $total]);
     }
 
+    protected function calculatePortfolio($user_id) {
+      
+    }
     // @params
     // pan - file
     // account_no - account number
