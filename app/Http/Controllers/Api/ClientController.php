@@ -150,7 +150,7 @@ class ClientController extends Controller
         return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
       }
 
-      $gamere_total = $this->calculatePortfolio(auth()->user()->id, $client->id, "G RUPEE");
+      $gamere_total = $this->calculatePortfolio(auth()->user()->id, $client->id, "G RUPEE", "amount");
       $total = 0;
       $deposits = Deposit::where('user_id', auth()->user()->id)->where('is_client', 1)->get();
       $payouts = Payout::where('user_id', auth()->user()->id)->where('is_external', 0)->get();
@@ -175,12 +175,20 @@ class ClientController extends Controller
       return response()->json(['status' => 'success', 'data' => $data, 'total'=> $total]);
     }
 
-    protected function calculatePortfolio($user_id, $client_id, $currency) {
+    protected function calculatePortfolio($user_id, $client_id, $currency, $type) {
+      if ($type == "amount") {
+        $deposit = "amount";
+        $payout = "txn_amount";
+      } else {
+        $deposit = "inr_value";
+        $payout = "inr_value";
+      }
+
       $query = "SELECT
               (
                 (
                   SELECT
-                    SUM(amount)
+                    SUM(" . $deposit . ")
                   FROM
                     deposits
                   WHERE
@@ -194,7 +202,7 @@ class ClientController extends Controller
                   )
                 ) - (
                   SELECT
-                    SUM(txn_amount)
+                  SUM(" . $payout . ")
                   FROM
                     payouts
                   WHERE
