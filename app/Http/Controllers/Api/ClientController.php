@@ -412,7 +412,7 @@ class ClientController extends Controller
     // status
     public function responseDeposit(Request $request) {
       $deposit = Deposit::where('order_id', $request->ORDER_ID)->first();
-
+print_r($request->ORDER_ID); exit();
       if (empty($deposit)) {
         return response()->json(['status' => 'fail', "message" => 'Order id does not exist in DB.']);
       }
