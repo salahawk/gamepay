@@ -9,6 +9,7 @@ use Twilio\Rest\Client as Twiliio;
 use Mail;
 use Auth;
 use Illuminate\Support\Facades\Session;
+use DB;
 
 use App\Models\Deposit;
 use App\Models\User;
@@ -140,16 +141,76 @@ class ClientController extends Controller
     // @params
     // @RETURN
     // user's all data
-    public function portfolio() {
-      // $this->calculatePortfolio(auth()->user()->id);
+    public function portfolio(Request $request) {
+      $ip_string = $request->header('origin');
+      $pieces = explode("//", $ip_string);
+      $client = Client::where('ip', trim($pieces[1], "/"))->first();
+
+      if (empty($client)) {
+        return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
+      }
+
+      $gamere_total = $this->calculatePortfolio(auth()->user()->id, $client->id, "G RUPEE");
       $total = 0;
       $deposits = Deposit::where('user_id', auth()->user()->id)->where('is_client', 1)->get();
       $payouts = Payout::where('user_id', auth()->user()->id)->where('is_external', 0)->get();
-      return response()->json(['status' => 'success', 'deposits' => $deposits, 'payouts' => $payouts, 'total'=> $total]);
+      $data = array(
+        [
+          "asset" => "G RUPEE",
+          "available" => 5023,
+          "gamere" => 5023
+        ],
+        [
+          "asset" => "BTC",
+          "available" => 23,
+          "gamere" => 23412
+        ],
+        [
+          "asset" => "USDT",
+          "available" => 476,
+          "gamere" => 2342
+        ]
+        );
+        $total = "43452";
+      return response()->json(['status' => 'success', 'data' => $data, 'total'=> $total]);
     }
 
-    protected function calculatePortfolio($user_id) {
-      
+    protected function calculatePortfolio($user_id, $client_id, $currency) {
+      $query = "SELECT
+              (
+                (
+                  SELECT
+                    SUM(amount)
+                  FROM
+                    deposits
+                  WHERE
+                    deposits.user_id = '". $user_id . "'
+                  AND deposits.caller_id = '". $client_id . "'
+                  AND deposits.is_client = '1'
+                  AND deposits.crypto = '" . $currency . "'
+                  AND (
+                    deposits.status = 'Captured'
+                    OR deposits.status = 'Success'
+                  )
+                ) - (
+                  SELECT
+                    SUM(txn_amount)
+                  FROM
+                    payouts
+                  WHERE
+                    payouts.user_id = '". $user_id . "'
+                  AND payouts.caller_id = '". $client_id . "'
+                  AND payouts.is_external = '0'
+                  AND payouts.currency = '" . $currency . "'
+                  AND (
+                    payouts. STATUS = 'Captured'
+                    OR payouts. STATUS = 'Success'
+                  )
+                )
+              ) AS total_sum  WHERE 1";
+              
+        $total = DB::select($query);
+        return $total[0]->total_sum;
     }
     // @params
     // pan - file
@@ -486,6 +547,12 @@ class ClientController extends Controller
       } else {
         return true;
       }
+    }
+
+    public function history() {
+      $deposits = Deposit::where('user_id', auth()->user()->id)->where('is_client', 1)->get();
+      $payouts = Payout::where('user_id', auth()->user()->id)->where('is_external', 0)->get();
+      return response()->json(['status' => 'success', 'deposits' => $deposits, 'payouts' => $payouts]);
     }
 
 

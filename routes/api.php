@@ -41,7 +41,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::post('/pan', 'Api\ClientController@savePan');
     Route::post('/payout-process', 'Api\ClientController@processPayout');
     Route::post('/kyc/process', 'Api\ClientController@processKyc');
-    
+    Route::get('/history', 'Api\ClientController@history');
 });
 
 Route::post('/kyc/response', 'Api\ClientController@responseKyc');

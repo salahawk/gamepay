@@ -108,9 +108,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
 
 
 
-//-------------------------------- Merchant enrollent -------------------------------------------//
+//-------------------------------- Merchant enrollment -------------------------------------------//
 Route::get('/', 'MerchantController@index')->name('home');
 Route::post('merchant/add', 'MerchantController@addMerchant')->name('merchant.add');
 Route::get('terms', 'MerchantController@terms')->name('terms');
-//-------------------------------- Merchant enrollent end -------------------------------------------//
+//-------------------------------- Merchant enrollment end -------------------------------------------//
 
