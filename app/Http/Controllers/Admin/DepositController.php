@@ -40,7 +40,7 @@ class DepositController extends Controller
 
     public function dataMissed() {
         $deposits = Deposit::where('status', 'Captured')
-                            ->where('minted_status', "<>", "success")
+                            ->where('mint_status', "<>", "success")
                             ->orderby('created_at', 'desc')
                             ->select('*');
 
