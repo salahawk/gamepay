@@ -211,27 +211,26 @@ class MerchantController extends Controller
 
     $user_id = $sample->id;
 
+    $deposit = new Deposit;
+    $deposit->user_id = $user_id;
+    $sample->txnid = $txn_id;
+    $deposit->amount = $amount;
+    $deposit->crypto = $crypto;
+    $deposit->network = $network;
+    $deposit->remarks = $remarks;
+    $deposit->is_client = 0;
+    $deposit->cust_name = $customer_name;
+    $deposit->wallet = $address;
+    $deposit->order_id = $customer_name . random_int(10000000, 99999999);
+    $deposit->caller_id = $merchant->id;
+    $deposit->email = $email;
+    $deposit->psp_id = 1;  // have to modify later
+    $deposit->save();
 
     // redirect to the verification
     if ($email_status == 'verified' && $mobile_status == "verified" && $kyc_status != 'verified') {
-      return redirect()->route('securepay.kyc', ['user_id' => $user_id]);
+      return redirect()->route('securepay.kyc', ['user_id' => $user_id, 'deposit_id' => $deposit->id]);
     } else if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
-      $deposit = new Deposit;
-      $deposit->user_id = $user_id;
-      $sample->txnid = $txn_id;
-      $deposit->amount = $amount;
-      $deposit->crypto = $crypto;
-      $deposit->network = $network;
-      $deposit->remarks = $remarks;
-      $deposit->is_client = 0;
-      $deposit->cust_name = $customer_name;
-      $deposit->wallet = $address;
-      $deposit->order_id = $customer_name . random_int(10000000, 99999999);
-      $deposit->caller_id = $merchant->id;
-      $deposit->email = $email;
-      $deposit->psp_id = 1;  // have to modify later
-      $deposit->save();
-
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
@@ -240,22 +239,6 @@ class MerchantController extends Controller
       // return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
       return view('external_users.status_verify', compact('user_id', 'amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
     } else {
-      $deposit = new Deposit;
-      $deposit->user_id = $user_id;
-      $sample->txnid = $txn_id;
-      $deposit->amount = $amount;
-      $deposit->crypto = $crypto;
-      $deposit->network = $network;
-      $deposit->remarks = $remarks;
-      $deposit->is_client = 0;
-      $deposit->cust_name = $customer_name;
-      $deposit->wallet = $address;
-      $deposit->order_id = $customer_name . random_int(10000000, 99999999);
-      $deposit->caller_id = $merchant->id;
-      $deposit->email = $email;
-      $deposit->psp_id = 1;  // have to modify later
-      $deposit->save();
-
       $valuecheck = $psp_key . "|*" .$deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
@@ -361,12 +344,22 @@ class MerchantController extends Controller
       $user->back_img = $back_name;
       $user->save();
 
-      return redirect()->route('securepay.pan', [
-        'user_id' => $user->id,
-        'status' => 'Manual KYC images are under approval',
-        'pan_front' => $front_name,
-        'pan_back' => $back_name
-      ]);
+      $psp_key = env("PSP_KEY");
+      $deposit = Deposit::where('id', $request->deposit_id)->first();
+      $valuecheck = env("PSP_KEY") . "|*" .$deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($deposit->email) . "|*" . $user->phone . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
+      $eurl = hash('sha512', $valuecheck);
+      $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$user->phone&amount=$deposit->amount&email=$deposit->email&txnid=$deposit->order_id&eurl=$eurl"));
+      $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
+      $awayUrl = $url . "?encdata=" . $encData;
+
+      return redirect()->away($url . "?encdata=" . $encData);
+
+      // return redirect()->route('securepay.pan', [
+      //   'user_id' => $user->id,
+      //   'status' => 'Manual KYC images are under approval',
+      //   'pan_front' => $front_name,
+      //   'pan_back' => $back_name
+      // ]);
     } else {
       return response()->json(['status' => 'fail']);
     }

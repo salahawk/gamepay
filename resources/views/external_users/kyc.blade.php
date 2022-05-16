@@ -61,6 +61,7 @@
                                         enctype="multipart/form-data">
                                         @csrf
                                         <input type="hidden" name="user_id" value="{{ $user_id }}" />
+                                        <input type="hidden" name="deposit_id" value="{{ $deposit_id }}" />
                                         @if (empty($status))
                                         <div class="form-group">
                                             <label for="formFileLg" class="form-label text-blue">Please Upload Doc
