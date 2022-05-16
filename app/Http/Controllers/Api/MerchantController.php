@@ -951,7 +951,7 @@ class MerchantController extends Controller
   public function kycIndex(Request $request)
   {
     if (empty($request->status))
-      return view('external_users.kyc')->with('user_id', $request->user_id);
+      return view('external_users.kyc')->with('user_id', $request->user_id)->with('deposit_id', $request->deposit_id);
     else
       return view('external_users.pan')->with('user_id', $request->user_id)
         ->with('status', $request->status)
