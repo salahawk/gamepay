@@ -107,7 +107,7 @@ class AuthController extends Controller
           return response()->json(['status' => 'fail', 'message' => $message]);
         }
 
-        $ip_string = $request->header('origin'); print_r($ip_string);
+        $ip_string = $request->header('origin'); 
         $pieces = explode("//", $ip_string);
         $client = Client::where('ip', $pieces[1])->first();
 
