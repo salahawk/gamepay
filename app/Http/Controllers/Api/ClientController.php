@@ -308,7 +308,7 @@ class ClientController extends Controller
                           "ACTION" => "ADD",
             ),
             CURLOPT_HTTPHEADER => array (
-              'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42'
+              'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15'
             ),
           ));
 
@@ -343,7 +343,7 @@ class ClientController extends Controller
                       "ORDER_ID" => $order_id,
           ),
           CURLOPT_HTTPHEADER => array(
-            'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+            'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15',
           ),
         ));
   
@@ -505,7 +505,7 @@ class ClientController extends Controller
                 "ORDER_ID" => $request->ORDER_ID,
               ),
               CURLOPT_HTTPHEADER => array(
-                'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42'
+                'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15'
               ),
             ));
   
@@ -541,7 +541,7 @@ class ClientController extends Controller
           'ACTION' => 'VERIFY'
         ),
         CURLOPT_HTTPHEADER => array(
-          'Authorization: Bearer 853E8CA793795D2067CA199ECE28222CBF5ACA699BE450ED3F76D49A01137A42',
+          'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15',
         ),
       ));
 
