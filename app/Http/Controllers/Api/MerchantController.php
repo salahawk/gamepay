@@ -762,6 +762,16 @@ class MerchantController extends Controller
     return $awayUrl;
   }
 
+  public function kycIndex(Request $request)
+  {
+    if (empty($request->status))
+      return view('external_users.kyc')->with('user_id', $request->user_id)->with('deposit_id', $request->deposit_id);
+    else
+      return view('external_users.pan')->with('user_id', $request->user_id)
+        ->with('status', $request->status)
+        ->with('pan_front', $request->pan_front)
+        ->with('pan_back', $request->pan_back);
+  }
 
 
 
@@ -946,17 +956,6 @@ class MerchantController extends Controller
     } else {
       return false;
     }
-  }
-
-  public function kycIndex(Request $request)
-  {
-    if (empty($request->status))
-      return view('external_users.kyc')->with('user_id', $request->user_id)->with('deposit_id', $request->deposit_id);
-    else
-      return view('external_users.pan')->with('user_id', $request->user_id)
-        ->with('status', $request->status)
-        ->with('pan_front', $request->pan_front)
-        ->with('pan_back', $request->pan_back);
   }
 
   public function getUpi(Request $request)
