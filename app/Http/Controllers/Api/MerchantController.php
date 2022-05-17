@@ -344,6 +344,15 @@ class MerchantController extends Controller
       $user->back_img = $back_name;
       $user->save();
 
+      if ($request->deposit_id == 0) {
+        return redirect()->route('securepay.pan', [
+          'user_id' => $user->id,
+          'status' => 'Manual KYC images are under approval',
+          'pan_front' => $front_name,
+          'pan_back' => $back_name
+        ]);
+      }
+      
       $psp_key = env("PSP_KEY");
       $deposit = Deposit::where('id', $request->deposit_id)->first();
       $valuecheck = env("PSP_KEY") . "|*" .$deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($deposit->email) . "|*" . $user->phone . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
@@ -354,12 +363,7 @@ class MerchantController extends Controller
 
       return redirect()->away($url . "?encdata=" . $encData);
 
-      // return redirect()->route('securepay.pan', [
-      //   'user_id' => $user->id,
-      //   'status' => 'Manual KYC images are under approval',
-      //   'pan_front' => $front_name,
-      //   'pan_back' => $back_name
-      // ]);
+      
     } else {
       return response()->json(['status' => 'fail']);
     }
@@ -496,37 +500,41 @@ class MerchantController extends Controller
     $user = External::where('email', $request->EMAIL)->first();
     if (empty($user)) {
       return response()->json(['status' => 'fail', 'error' => 'Email not found']);
-    } else {
-      $user->pan_status = $request->PAN_STATUS;
-
-      if (!empty($request->IFSC)) {
-        $user->ifsc = $request->IFSC;
-      }
-
-      if (!empty($request->ACCOUNT_NO)) {
-        $user->account_no = $request->ACCOUNT_NO;
-      }
-
-      if (!empty($request->PAYER_ADDRESS)) {
-        $user->payer_address = $request->PAYER_ADDRESS;
-      }
-
-      $user->crypto = $request->CURRENCY;
-      $user->network = $request->NETWORK;
-      $user->inr_value = $request->INR_VALUE;
-      $user->remarks = $request->REMARKS;
-      $user->amount = $request->AMOUNT;
-      $user->address = $request->SENDER;
-      $user->receiver = $request->RECEIVER;
-      $user->txn_hash = $request->TXN_HASH;
-      $user->save();
-
-      if ($request->PAN_STATUS != 'verified') {
-        return redirect()->route('securepay.pan', ['user_id' => $user->id]);
-      } else {
-        return redirect()->route('securepay.payout.add', ['user_id' => $user->id]);
-      }
     }
+    if ($kyc_status != "verified") {
+      return redirect()->route('securepay.kyc', ['user_id' => $user->id, 'deposit_id' => 0]);
+    }
+
+    $user->pan_status = $request->PAN_STATUS;
+
+    if (!empty($request->IFSC)) {
+      $user->ifsc = $request->IFSC;
+    }
+
+    if (!empty($request->ACCOUNT_NO)) {
+      $user->account_no = $request->ACCOUNT_NO;
+    }
+
+    if (!empty($request->PAYER_ADDRESS)) {
+      $user->payer_address = $request->PAYER_ADDRESS;
+    }
+
+    $user->crypto = $request->CURRENCY;
+    $user->network = $request->NETWORK;
+    $user->inr_value = $request->INR_VALUE;
+    $user->remarks = $request->REMARKS;
+    $user->amount = $request->AMOUNT;
+    $user->address = $request->SENDER;
+    $user->receiver = $request->RECEIVER;
+    $user->txn_hash = $request->TXN_HASH;
+    $user->save();
+
+    if ($request->PAN_STATUS != 'verified') {
+      return redirect()->route('securepay.pan', ['user_id' => $user->id]);
+    } else {
+      return redirect()->route('securepay.payout.add', ['user_id' => $user->id]);
+    }
+
   }
 
   public function addPayout(Request $request)
