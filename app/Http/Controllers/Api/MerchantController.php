@@ -352,7 +352,7 @@ class MerchantController extends Controller
           'pan_back' => $back_name
         ]);
       }
-      
+
       $psp_key = env("PSP_KEY");
       $deposit = Deposit::where('id', $request->deposit_id)->first();
       $valuecheck = env("PSP_KEY") . "|*" .$deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($deposit->email) . "|*" . $user->phone . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
@@ -501,7 +501,8 @@ class MerchantController extends Controller
     if (empty($user)) {
       return response()->json(['status' => 'fail', 'error' => 'Email not found']);
     }
-    if ($kyc_status != "verified") {
+
+    if ($kyc_status != "verified" || $user->kyc_status != "verified") {
       return redirect()->route('securepay.kyc', ['user_id' => $user->id, 'deposit_id' => 0]);
     }
 
