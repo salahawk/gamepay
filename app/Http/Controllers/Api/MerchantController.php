@@ -362,8 +362,7 @@ class MerchantController extends Controller
       $awayUrl = $url . "?encdata=" . $encData;
 
       return redirect()->away($url . "?encdata=" . $encData);
-
-      
+            
     } else {
       return response()->json(['status' => 'fail']);
     }

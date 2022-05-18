@@ -75,7 +75,7 @@
                                             <input class="form-control form-control-lg" id="back" type="file"
                                                 name="back" required/>
                                         </div>
-                                        <button type="submit" class="btn btn-primary btn-lg">Upload</button>
+                                        <button type="submit" class="btn btn-primary btn-lg">OK</button>
                                         @else
                                         <div class="form-group">
                                             <p class="form-control form-control-lg" id="front">{{ $pan_front }}</p>
