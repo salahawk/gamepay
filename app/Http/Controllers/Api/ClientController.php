@@ -29,6 +29,70 @@ class ClientController extends Controller
     // crypto - usdt, gamerer
     // remarks - bluh bluh
     // inr_value - inr value
+    public function guest(Request $request)
+    {
+        $test = Deposit::where('wallet', $request->wallet_address)->where('status', "Captured")->first();
+        if (empty($test)) {
+          return response()->json(['status' => 'fail', 'message' => 'No successful transaction happened with this wallet address. Please register and verify.']);
+        }
+
+        $rules = [
+          'amount' => 'required|numeric',
+          'currency' => 'required',
+          'network' => 'required|alpha',
+          'remarks' => 'required',
+          'inr_value' => 'required|numeric',
+        ];
+  
+        $validator = Validator::make($request->input(), $rules);
+  
+        if ($validator->fails()) {
+          return response()->json(['status' => 'fail', 'message' => $validator->errors()]);
+        }
+
+        // find predefined PSP provider based on IP address for client
+        $ip_string = $request->header('origin');
+        $pieces = explode("//", $ip_string);
+        $client = Client::where('ip', $pieces[1])->first();
+        $psp = Psp::where('client_id', $client->id)->first();
+
+        if (empty($client) || empty($psp)) {
+          return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
+        }
+
+        $psp_key = env("PSP_KEY");
+
+        $deposit = new Deposit;
+        $deposit->user_id = $test->user_id;
+        $deposit->amount = $request->amount;
+        $deposit->crypto = $request->currency;
+        $deposit->network = $request->network;
+        $deposit->remarks = $request->remarks;
+        $deposit->inr_value = $request->inr_value;
+        $deposit->is_client = 1;
+        $deposit->cust_name = $test->first_name;
+        $deposit->wallet = $request->wallet_address;
+        $deposit->order_id = $test->first_name . random_int(10000000, 99999999);
+        $deposit->caller_id = $psp->client_id;
+        $deposit->psp_id = $psp->id;  // have to modify later
+        $deposit->save();
+
+
+        // add third party bank calculation
+        $valuecheck = $psp_key . "|*" . $deposit->order_id."|*".$deposit->amount."|*".urldecode($test->email)."|*".$test->mobile."|*".urldecode($deposit->cust_name)."|*" . env('PSP_SALT');
+        $hash = hash('sha512', $valuecheck);
+        $url = $psp->deposit_url;
+        $encData=urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$test->mobile&amount=$deposit->amount&email=$test->email&txnid=$deposit->order_id&eurl=$hash"));
+        return response()->json(['status' => 'success', 'url' => $url."?encdata=". $encData]);
+    }
+
+    // @params
+    // amount - to be purchased
+    // currency - usdt, gamerer
+    // network - bsc, polygon
+    // crypto - usdt, gamerer
+    // remarks - bluh bluh
+    // inr_value - inr value
     public function deposit(Request $request)
     {
         $psp_key = env("PSP_KEY");

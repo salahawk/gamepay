@@ -23,6 +23,8 @@ Route::post('login', 'Api\AuthController@login');
 Route::get('logout', 'Api\AuthController@logout')->middleware('auth:sanctum');
 Route::post('mobile/verify', 'Api\ClientController@submitMobileOtp');
 
+Route::post('guest', 'Api\ClientController@guest');
+
 Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     // Route::apiResource('projects', 'ProjectsApiController');
     // Route::apiResource('teams', 'TeamApiController');
