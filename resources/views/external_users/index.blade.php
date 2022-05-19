@@ -66,7 +66,7 @@
                                     data-imagesrc="{{ asset('assets/img/binance.png') }}" data-description="">BSC
                                 </option>
                                 <option value="1" class="text-blue"
-                                    data-imagesrc="{{ asset('assets/img/awax.png') }}" data-description="">AWAX
+                                    data-imagesrc="{{ asset('assets/img/awax.png') }}" data-description="">AVAX
                                 </option>
                                 <option value="1" class="text-blue"
                                     data-imagesrc="{{ asset('assets/img/ethereum.png') }}" data-description="">ETH

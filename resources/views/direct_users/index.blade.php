@@ -60,7 +60,7 @@
                                             </option>
                                             <option value="1" class="text-blue"
                                                 data-imagesrc="{{ asset('assets/img/awax.png') }}" data-description="">
-                                                AWAX
+                                                AVAX
                                             </option>
                                             <option value="1" class="text-blue"
                                                 data-imagesrc="{{ asset('assets/img/ethereum.png') }}"

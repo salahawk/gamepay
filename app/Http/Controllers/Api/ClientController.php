@@ -98,6 +98,33 @@ class ClientController extends Controller
         $psp_key = env("PSP_KEY");
         $user = User::find(auth()->user()->id);
         
+        // find predefined PSP provider based on IP address for client
+        $ip_string = $request->header('origin');
+        $pieces = explode("//", $ip_string);
+        $client = Client::where('ip', $pieces[1])->first();
+        $psp = Psp::where('client_id', $client->id)->first();
+
+        if (empty($client) || empty($psp)) {
+          return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
+        }
+
+        $deposit = new Deposit;
+        $deposit->user_id = $user->id;
+        $deposit->amount = $request->amount;
+        $deposit->crypto = $request->currency;
+        $deposit->network = $request->network;
+        $deposit->remarks = $request->remarks;
+        $deposit->inr_value = $request->inr_value;
+        $deposit->is_client = 1;
+        $deposit->cust_name = $user->first_name;
+        $deposit->wallet = $request->wallet_address;
+        $deposit->order_id = $user->first_name . random_int(10000000, 99999999);
+        $deposit->caller_id = $psp->client_id;
+        $deposit->psp_id = $psp->id;  // have to modify later
+        $deposit->save();
+
+        Session::put('deposit_id', $deposit->id);
+
         if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
           return response()->json(['status' => 'fail', 'kyc' => 'no', 'mobile'=>'yes']);
         } else if ($user->email_status == "verified" && $user->mobile_status != "verified" && $user->kyc_status != "verified") {
@@ -126,22 +153,6 @@ class ClientController extends Controller
           if (empty($client) || empty($psp)) {
             return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
           }
-
-          $deposit = new Deposit;
-          $deposit->user_id = $user->id;
-          $deposit->amount = $request->amount;
-          $deposit->crypto = $request->currency;
-          $deposit->network = $request->network;
-          $deposit->remarks = $request->remarks;
-          $deposit->inr_value = $request->inr_value;
-          $deposit->is_client = 1;
-          $deposit->cust_name = $user->first_name;
-          $deposit->wallet = $request->wallet_address;
-          $deposit->order_id = $user->first_name . random_int(10000000, 99999999);
-          $deposit->caller_id = $psp->client_id;
-          $deposit->psp_id = $psp->id;  // have to modify later
-          $deposit->save();
-
 
           // add third party bank calculation
           $valuecheck = $psp_key . "|*" . $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->mobile."|*".urldecode($deposit->cust_name)."|*" . env('PSP_SALT');
@@ -189,7 +200,22 @@ class ClientController extends Controller
         $user->back_img = $back_name;
         $user->save();
 
-        return response()->json(['status' => 'success']);
+        $psp_key = env("PSP_KEY");
+        $ip_string = $request->header('origin');
+        $pieces = explode("//", $ip_string);
+        $client = Client::where('ip', $pieces[1])->first();
+        $psp = Psp::where('client_id', $client->id)->first();
+
+        if (empty($client) || empty($psp)) {
+          return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
+        }
+
+        $deposit = Deposit::find(Session::get('deposit_id'));
+        $valuecheck = $psp_key . "|*" . $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->mobile."|*".urldecode($deposit->cust_name)."|*" . env('PSP_SALT');
+        $hash = hash('sha512', $valuecheck);
+        $url = $psp->deposit_url;
+        $encData=urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
+        return redirect()->away($url."?encdata=". $encData);
       } else {
         return response()->json(['status' => 'fail', 'message' => 'File types are not allowed image files']);
       }
