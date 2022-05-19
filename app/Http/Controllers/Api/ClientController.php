@@ -211,6 +211,7 @@ class ClientController extends Controller
         }
 
         $deposit = Deposit::find(Session::get('deposit_id'));
+        Session::forget('deposit_id');
         $valuecheck = $psp_key . "|*" . $deposit->order_id."|*".$deposit->amount."|*".urldecode($user->email)."|*".$user->mobile."|*".urldecode($deposit->cust_name)."|*" . env('PSP_SALT');
         $hash = hash('sha512', $valuecheck);
         $url = $psp->deposit_url;
@@ -240,28 +241,32 @@ class ClientController extends Controller
         return response()->json(['status'=>'fail', 'message'=>'Unknown ip address']);
       }
 
-      $gamere_total = $this->calculatePortfolio(auth()->user()->id, $client->id, "G RUPEE", "amount");
-      $total = 0;
-      $deposits = Deposit::where('user_id', auth()->user()->id)->where('is_client', 1)->get();
-      $payouts = Payout::where('user_id', auth()->user()->id)->where('is_external', 0)->get();
+      $gamere = $this->calculatePortfolio(auth()->user()->id, $client->id, "G RUPEE", "amount");
+      $gamere_inr = $this->calculatePortfolio(auth()->user()->id, $client->id, "G RUPEE", "inr_value");
+      $btc = $this->calculatePortfolio(auth()->user()->id, $client->id, "BTC", "amount");
+      $btc_inr = $this->calculatePortfolio(auth()->user()->id, $client->id, "BTC", "inr_value");
+      $usdt = $this->calculatePortfolio(auth()->user()->id, $client->id, "USDT", "amount");
+      $usdt_inr = $this->calculatePortfolio(auth()->user()->id, $client->id, "USDT", "inr_value");
+var_dump($gamere);
+      $total = $gamere_inr + $btc_inr + $usdt_inr;
+
       $data = array(
         [
           "asset" => "G RUPEE",
-          "available" => 5023,
-          "gamere" => 5023
+          "available" => $gamere,
+          "gamere" => $gamere_inr
         ],
         [
           "asset" => "BTC",
-          "available" => 23,
-          "gamere" => 23412
+          "available" => $btc,
+          "gamere" => $btc_inr
         ],
         [
           "asset" => "USDT",
-          "available" => 476,
-          "gamere" => 2342
+          "available" => $usdt,
+          "gamere" => $usdt_inr
         ]
-        );
-        $total = "43452";
+      );
       return response()->json(['status' => 'success', 'data' => $data, 'total'=> $total]);
     }
 
@@ -308,7 +313,7 @@ class ClientController extends Controller
               ) AS total_sum  WHERE 1";
               
         $total = DB::select($query);
-        return $total[0]->total_sum;
+        return empty($total[0]->total_sum) ? 0 : $total[0]->total_sum;
     }
     // @params
     // pan - file
