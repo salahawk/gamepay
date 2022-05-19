@@ -247,7 +247,7 @@ class ClientController extends Controller
       $btc_inr = $this->calculatePortfolio(auth()->user()->id, $client->id, "BTC", "inr_value");
       $usdt = $this->calculatePortfolio(auth()->user()->id, $client->id, "USDT", "amount");
       $usdt_inr = $this->calculatePortfolio(auth()->user()->id, $client->id, "USDT", "inr_value");
-var_dump($gamere);
+
       $total = $gamere_inr + $btc_inr + $usdt_inr;
 
       $data = array(
