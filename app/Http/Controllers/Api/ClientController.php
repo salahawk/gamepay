@@ -507,7 +507,7 @@ class ClientController extends Controller
     // status
     public function responseDeposit(Request $request) {
       $deposit = Deposit::where('order_id', $request->ORDER_ID)->first();
-print_r($request->input());
+
       if (empty($deposit)) {
         return response()->json(['status' => 'fail', "message" => 'Order id does not exist in DB.']);
       }
@@ -521,7 +521,7 @@ print_r($request->input());
       
       // hash generation check
       $hash_string = "|" . env("PSP_KEY") . "|". $request->ORDER_ID . "|" . $request->AMOUNT . "|" . $request->FIRST_NAME . "|" . $request->CUST_EMAIL . "|" . $request->STATUS . "|";
-      print_r($hash_string);
+      
       $hash_string .= env('PSP_SALT');
       $hash = hash("sha512", $hash_string);
 
