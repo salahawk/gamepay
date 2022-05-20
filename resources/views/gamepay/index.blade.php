@@ -17,7 +17,7 @@
 <body data-spy="scroll" data-target="#pb-navbar" data-offset="200">
 <nav class="navbar navbar-expand-lg navbar-dark pb_navbar pb_scrolled-light">
   <div class="container"> <a class="navbar-brand" href="#"><img src="{{asset('assets/img/gamepay/logo.png')}}"/></a>
-    <div class="ml-auto toplink font-weight-bold"> <a href="#">jaydeep@gamepay.online</a> </div>
+    <div class="ml-auto toplink font-weight-bold"> <a href="#">support@gamepay.online</a> </div>
   </div>
 </nav>
 <section class="pb_cover_v3 overflow-hidden cover-bg-indigo cover-bg-opacity text-left pb_gradient_v1 pb_slant-light">
