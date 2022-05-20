@@ -521,6 +521,7 @@ class ClientController extends Controller
       
       // hash generation check
       $hash_string = "|" . env("PSP_KEY") . "|". $request->ORDER_ID . "|" . $request->AMOUNT . "|" . $request->FIRST_NAME . "|" . $request->CUST_EMAIL . "|" . $request->STATUS . "|";
+      print_r($hash_string);
       $hash_string .= env('PSP_SALT');
       $hash = hash("sha512", $hash_string);
 
