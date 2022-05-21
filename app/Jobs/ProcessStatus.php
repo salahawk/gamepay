@@ -35,7 +35,7 @@ class ProcessStatus implements ShouldQueue
      */
     public function handle()
     {
-        $test = Deposit::find($this->deposit_id); print_r($test->order_id);
+        $test = Deposit::find($this->deposit_id); print_r($this->client_url);
         if ($test->status == 'incomplete') {
             // status inquiry
             $curl = curl_init();
