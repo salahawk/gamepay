@@ -17,6 +17,7 @@ use App\Models\External;
 use App\Models\Payout;
 use App\Models\Merchant;
 use App\Models\Verification;
+use App\Jobs\ProcessStatus;
 
 class MerchantController extends Controller
 {
@@ -181,6 +182,8 @@ class MerchantController extends Controller
       $eurl = hash('sha512', $valuecheck);
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php'; // have to modify later based on routing logic
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
+
+      ProcessStatus::dispatch($deposit->id, $url)->delay(now()->addMinutes(10));
       return redirect()->away($url . "?encdata=" . $encData);
     }
 
@@ -213,7 +216,7 @@ class MerchantController extends Controller
 
     $deposit = new Deposit;
     $deposit->user_id = $user_id;
-    $sample->txnid = $txn_id;
+    $deposit->txnid = $txn_id;
     $deposit->amount = $amount;
     $deposit->crypto = $crypto;
     $deposit->network = $network;
@@ -245,6 +248,7 @@ class MerchantController extends Controller
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
       $awayUrl = $url . "?encdata=" . $encData;
 
+      ProcessStatus::dispatch($deposit->id, $url)->delay(now()->addMinutes(10));
       return redirect()->away($url . "?encdata=" . $encData);
     }
   }
@@ -361,6 +365,7 @@ class MerchantController extends Controller
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
       $awayUrl = $url . "?encdata=" . $encData;
 
+      ProcessStatus::dispatch($deposit->id, $url)->delay(now()->addMinutes(10));
       return redirect()->away($url . "?encdata=" . $encData);
             
     } else {
