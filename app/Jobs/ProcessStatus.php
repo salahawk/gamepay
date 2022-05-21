@@ -60,7 +60,7 @@ class ProcessStatus implements ShouldQueue
             $response = curl_exec($curl);
             curl_close($curl);
             $json_resp = json_decode($response);
-            print_r($json_resp);
+            print_r($json_resp); exit();
             $test->status = $json_resp->STATUS;
             $test->save();
         }
