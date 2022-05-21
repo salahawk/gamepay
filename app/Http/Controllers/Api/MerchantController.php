@@ -183,7 +183,7 @@ class MerchantController extends Controller
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php'; // have to modify later based on routing logic
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
 print_r("NONONONONO");
-      ProcessStatus::dispatch($deposit->id, $url)->delay(now()->addMinutes(10));
+      ProcessStatus::dispatch($deposit->id, $url);
       return redirect()->away($url . "?encdata=" . $encData);
     }
 
