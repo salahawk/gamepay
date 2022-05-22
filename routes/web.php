@@ -114,3 +114,12 @@ Route::post('merchant/add', 'MerchantController@addMerchant')->name('merchant.ad
 Route::get('terms', 'MerchantController@terms')->name('terms');
 //-------------------------------- Merchant enrollment end -------------------------------------------//
 
+
+//-------------------------------- Merchant Admin -------------------------------------------//
+Route::group(['prefix' => 'merchant/admin', 'as' => 'admin-merchant.', 'namespace'=>'AdminMerchant'], function() {
+    Route::get('deposits', 'DepositController@index')->name('deposits');
+    Route::post('deposits/data', 'DepositController@data')->name('deposits.data');
+    Route::get('withdrawals', 'WithdrawalController@index')->name('withdrawals');
+    Route::post('withdrawals/data', 'WithdrawalController@data')->name('withdrawals.data');
+});
+//-------------------------------- Merchant Admin -------------------------------------------//
