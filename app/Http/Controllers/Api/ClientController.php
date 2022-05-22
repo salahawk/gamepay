@@ -212,7 +212,8 @@ class ClientController extends Controller
       if (empty($client) || empty($psp)) {
         return response()->json(['status' => 'fail', 'message' => 'Unknown ip address']);
       }
-
+print_r(Session::get('deposit_id'));
+print_r("herer");
       $deposit = Deposit::find(Session::get('deposit_id'));
       Session::forget('deposit_id');
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($user->email) . "|*" . $user->mobile . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');

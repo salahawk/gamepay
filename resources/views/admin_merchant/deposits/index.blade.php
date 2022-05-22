@@ -49,30 +49,30 @@
         </div>
         <div class="col-6 col-md">
           <div class="form-group mb-4 mb-md-0">
-            <select class="form-control" id="exampleFormControlSelect1">
-              <option>Status</option>
-              <option>Succeeded</option>
-              <option>Failed</option>
-              <option>Pending</option>
+            <select class="form-control" id="status">
+              <option value="0">Status</option>
+              <option value="Success">Succeeded</option>
+              <option value="Failed">Failed</option>
+              <option value="">Pending</option>
             </select>
           </div>
         </div>
         <div class="col-6 col-md">
           <div class="form-group mb-4 mb-md-0">
-            <select class="form-control" id="exampleFormControlSelect1">
-              <option>Search By</option>
-              <option>Email ID</option>
-              <option>Order Id</option>
+            <select class="form-control" id="category">
+              <option value="0">Search By</option>
+              <option value="1">Email ID</option>
+              <option value="2">Order Id</option>
             </select>
           </div>
         </div>
         <div class="col-6 col-md">
           <div class="form-group mb-4 mb-md-0">
-            <input class="form-control" type="text" placeholder="Enter Email">
+            <input class="form-control field" type="text" placeholder="Enter Email">
           </div>
         </div>
         <div class="col-12 col-md">
-          <button type="button" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-primary search">Submit</button>
           <button type="button" class="btn btn-primary">Download</button>
         </div>
       </div>
@@ -103,7 +103,7 @@
     </div>
   </div>
 </main>
-@endsection
+@endsection11
 
 @section('footer_scipts')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -111,45 +111,56 @@
 </script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script>
-  var table = $('#datatablesSimple').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: {
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-      },
-      url: "{{ route('admin-merchant.deposits.data') }}",
-      type: "POST"
-    },
-    columns: [{
-        data: 'order_id',
-        name: 'order_id'
-      },
-      {
-        data: 'email',
-        name: 'email'
-      },
-      {
-        data: 'created_at',
-        name: 'created_at'
-      },
-      {
-        data: 'amount',
-        name: 'amount'
-      },
-      {
-        data: 'inr_value',
-        name: 'inr_value'
-      },
-      {
-        data: 'status',
-        name: 'status'
-      },
-      {
-        data: 'remarks',
-        name: 'remarks'
-      },
-    ],
+  // var table = $('#datatablesSimple').DataTable({
+  //   processing: true,
+  //   serverSide: true,
+  //   ajax: {
+  //     headers: {
+  //       'X-CSRF-TOKEN': '{{ csrf_token() }}'
+  //     },
+  //     url: "{{ route('admin-merchant.deposits.data') }}",
+  //     type: "POST",
+  //     data: function(data) {
+  //       data["from"] = $('#from').val(),
+  //       data['to'] = $("#to").val();
+  //       data['email'] = $("#category").val() == 1 ? $(".field").val() : "";
+  //       data['status'] = $("#status").val() == 0 ? "" : $("#status").val();
+  //       data['order_id'] = $("#category").val() == 2 ? $(".field").val() : "";
+  //     }
+  //   },
+  //   columns: [{
+  //       data: 'order_id',
+  //       name: 'order_id'
+  //     },
+  //     {
+  //       data: 'email',
+  //       name: 'email'
+  //     },
+  //     {
+  //       data: 'created_at',
+  //       name: 'created_at'
+  //     },
+  //     {
+  //       data: 'amount',
+  //       name: 'amount'
+  //     },
+  //     {
+  //       data: 'inr_value',
+  //       name: 'inr_value'
+  //     },
+  //     {
+  //       data: 'status',
+  //       name: 'status'
+  //     },
+  //     {
+  //       data: 'remarks',
+  //       name: 'remarks'
+  //     },
+  //   ],
+  // });
+
+  $(document).on('.search', function() {
+    table.ajax.reload();
   });
 </script>
 @endsection
