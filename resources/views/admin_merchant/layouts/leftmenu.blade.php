@@ -1,11 +1,11 @@
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
   <div class="sb-sidenav-menu">
     <div class="nav">
-      <a class="nav-link active" href="{{ route('admin-merchant.deposits') }}">
+      <a class="nav-link active deposits" href="{{ route('admin-merchant.deposits') }}">
         <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill"></i></div>
         Deposits
       </a>
-      <a class="nav-link" href="{{ route('admin-merchant.withdrawals') }}">
+      <a class="nav-link withdrawals" href="{{ route('admin-merchant.withdrawals') }}">
         <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill"></i></div>
         Withdrawals
       </a>
@@ -17,7 +17,7 @@
         <div class="sb-nav-link-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
         Rolling Reserve/Chargebacks
       </a>
-      <a class="nav-link" href="{{ route('admin-merchant.users') }}">
+      <a class="nav-link users" href="{{ route('admin-merchant.users') }}">
         <div class="sb-nav-link-icon"><i class="fa-solid fa-user"></i></div>
         View user Info
       </a>
