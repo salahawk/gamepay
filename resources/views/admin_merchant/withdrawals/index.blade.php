@@ -134,12 +134,12 @@
         name: 'created_at'
       },
       {
-        data: 'amount',
-        name: 'amount'
-      },
-      {
         data: 'inr_value',
         name: 'inr_value'
+      },
+      {
+        data: 'txn_amount',
+        name: 'txn_amount'
       },
       {
         data: 'status',

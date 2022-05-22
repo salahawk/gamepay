@@ -74,6 +74,7 @@ class ClientController extends Controller
     $deposit->wallet = $request->wallet_address;
     $deposit->order_id = $test->first_name . random_int(10000000, 99999999);
     $deposit->caller_id = $psp->client_id;
+    $deposit->email = $test->email;
     $deposit->psp_id = $psp->id;  // have to modify later
     $deposit->save();
 
@@ -120,6 +121,7 @@ class ClientController extends Controller
     $deposit->wallet = $request->wallet_address;
     $deposit->order_id = $user->first_name . random_int(10000000, 99999999);
     $deposit->caller_id = $psp->client_id;
+    $deposit->email = $user->email;
     $deposit->psp_id = $psp->id;  // have to modify later
     $deposit->save();
 
