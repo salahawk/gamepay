@@ -121,5 +121,7 @@ Route::group(['prefix' => 'merchant/admin', 'as' => 'admin-merchant.', 'namespac
     Route::post('deposits/data', 'DepositController@data')->name('deposits.data');
     Route::get('withdrawals', 'WithdrawalController@index')->name('withdrawals');
     Route::post('withdrawals/data', 'WithdrawalController@data')->name('withdrawals.data');
+    Route::get('users', 'UserController@index')->name('users');
+    Route::post('users/data', 'UserController@data')->name('users.data');
 });
 //-------------------------------- Merchant Admin -------------------------------------------//

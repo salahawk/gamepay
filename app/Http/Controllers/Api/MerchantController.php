@@ -186,7 +186,7 @@ class MerchantController extends Controller
       ProcessStatus::dispatch($deposit->id, $verify_url)->delay(now()->addMinutes(1));
       return redirect()->away($url . "?encdata=" . $encData);
     }
-
+    
     $garbage = External::where('email', $email)
       ->delete();
 
@@ -210,6 +210,7 @@ class MerchantController extends Controller
     $sample->curl = $curl;
     $sample->hash = $hash;
     $sample->beneficiary_cd = $customer_name . random_int(10000000000, 99999999999);
+    $sample->merchant_id = $merchant->id;
     $saved = $sample->save();
 
     $user_id = $sample->id;

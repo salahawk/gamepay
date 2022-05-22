@@ -17,7 +17,7 @@
         <div class="sb-nav-link-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
         Rolling Reserve/Chargebacks
       </a>
-      <a class="nav-link" href="user-info.html">
+      <a class="nav-link" href="{{ route('admin-merchant.users') }}">
         <div class="sb-nav-link-icon"><i class="fa-solid fa-user"></i></div>
         View user Info
       </a>
