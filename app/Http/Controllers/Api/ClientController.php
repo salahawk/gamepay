@@ -221,7 +221,7 @@ class ClientController extends Controller
       $hash = hash('sha512', $valuecheck);
       $url = $psp->deposit_url;
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
-      return redirect()->away($url . "?encdata=" . $encData);
+      return response()->json(['status' => 'success', 'data' => $url . "?encdata=" . $encData]);
     } else {
       return response()->json(['status' => 'fail', 'message' => 'File types are not allowed image files']);
     }
