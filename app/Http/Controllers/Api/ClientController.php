@@ -128,7 +128,7 @@ class ClientController extends Controller
     $deposit->save();
 
     $this->deposit_id =  $deposit->id;
-
+    Session::put("deposit_id", $deposit->id);
     if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
       return response()->json(['status' => 'fail', 'kyc' => 'no', 'mobile' => 'yes']);
     } else if ($user->email_status == "verified" && $user->mobile_status != "verified" && $user->kyc_status != "verified") {
@@ -214,7 +214,8 @@ class ClientController extends Controller
       if (empty($client) || empty($psp)) {
         return response()->json(['status' => 'fail', 'message' => 'Unknown ip address']);
       }
-
+print_r(Session::get('deposit_id'));
+print_r($this->deposit_id);
       $deposit = Deposit::where('id', $this->deposit_id)->first();
       $this->deposit_id = '';
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($user->email) . "|*" . $user->mobile . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
