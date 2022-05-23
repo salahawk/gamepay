@@ -215,7 +215,7 @@ class ClientController extends Controller
         return response()->json(['status' => 'fail', 'message' => 'Unknown ip address']);
       }
 
-      $deposit = Deposit::where('id', $this->deposit_id);
+      $deposit = Deposit::where('id', $this->deposit_id)->first();
       $this->deposit_id = '';
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($user->email) . "|*" . $user->mobile . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
       $hash = hash('sha512', $valuecheck);
