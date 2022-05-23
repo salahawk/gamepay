@@ -214,6 +214,7 @@ class ClientController extends Controller
       if (empty($client) || empty($psp)) {
         return response()->json(['status' => 'fail', 'message' => 'Unknown ip address']);
       }
+      print_r("here");
 print_r(Session::get('deposit_id'));
 print_r($this->deposit_id);
       $deposit = Deposit::where('id', $this->deposit_id)->first();
