@@ -126,7 +126,7 @@ class ClientController extends Controller
     $deposit->email = $user->email;
     $deposit->psp_id = $psp->id;  // have to modify later
     $deposit->save();
-
+var_dump($deposit->id);
     $this->deposit_id =  $deposit->id;
     Session::put("deposit_id", $deposit->id);
     if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
