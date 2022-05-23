@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
 {
+  protected $deposit_id;
+
   // @params
   // amount - to be purchased
   // currency - usdt, gamerer
@@ -125,7 +127,7 @@ class ClientController extends Controller
     $deposit->psp_id = $psp->id;  // have to modify later
     $deposit->save();
 
-    Session::put('deposit_id', $deposit->id);
+    $this->deposit_id =  $deposit->id;
 
     if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
       return response()->json(['status' => 'fail', 'kyc' => 'no', 'mobile' => 'yes']);
@@ -212,10 +214,9 @@ class ClientController extends Controller
       if (empty($client) || empty($psp)) {
         return response()->json(['status' => 'fail', 'message' => 'Unknown ip address']);
       }
-print_r(Session::get('deposit_id'));
-print_r("herer");
-      $deposit = Deposit::find(Session::get('deposit_id'));
-      Session::forget('deposit_id');
+
+      $deposit = Deposit::find($this->deposit_id);
+      $this->deposit_id = '';
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($user->email) . "|*" . $user->mobile . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
       $hash = hash('sha512', $valuecheck);
       $url = $psp->deposit_url;
