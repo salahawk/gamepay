@@ -1,5 +1,11 @@
 @extends('admin_merchant.layouts.app')
-
+@section('header_styles')
+<style>
+.dataTable-selector {
+  width: 70px;
+}
+</style>
+@endsection
 @section('contents')
 <main>
   <div class="container-fluid px-4 pt-5">
@@ -81,7 +87,7 @@
       <div class="card mb-4 boxshadow">
         <div class="card-header py-3 fw-bold"> <i class="fas fa-table me-1"></i> Transaction </div>
         <div class="card-body">
-          <table id="datatablesSimple" class="">
+          <table id="datatablesSimple" class="table table-hover table-bordered table-responsive">
             <thead>
               <tr>
                 <th>Order ID</th>
@@ -111,9 +117,11 @@
 </script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script>
+$(document).ready(function() {
   var table = $('#datatablesSimple').DataTable({
     processing: true,
     serverSide: true,
+    language: { search: "" },
     ajax: {
       headers: {
         'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -167,5 +175,14 @@
     $("#status").val(0);
     $(".field").val("");
   });
+
+  $(document).find('select[name="datatablesSimple_length"]').addClass("dataTable-selector");
+  $(document).find('input[type="search"]').addClass("dataTable-input");
+  $(document).find('input[type="search"]').attr("placeholder", "Search...");
+  $(document).find("div.dataTable-dropdown").remove();
+  $(document).find("div.dataTable-search").remove();
+  // $(document).find("div.dataTables_filter").html('<label><input type="search" class="dataTable-input" placeholder="Search..." aria-controls="datatablesSimple"></label>');
+  $(document).find("div.dataTables_filter").replace("Search:", "");
+});
 </script>
 @endsection
