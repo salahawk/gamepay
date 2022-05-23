@@ -170,7 +170,7 @@ class MerchantController extends Controller
       $deposit->is_client = 0;
       $deposit->cust_name = $customer_name;
       $deposit->wallet = $address;
-      $deposit->order_id = $customer_name . random_int(10000000, 99999999);
+      $deposit->order_id = strlen($customer_name) < 3 ? $customer_name . random_int(10000000, 99999999) : substr($customer_name, 0, 4) . random_int(10000000, 99999999);
       $deposit->caller_id = $merchant->id;
       $deposit->email = $email;
       $deposit->psp_id = 1;  // have to modify later based on routing logic
@@ -225,7 +225,7 @@ class MerchantController extends Controller
     $deposit->is_client = 0;
     $deposit->cust_name = $customer_name;
     $deposit->wallet = $address;
-    $deposit->order_id = $customer_name . random_int(10000000, 99999999);
+    $deposit->order_id = strlen($customer_name) < 3 ? $customer_name . random_int(10000000, 99999999) : substr($customer_name, 0, 4) . random_int(10000000, 99999999);
     $deposit->caller_id = $merchant->id;
     $deposit->email = $email;
     $deposit->psp_id = 1;  // have to modify later

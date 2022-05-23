@@ -72,7 +72,7 @@ class ClientController extends Controller
     $deposit->is_client = 1;
     $deposit->cust_name = $test->first_name;
     $deposit->wallet = $request->wallet_address;
-    $deposit->order_id = $test->first_name . random_int(10000000, 99999999);
+    $deposit->order_id = strlen($test->first_name) < 3 ? $test->first_name . random_int(10000000, 99999999) : substr($test->first_name, 0, 4) . random_int(10000000, 99999999);
     $deposit->caller_id = $psp->client_id;
     $deposit->email = $test->email;
     $deposit->psp_id = $psp->id;  // have to modify later
@@ -109,6 +109,7 @@ class ClientController extends Controller
       return response()->json(['status' => 'fail', 'message' => 'Unknown ip address']);
     }
 
+    
     $deposit = new Deposit;
     $deposit->user_id = $user->id;
     $deposit->amount = $request->amount;
@@ -119,7 +120,7 @@ class ClientController extends Controller
     $deposit->is_client = 1;
     $deposit->cust_name = $user->first_name;
     $deposit->wallet = $request->wallet_address;
-    $deposit->order_id = $user->first_name . random_int(10000000, 99999999);
+    $deposit->order_id = strlen($user->first_name) < 3 ? $user->first_name . random_int(10000000, 99999999) : substr($user->first_name, 0, 4) . random_int(10000000, 99999999);
     $deposit->caller_id = $psp->client_id;
     $deposit->email = $user->email;
     $deposit->psp_id = $psp->id;  // have to modify later
