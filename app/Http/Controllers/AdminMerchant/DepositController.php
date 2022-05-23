@@ -19,19 +19,21 @@ class DepositController extends Controller
   }
 
   public function data(Request $request)
-  {print_r($request->from); exit();
+  {
     $from = $request->from == "" ? "1990-12-31" : $request->from;
     $to = $request->to == "" ? "2999-12-31" : $request->to;
-
-    // $deposits = Deposit::where('created_at', '>', $from)
-    //   ->where('created_at', '<', $to)
-    //   ->where('status', $request->status)
-    //   ->where('email', $request->email)
-    //   ->where('order_id', $request->order_id)
-    //   ->orderby('created_at', 'desc')->select('*');
+    $status = $request->status == "" ?  "%" : $request->status;
+    $status_sign = $request->status == "" ?  "like" : "=";
+    $email = $request->email == "" ?  "%" : $request->email;
+    $email_sign = $request->email == "" ?  "like" : "=";
+    $order_id = $request->order_id == "" ?  "%" : $request->order_id;
+    $order_id_sign = $request->order_id == "" ?  "like" : "=";
     
     $deposits = Deposit::where('created_at', '>', $from)
       ->where('created_at', '<', $to)
+      ->where('status', $status_sign, $status)
+      ->where('email', $email_sign, $email)
+      ->where('order_id', $order_id_sign, $order_id)
       ->orderby('created_at', 'desc')->select('*');
     return DataTables::of($deposits)
       ->make(true);

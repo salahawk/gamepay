@@ -51,7 +51,7 @@
           <div class="form-group mb-4 mb-md-0">
             <select class="form-control" id="status">
               <option value="0">Status</option>
-              <option value="Success">Succeeded</option>
+              <option value="Captured">Succeeded</option>
               <option value="Failed">Failed</option>
               <option value="">Pending</option>
             </select>
@@ -103,7 +103,7 @@
     </div>
   </div>
 </main>
-@endsection11
+@endsection
 
 @section('footer_scipts')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -111,56 +111,61 @@
 </script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script>
-  // var table = $('#datatablesSimple').DataTable({
-  //   processing: true,
-  //   serverSide: true,
-  //   ajax: {
-  //     headers: {
-  //       'X-CSRF-TOKEN': '{{ csrf_token() }}'
-  //     },
-  //     url: "{{ route('admin-merchant.deposits.data') }}",
-  //     type: "POST",
-  //     data: function(data) {
-  //       data["from"] = $('#from').val(),
-  //       data['to'] = $("#to").val();
-  //       data['email'] = $("#category").val() == 1 ? $(".field").val() : "";
-  //       data['status'] = $("#status").val() == 0 ? "" : $("#status").val();
-  //       data['order_id'] = $("#category").val() == 2 ? $(".field").val() : "";
-  //     }
-  //   },
-  //   columns: [{
-  //       data: 'order_id',
-  //       name: 'order_id'
-  //     },
-  //     {
-  //       data: 'email',
-  //       name: 'email'
-  //     },
-  //     {
-  //       data: 'created_at',
-  //       name: 'created_at'
-  //     },
-  //     {
-  //       data: 'amount',
-  //       name: 'amount'
-  //     },
-  //     {
-  //       data: 'inr_value',
-  //       name: 'inr_value'
-  //     },
-  //     {
-  //       data: 'status',
-  //       name: 'status'
-  //     },
-  //     {
-  //       data: 'remarks',
-  //       name: 'remarks'
-  //     },
-  //   ],
-  // });
+  var table = $('#datatablesSimple').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      url: "{{ route('admin-merchant.deposits.data') }}",
+      type: "POST",
+      data: function(data) {
+        data["from"] = $('#from').val(),
+        data['to'] = $("#to").val();
+        data['email'] = $("#category").val() == 1 ? $(".field").val() : "";
+        data['status'] = $("#status").val() == 0 ? "" : $("#status").val();
+        data['order_id'] = $("#category").val() == 2 ? $(".field").val() : "";
+      }
+    },
+    columns: [{
+        data: 'order_id',
+        name: 'order_id'
+      },
+      {
+        data: 'email',
+        name: 'email'
+      },
+      {
+        data: 'created_at',
+        name: 'created_at'
+      },
+      {
+        data: 'amount',
+        name: 'amount'
+      },
+      {
+        data: 'inr_value',
+        name: 'inr_value'
+      },
+      {
+        data: 'status',
+        name: 'status'
+      },
+      {
+        data: 'remarks',
+        name: 'remarks'
+      },
+    ],
+  });
 
-  $(document).on('.search', function() {
+  $(document).on('click', '.search', function() {
     table.ajax.reload();
+    $('#from').val("");
+    $("#to").val("");
+    $("#category").val(0);
+    $("#status").val(0);
+    $(".field").val("");
   });
 </script>
 @endsection
