@@ -116,6 +116,10 @@ class AuthController extends Controller
         }
         
         $user = User::where('email', $request->email)->where('client_id', $client->id)->first();
+        if (empty($user)) {
+          return response()->json(['status'=>'fail', 'message'=>'Unknown email.']);
+        }
+
         if (Hash::check($request->password, $user->password)) {
               // $user = User::where('email', $request->email)
               //             ->where('client_id', $client->id)->first();

@@ -22,8 +22,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
 {
-  protected $deposit_id;
-
   // @params
   // amount - to be purchased
   // currency - usdt, gamerer
@@ -126,9 +124,10 @@ class ClientController extends Controller
     $deposit->email = $user->email;
     $deposit->psp_id = $psp->id;  // have to modify later
     $deposit->save();
-var_dump($deposit->id);
-    $this->deposit_id =  $deposit->id;
-    Session::put("deposit_id", $deposit->id);
+
+    $user->current_deposit_id = $deposit->id;
+    $user->save();
+    
     if ($user->email_status == "verified" && $user->mobile_status == "verified" && $user->kyc_status != "verified") {
       return response()->json(['status' => 'fail', 'kyc' => 'no', 'mobile' => 'yes']);
     } else if ($user->email_status == "verified" && $user->mobile_status != "verified" && $user->kyc_status != "verified") {
@@ -214,11 +213,9 @@ var_dump($deposit->id);
       if (empty($client) || empty($psp)) {
         return response()->json(['status' => 'fail', 'message' => 'Unknown ip address']);
       }
-      print_r("here");
-print_r(Session::get('deposit_id'));
-print_r($this->deposit_id);
-      $deposit = Deposit::where('id', $this->deposit_id)->first();
-      $this->deposit_id = '';
+
+      $deposit = Deposit::where('id', $user->current_deposit_id)->first();
+
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($user->email) . "|*" . $user->mobile . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
       $hash = hash('sha512', $valuecheck);
       $url = $psp->deposit_url;
@@ -543,7 +540,7 @@ print_r($this->deposit_id);
     }
 
     // amount and email double check
-    if ($request->AMOUNT != $deposit->amount || $request->CUST_EMAIL != $deposit->email) {
+    if ($request->AMOUNT != $deposit->amount || $request->CUST_EMAIL != $deposit->email || $request->order_id != $deposit->order_id) {
       return response()->json(['status' => 'fail', 'message' => "amount or email is incorrect in response"]);
     }
 
@@ -565,18 +562,19 @@ print_r($this->deposit_id);
     if (!$saved) {
       return response()->json(['status' => 'fail']);
     }
-
+    $c_url = "";
     if ($deposit->is_client == 0) { // if merchant
       // send response back to merchant
       if ($request->STATUS == "Captured" || $request->STATUS == "Success") {
         $response_url = $deposit->user->surl;
+        $c_url = $deposit->user->curl;
       } else {
         $response_url = $deposit->user->eurl;
       }
 
       $hash_string = $caller->key . "|*" . $deposit->txnid . "|*" . $deposit->amount . "|*" . $deposit->email . "|*" . $deposit->status . "|*" . $caller->salt;
       $hash = hash('sha512', $hash_string);
-      
+      // surl
       $curl = curl_init();
       curl_setopt_array($curl, array(
         CURLOPT_URL => $response_url,
@@ -598,7 +596,39 @@ print_r($this->deposit_id);
       ));
 
       $response = curl_exec($curl);
-      curl_close($curl);      
+      curl_close($curl); 
+      
+      // callback url
+      if ($c_url) {
+        // hash calculation
+        // $hash_sequence = "key|orderid|mobile|amount|email|pgtxnmessage|responsemessage|paymenttype|status";
+        $status = "Success";
+        $hash_sequence = $caller->key . "|" . $deposit->txnid . "|" . $deposit->amount . "|" . $deposit->email . "|" . $status . "|" . $caller->salt;
+        $hash = hash('sha512', $hash_sequence);
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $c_url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS => array(
+            "KEY" => $caller->key,
+            "TXNID" => $deposit->txnid,
+            "AMOUNT" => $deposit->amount,
+            "EMAIL" => $deposit->email,
+            "STATUS" => $deposit->status,
+            "HASH" => $hash,
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        curl_close($curl); 
+      }
+
     } else { // if client
       if ($request->STATUS == "Captured" || $request->STATUS == "Success") {
         // mint tokens
