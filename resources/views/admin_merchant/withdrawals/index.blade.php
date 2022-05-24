@@ -1,5 +1,11 @@
 @extends('admin_merchant.layouts.app')
-
+@section('header_styles')
+<style>
+.dataTable-selector {
+  width: 70px;
+}
+</style>
+@endsection
 @section('contents')
 <main>
   <div class="container-fluid px-4">
@@ -35,7 +41,7 @@
         <div class="col-6 col-md">
           <div class="form-group mb-4 mb-md-0">
             <div class="datepicker date input-group p-0">
-              <input type="text" placeholder="From Date" class="form-control" id="fromdate">
+              <input type="text" placeholder="From Date" class="form-control" id="from">
               <div class="input-group-append"><span class="input-group-text px-4"><i class="fa-solid fa-calendar-days"></i></span></div>
             </div>
           </div>
@@ -43,7 +49,7 @@
         <div class="col-6 col-md">
           <div class="form-group mb-4 mb-md-0">
             <div class="datepicker date input-group p-0">
-              <input type="text" placeholder="To Date" class="form-control" id="todate">
+              <input type="text" placeholder="To Date" class="form-control" id="to">
               <div class="input-group-append"><span class="input-group-text px-4"><i class="fa-solid fa-calendar-days"></i></span></div>
             </div>
           </div>
@@ -51,30 +57,30 @@
         </div>
         <div class="col-6 col-md">
           <div class="form-group mb-4 mb-md-0">
-            <select class="form-control" id="exampleFormControlSelect1">
-              <option>Status</option>
-              <option>Succeeded</option>
-              <option>Failed</option>
-              <option>Pending</option>
+            <select class="form-control" id="status">
+              <option value="0">Status</option>
+              <option value="Captured">Succeeded</option>
+              <option value="Failed">Failed</option>
+              <option value="">Pending</option>
             </select>
           </div>
         </div>
         <div class="col-6 col-md">
           <div class="form-group mb-4 mb-md-0">
-            <select class="form-control" id="exampleFormControlSelect1">
-              <option>Search By</option>
-              <option>Email ID</option>
-              <option>Order Id</option>
+            <select class="form-control" id="category">
+              <option value="0">Search By</option>
+              <option value="1">Email ID</option>
+              <option value="2">Order Id</option>
             </select>
           </div>
         </div>
         <div class="col-6 col-md">
           <div class="form-group mb-4 mb-md-0">
-            <input class="form-control" type="text" placeholder="Enter Email">
+            <input class="form-control field" type="text" placeholder="Enter Email">
           </div>
         </div>
         <div class="col-12 col-md">
-          <button type="button" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-primary search">Submit</button>
           <button type="button" class="btn btn-primary">Download</button>
         </div>
       </div>
@@ -106,20 +112,25 @@
 </main>
 @endsection
 @section('footer_scipts')
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
-</script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script>
   var table = $('#datatablesSimple').DataTable({
     processing: true,
     serverSide: true,
+    language: { search: "" },
     ajax: {
       headers: {
         'X-CSRF-TOKEN': '{{ csrf_token() }}'
       },
       url: "{{ route('admin-merchant.withdrawals.data') }}",
-      type: "POST"
+      type: "POST",
+      data: function(data) {
+        data["from"] = $('#from').val(),
+        data['to'] = $("#to").val();
+        data['email'] = $("#category").val() == 1 ? $(".field").val() : "";
+        data['status'] = $("#status").val() == 0 ? "" : $("#status").val();
+        data['order_id'] = $("#category").val() == 2 ? $(".field").val() : "";
+      }
     },
     columns: [{
         data: 'order_id',
@@ -151,5 +162,20 @@
       },
     ],
   });
+
+  $(document).on('click', '.search', function() {
+    table.ajax.reload();
+    $('#from').val("");
+    $("#to").val("");
+    $("#category").val(0);
+    $("#status").val(0);
+    $(".field").val("");
+  });
+
+  $(document).find('select[name="datatablesSimple_length"]').addClass("dataTable-selector");
+  $(document).find('input[type="search"]').addClass("dataTable-input");
+  $(document).find('input[type="search"]').attr("placeholder", "Search...");
+  $(document).find("div.dataTable-dropdown").remove();
+  $(document).find("div.dataTable-search").remove();
 </script>
 @endsection

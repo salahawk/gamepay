@@ -29,7 +29,9 @@ class DepositController extends Controller
     $order_id = $request->order_id == "" ?  "%" : $request->order_id;
     $order_id_sign = $request->order_id == "" ?  "like" : "=";
     
-    $deposits = Deposit::where('created_at', '>', $from)
+    $deposits = Deposit::where('is_client', 0)
+      ->where('caller_id', 1)
+      ->where('created_at', '>', $from)
       ->where('created_at', '<', $to)
       ->where('status', $status_sign, $status)
       ->where('email', $email_sign, $email)
@@ -39,8 +41,7 @@ class DepositController extends Controller
       ->make(true);
   }
 
-  public function search(Request $request)
-  {
-
+  public function guide() {
+    return view('admin_merchant.deposits.guide');
   }
 }

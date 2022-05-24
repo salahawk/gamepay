@@ -640,6 +640,7 @@ class MerchantController extends Controller
 
     $payout = new Payout;
     $payout->user_id = $user->id;
+    $payout->email = $user->email;
     $payout->hash = $json_resp->HASH;
     $payout->status = $json_resp->STATUS;
     $payout->beneficiary_cd = $json_resp->BENEFICIARY_CD;

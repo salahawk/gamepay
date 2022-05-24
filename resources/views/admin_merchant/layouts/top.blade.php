@@ -1,6 +1,6 @@
 <nav class="sb-topnav navbar navbar-expand bg-white py-3 boxshadow">
   <!-- Navbar Brand-->
-  <a class="navbar-brand ps-3" href="index.html"><img src="{{asset('assets/img/admin-merchant/logo.png')}}" width="100px" /></a>
+  <a class="navbar-brand ps-3" href="{{ route('admin-merchant.deposits') }}"><img src="{{asset('assets/img/admin-merchant/logo.png')}}" width="100px" /></a>
   <!-- Sidebar Toggle-->
   <button class="btn btn-link topbar btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
   <!-- Navbar Search-->

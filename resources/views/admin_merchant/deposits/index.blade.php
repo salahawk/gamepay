@@ -39,7 +39,7 @@
         <div class="col-6 col-md">
           <div class="form-group mb-4 mb-md-0">
             <div class="datepicker date input-group p-0">
-              <input type="text" placeholder="From Date" class="form-control" id="fromdate">
+              <input type="text" placeholder="From Date" class="form-control" id="from">
               <div class="input-group-append"><span class="input-group-text px-4"><i class="fa-solid fa-calendar-days"></i></span></div>
             </div>
           </div>
@@ -47,7 +47,7 @@
         <div class="col-6 col-md">
           <div class="form-group mb-4 mb-md-0">
             <div class="datepicker date input-group p-0">
-              <input type="text" placeholder="To Date" class="form-control" id="todate">
+              <input type="text" placeholder="To Date" class="form-control" id="to">
               <div class="input-group-append"><span class="input-group-text px-4"><i class="fa-solid fa-calendar-days"></i></span></div>
             </div>
           </div>
@@ -112,9 +112,9 @@
 @endsection
 
 @section('footer_scipts')
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
-</script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"> -->
+<!-- </script> -->
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function() {
@@ -181,8 +181,6 @@ $(document).ready(function() {
   $(document).find('input[type="search"]').attr("placeholder", "Search...");
   $(document).find("div.dataTable-dropdown").remove();
   $(document).find("div.dataTable-search").remove();
-  // $(document).find("div.dataTables_filter").html('<label><input type="search" class="dataTable-input" placeholder="Search..." aria-controls="datatablesSimple"></label>');
-  $(document).find("div.dataTables_filter").replace("Search:", "");
 });
 </script>
 @endsection

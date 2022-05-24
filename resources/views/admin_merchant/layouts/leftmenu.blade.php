@@ -9,11 +9,11 @@
         <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill"></i></div>
         Withdrawals
       </a>
-      <a class="nav-link" href="swap.html">
+      <a class="nav-link swap" href="{{ route('admin-merchant.swap') }}">
         <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
         Swap
       </a>
-      <a class="nav-link" href="rolling-reserve.html">
+      <a class="nav-link rolling" href="{{ route('admin-merchant.rolling') }}">
         <div class="sb-nav-link-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
         Rolling Reserve/Chargebacks
       </a>
@@ -21,19 +21,19 @@
         <div class="sb-nav-link-icon"><i class="fa-solid fa-user"></i></div>
         View user Info
       </a>
-      <a class="nav-link" href="deposit-integration-guide.html">
+      <a class="nav-link deposit-guide" href="{{ route('admin-merchant.deposits.guide') }}">
         <div class="sb-nav-link-icon"><i class="fa-solid fa-file-lines"></i></div>
         Deposit integration Guide
       </a>
-      <a class="nav-link" href="payout-integration-guide.html">
+      <a class="nav-link withdrawal-guide" href="{{ route('admin-merchant.withdrawals.guide') }}">
         <div class="sb-nav-link-icon"><i class="fa-solid fa-file-lines"></i></div>
         Payout integration Guide
       </a>
-      <a class="nav-link" href="fee-structure.html">
+      <a class="nav-link fee" href="{{ route('admin-merchant.users.fee') }}">
         <div class="sb-nav-link-icon"><i class="fa-solid fa-rectangle-list"></i></div>
         Fee Structure
       </a>
-      <a class="nav-link" href="#">
+      <a class="nav-link history" href="{{ route('admin-merchant.withdrawals.guide') }}">
         <div class="sb-nav-link-icon"><i class="fa-solid fa-rectangle-list"></i></div>
         GR Txn History
       </a>
