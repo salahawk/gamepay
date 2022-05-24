@@ -1,9 +1,9 @@
 @extends('admin_merchant.layouts.app')
 @section('header_styles')
 <style>
-.dataTable-selector {
-  width: 70px;
-}
+  .dataTable-selector {
+    width: 70px;
+  }
 </style>
 @endsection
 @section('contents')
@@ -38,7 +38,7 @@
     <p class="text-success">Today withdraw: 10,00000</p>
     <div class="bg-white boxshadow rounded p-3 p-md-4 mb-4">
       <div class="row forms">
-        <div class="col-6 col-md">
+        <div class="col-6 col-md-4 mb-3">
           <div class="form-group mb-4 mb-md-0">
             <div class="datepicker date input-group p-0">
               <input type="text" placeholder="From Date" class="form-control" id="from">
@@ -46,7 +46,7 @@
             </div>
           </div>
         </div>
-        <div class="col-6 col-md">
+        <div class="col-6 col-md-4 mb-3">
           <div class="form-group mb-4 mb-md-0">
             <div class="datepicker date input-group p-0">
               <input type="text" placeholder="To Date" class="form-control" id="to">
@@ -55,7 +55,7 @@
           </div>
           <!-- DEnd ate Picker Input -->
         </div>
-        <div class="col-6 col-md">
+        <div class="col-6 col-md-4 mb-3">
           <div class="form-group mb-4 mb-md-0">
             <select class="form-control" id="status">
               <option value="0">Status</option>
@@ -65,7 +65,7 @@
             </select>
           </div>
         </div>
-        <div class="col-6 col-md">
+        <div class="col-6 col-md-4 mb-3 mb-md-0">
           <div class="form-group mb-4 mb-md-0">
             <select class="form-control" id="category">
               <option value="0">Search By</option>
@@ -74,12 +74,12 @@
             </select>
           </div>
         </div>
-        <div class="col-6 col-md">
+        <div class="col-6 col-md-4 mb-3 mb-md-0">
           <div class="form-group mb-4 mb-md-0">
             <input class="form-control field" type="text" placeholder="Enter Email">
           </div>
         </div>
-        <div class="col-12 col-md">
+        <div class="col-6 col-md-4 mb-3 mb-md-0">
           <button type="button" class="btn btn-primary search">Submit</button>
           <button type="button" class="btn btn-primary">Download</button>
         </div>
@@ -117,7 +117,9 @@
   var table = $('#datatablesSimple').DataTable({
     processing: true,
     serverSide: true,
-    language: { search: "" },
+    language: {
+      search: ""
+    },
     ajax: {
       headers: {
         'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -126,7 +128,7 @@
       type: "POST",
       data: function(data) {
         data["from"] = $('#from').val(),
-        data['to'] = $("#to").val();
+          data['to'] = $("#to").val();
         data['email'] = $("#category").val() == 1 ? $(".field").val() : "";
         data['status'] = $("#status").val() == 0 ? "" : $("#status").val();
         data['order_id'] = $("#category").val() == 2 ? $(".field").val() : "";
@@ -165,11 +167,11 @@
 
   $(document).on('click', '.search', function() {
     table.ajax.reload();
-    $('#from').val("");
-    $("#to").val("");
-    $("#category").val(0);
-    $("#status").val(0);
-    $(".field").val("");
+    // $('#from').val("");
+    // $("#to").val("");
+    // $("#category").val(0);
+    // $("#status").val(0);
+    // $(".field").val("");
   });
 
   $(document).find('select[name="datatablesSimple_length"]').addClass("dataTable-selector");
