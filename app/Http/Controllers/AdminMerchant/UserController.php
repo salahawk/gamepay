@@ -6,14 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\External;
-use App\Models\User;
+use App\Models\Merchant;
 
 use Yajra\DataTables\DataTables;
 use Auth;
+use Hash;
+use Session;
 
 class UserController extends Controller
 {
-    public function index()
+    public function users()
     {
         return view('admin_merchant.users.index');
     }
@@ -47,5 +49,23 @@ class UserController extends Controller
 
     public function fee() {
         return view('admin_merchant.users.fee');
+    }
+
+    public function index() {
+        return view('admin_merchant.users.login');
+    }
+
+    public function login(Request $request) {
+        $merchant = Merchant::where('email', $request->email)->first();
+        if (empty($merchant)) {
+            return response()->json(['status'=>'fail', 'message'=>'Unknown email.']);
+        }
+
+        if (Hash::check($request->password, $merchant->password)) {
+            Session::put('merchant_id', $merchant->id);
+            return redirect()->route('admin-merchant.deposits');
+        }
+
+        return redirect()->route('home');
     }
 }

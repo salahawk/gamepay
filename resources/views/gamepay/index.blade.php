@@ -93,6 +93,9 @@
             <input type="tel" class="form-control py-3" placeholder="Mobile number*" required name="mobile" maxlength="12" minlength="10">
           </div>
           <div class="form-group">
+            <input type="password" class="form-control py-3" placeholder="Password*" required name="password" pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number.">
+          </div>
+          <div class="form-group">
             <input type="submit" class="btn btn-primary btn-lg btn-block mb-4  btn-shadow-blue" value="Submit">
             <p>By clicking “Submit”, you agree to the<br/>
               <a href="{{ route('terms') }}">Terms of Service and Privacy Policy</a>.</p>

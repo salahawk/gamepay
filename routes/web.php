@@ -116,14 +116,16 @@ Route::get('terms', 'MerchantController@terms')->name('terms');
 
 
 //-------------------------------- Merchant Admin -------------------------------------------//
-Route::group(['prefix' => 'merchant/admin', 'as' => 'admin-merchant.', 'namespace'=>'AdminMerchant'], function() {
+Route::post('merchant/admin/login', 'AdminMerchant\UserController@login')->name('admin-merchant.login');
+Route::get('merchant/admin', 'AdminMerchant\UserController@index')->name('admin-merchant.home');
+Route::group(['prefix' => 'merchant/admin', 'as' => 'admin-merchant.', 'middleware' => 'auth.gamepay', 'namespace'=>'AdminMerchant'], function() {
     Route::get('deposits', 'DepositController@index')->name('deposits');
     Route::post('deposits/data', 'DepositController@data')->name('deposits.data');
     Route::get('deposit-guide', 'DepositController@guide')->name('deposits.guide');
     Route::get('withdrawals', 'WithdrawalController@index')->name('withdrawals');
     Route::post('withdrawals/data', 'WithdrawalController@data')->name('withdrawals.data');
     Route::get('withdrawal-guide', 'WithdrawalController@guide')->name('withdrawals.guide');
-    Route::get('users', 'UserController@index')->name('users');
+    Route::get('users', 'UserController@users')->name('users');
     Route::get('fee', 'UserController@fee')->name('users.fee');
     Route::post('users/data', 'UserController@data')->name('users.data');
     Route::get('rolling', 'UserController@rolling')->name('rolling');

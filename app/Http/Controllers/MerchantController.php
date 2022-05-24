@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Hash;
 
 use App\Models\User;
 use App\Models\Merchant;
@@ -22,7 +23,8 @@ class MerchantController extends Controller
     $rules = [
         'name' => 'required|alpha',
         'mobile' => 'required|unique:merchants',
-        'email' => 'required|email|unique:merchants'
+        'email' => 'required|email|unique:merchants',
+        'password' => 'required'
     ];
 
     $validator = Validator::make($request->input(), $rules);
@@ -52,6 +54,7 @@ class MerchantController extends Controller
     $merchant->key = $key;
     $merchant->salt = $salt;
 
+    $merchant->password = Hash::make($request->password);
     $merchant->save();
 
     return redirect()->route('home');
