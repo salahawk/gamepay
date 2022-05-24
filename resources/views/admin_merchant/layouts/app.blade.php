@@ -46,6 +46,7 @@
       // INITIALIZE DATEPICKER PLUGIN
       $('.datepicker').datepicker({
         clearBtn: true,
+        autoclose: true,
         format: "yyyy-mm-dd"
       });
 
