@@ -539,12 +539,7 @@ class ClientController extends Controller
     if ($hash != $request->generateHash) {
       return response()->json(['status' => 'fail', "message" => 'hash is wrong']);
     }
-    var_dump($request->AMOUNT);
-    var_dump($deposit->amount);
-    var_dump($request->CUST_EMAIL);
-    var_dump($deposit->email);
-    var_dump($request->ORDER_ID);
-    var_dump($deposit->order_id);
+
     // amount and email double check
     if ($request->AMOUNT != $deposit->amount || $request->CUST_EMAIL != $deposit->email || $request->ORDER_ID != $deposit->order_id) {
       return response()->json(['status' => 'fail', 'message' => "amount or email is incorrect in response"]);
@@ -596,6 +591,7 @@ class ClientController extends Controller
           "TXNID" => $deposit->txnid,
           "AMOUNT" => $deposit->amount,
           "EMAIL" => $deposit->email,
+          "MOBILE" => $deposit->phone,
           "STATUS" => $deposit->status,
           "HASH" => $hash,
         ),
@@ -610,7 +606,7 @@ class ClientController extends Controller
         // $hash_sequence = "key|orderid|mobile|amount|email|pgtxnmessage|responsemessage|paymenttype|status";
         $status = "Success";
         $hash_sequence = $caller->key . "|" . $deposit->txnid . "|" . $deposit->amount . "|" . $deposit->email . "|" . $status . "|" . $caller->salt;
-        $hash = hash('sha512', $hash_sequence);
+        $hash_c = hash('sha512', $hash_sequence);
         $curl = curl_init();
         curl_setopt_array($curl, array(
           CURLOPT_URL => $c_url,
@@ -626,8 +622,9 @@ class ClientController extends Controller
             "TXNID" => $deposit->txnid,
             "AMOUNT" => $deposit->amount,
             "EMAIL" => $deposit->email,
+            "MOBILE" => $deposit->phone,
             "STATUS" => $deposit->status,
-            "HASH" => $hash,
+            "HASH" => $hash_c,
           ),
         ));
 
