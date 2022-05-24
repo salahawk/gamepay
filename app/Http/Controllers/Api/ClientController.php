@@ -543,10 +543,10 @@ class ClientController extends Controller
     var_dump($deposit->amount);
     var_dump($request->CUST_EMAIL);
     var_dump($deposit->email);
-    var_dump($request->order_id);
+    var_dump($request->ORDER_ID);
     var_dump($deposit->order_id);
     // amount and email double check
-    if ($request->AMOUNT != $deposit->amount || $request->CUST_EMAIL != $deposit->email || $request->order_id != $deposit->order_id) {
+    if ($request->AMOUNT != $deposit->amount || $request->CUST_EMAIL != $deposit->email || $request->ORDER_ID != $deposit->order_id) {
       return response()->json(['status' => 'fail', 'message' => "amount or email is incorrect in response"]);
     }
 
