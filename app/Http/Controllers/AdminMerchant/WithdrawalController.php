@@ -31,8 +31,8 @@ class WithdrawalController extends Controller
 
         $payouts = Payout::where('is_external', 1)
             ->where('caller_id', 1)
-            ->where('created_at', '>=', $from)
-            ->where('created_at', '<=', $to)
+            ->where('created_at', '>=', $from . " 00:00:00")
+            ->where('created_at', '<=', $to . " 23:59:59")
             ->where('status', $status_sign, $status)
             ->where('email', $email_sign, $email)
             ->where('order_id', $order_id_sign, $order_id)
@@ -41,7 +41,8 @@ class WithdrawalController extends Controller
             ->make(true);
     }
 
-    public function guide() {
+    public function guide()
+    {
         return view('admin_merchant.withdrawals.guide');
     }
 }

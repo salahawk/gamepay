@@ -31,8 +31,8 @@ class DepositController extends Controller
     
     $deposits = Deposit::where('is_client', 0)
       ->where('caller_id', 1)
-      ->where('created_at', '>=', $from)
-      ->where('created_at', '<=', $to)
+      ->where('created_at', '>=', $from . " 00:00:00")
+      ->where('created_at', '<=', $to . " 23:59:59")
       ->where('status', $status_sign, $status)
       ->where('email', $email_sign, $email)
       ->where('order_id', $order_id_sign, $order_id)

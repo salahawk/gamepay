@@ -33,8 +33,8 @@ class UserController extends Controller
         $order_id_sign = $request->order_id == "" ?  "like" : "=";
 
         $users = External::where('merchant_id', 1)
-            ->where('created_at', '>=', $from)
-            ->where('created_at', '<=', $to)
+            ->where('created_at', '>=', $from . " 00:00:00")
+            ->where('created_at', '<=', $to . " 23:59:59")
             ->where('pan_status', $status_sign, $status)
             ->where('email', $email_sign, $email)
             ->where('account_no', $order_id_sign, $order_id)
@@ -43,22 +43,26 @@ class UserController extends Controller
             ->make(true);
     }
 
-    public function rolling() {
+    public function rolling()
+    {
         return view('admin_merchant.users.rolling');
     }
 
-    public function fee() {
+    public function fee()
+    {
         return view('admin_merchant.users.fee');
     }
 
-    public function index() {
+    public function index()
+    {
         return view('admin_merchant.users.login');
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $merchant = Merchant::where('email', $request->email)->first();
         if (empty($merchant)) {
-            return response()->json(['status'=>'fail', 'message'=>'Unknown email.']);
+            return response()->json(['status' => 'fail', 'message' => 'Unknown email.']);
         }
 
         if (Hash::check($request->password, $merchant->password)) {
