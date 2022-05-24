@@ -539,7 +539,12 @@ class ClientController extends Controller
     if ($hash != $request->generateHash) {
       return response()->json(['status' => 'fail', "message" => 'hash is wrong']);
     }
-
+    var_dump($request->AMOUNT);
+    var_dump($deposit->amount);
+    var_dump($request->CUST_EMAIL);
+    var_dump($deposit->email);
+    var_dump($request->order_id);
+    var_dump($deposit->order_id);
     // amount and email double check
     if ($request->AMOUNT != $deposit->amount || $request->CUST_EMAIL != $deposit->email || $request->order_id != $deposit->order_id) {
       return response()->json(['status' => 'fail', 'message' => "amount or email is incorrect in response"]);
