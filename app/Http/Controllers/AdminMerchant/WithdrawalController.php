@@ -31,8 +31,8 @@ class WithdrawalController extends Controller
 
         $payouts = Payout::where('is_external', 1)
             ->where('caller_id', 1)
-            ->where('created_at', '>', $from)
-            ->where('created_at', '<', $to)
+            ->where('created_at', '>=', $from)
+            ->where('created_at', '<=', $to)
             ->where('status', $status_sign, $status)
             ->where('email', $email_sign, $email)
             ->where('order_id', $order_id_sign, $order_id)

@@ -33,8 +33,8 @@ class UserController extends Controller
         $order_id_sign = $request->order_id == "" ?  "like" : "=";
 
         $users = External::where('merchant_id', 1)
-            ->where('created_at', '>', $from)
-            ->where('created_at', '<', $to)
+            ->where('created_at', '>=', $from)
+            ->where('created_at', '<=', $to)
             ->where('pan_status', $status_sign, $status)
             ->where('email', $email_sign, $email)
             ->where('account_no', $order_id_sign, $order_id)
