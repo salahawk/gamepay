@@ -511,19 +511,8 @@ class MerchantController extends Controller
       return redirect()->route('securepay.kyc', ['user_id' => $user->id, 'deposit_id' => 0]);
     }
 
+    $payment_type = 'IMPS';
     $user->pan_status = $request->PAN_STATUS;
-
-    if (!empty($request->IFSC)) {
-      $user->ifsc = $request->IFSC;
-    }
-
-    if (!empty($request->ACCOUNT_NO)) {
-      $user->account_no = $request->ACCOUNT_NO;
-    }
-
-    if (!empty($request->PAYER_ADDRESS)) {
-      $user->payer_address = $request->PAYER_ADDRESS;
-    }
 
     $user->crypto = $request->CURRENCY;
     $user->network = $request->NETWORK;
@@ -533,85 +522,177 @@ class MerchantController extends Controller
     $user->address = $request->SENDER;
     $user->receiver = $request->RECEIVER;
     $user->txn_hash = $request->TXN_HASH;
-    $user->save();
-
+    
     if ($request->PAN_STATUS != 'verified') {
+      if (!empty($request->IFSC)) {
+        $user->ifsc = $request->IFSC;
+      }
+  
+      if (!empty($request->ACCOUNT_NO)) {
+        $user->account_no = $request->ACCOUNT_NO;
+      }
+  
+      if (!empty($request->PAYER_ADDRESS)) {
+        $user->payer_address = $request->PAYER_ADDRESS;
+      }
+      $user->save();
       return redirect()->route('securepay.pan', ['user_id' => $user->id]);
     } else {
-      return redirect()->route('securepay.payout.add', ['user_id' => $user->id]);
-    }
+      // check original bank detail and update the beneficiary code
+      $redo = false;
+      $redo_ifsc = false;
+      $redo_account_no = false;
+      $redo_payer_address = false;
 
+      $add_fields = array(
+        "BENEFICIARY_CD" => $user->beneficiary_cd,
+        "BENE_NAME" => $user->cust_name,
+        "MOBILE_NUMBER" => $user->phone,
+        "EMAIL_ID" => $user->email,
+        "BANK_NAME" => "YESB",
+        "ACTION" => "ADD",
+      );
+      // "PAYER_ADDRESS" => $user->payer_address,
+
+      if (!empty($request->IFSC)) {
+        $redo_ifsc = true;
+        if (!empty($user->ifsc) && $user->ifsc != $request->IFSC) {
+          $redo = true;
+        }
+        $user->ifsc = $request->IFSC;
+      }
+  
+      if (!empty($request->ACCOUNT_NO)) {
+        $redo_account_no = true;
+        if (!empty($user->account_no) && $user->account_no != $request->ACCOUNT_NO) {
+          $redo = true;
+        }
+        $user->account_no = $request->ACCOUNT_NO;
+      }
+  
+      if (!empty($request->PAYER_ADDRESS)) {
+        $payment_type = 'UPI';
+        $redo_payer_address = true;
+        if (!empty($user->payer_address) && $user->payer_address != $request->PAYER_ADDRESS) {
+          $redo = true;
+        }
+        $user->payer_address = $request->PAYER_ADDRESS;
+      }
+
+      $user->save();
+      
+      // add preparation
+      $add_url = "https://coinsplashgifts.com/payout/addben.php"; // have to select url based on routing logic
+      if ($redo_payer_address) { 
+        $add_fields['PAYER_ADDRESS'] = $user->payer_address;
+      }
+
+      if ($redo_account_no) { 
+        $add_fields['BENE_ACCOUNT_NO'] = $user->account_no;
+      }
+
+      if ($redo_ifsc) { 
+        $add_fields['IFSC_CODE'] = $user->ifsc;
+      }
+      
+      if ($this->verifyPayout($user->beneficiary_cd)) { // first check if it exists
+        if ($redo) {    // bank detail changed?
+          // terminate & add new
+          $curl = curl_init();   // first terminate
+          curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://coinsplashgifts.com/payout/terminate.php',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+              'BENEFICIARY_CD' => $user->beneficiary_cd,
+              'ACTION' => 'TERMINATE'
+            ),
+            CURLOPT_HTTPHEADER => array(
+              'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15'
+            ),
+          ));
+          $response = curl_exec($curl);
+          curl_close($curl);
+          
+          // second add
+          $curl = curl_init();
+          curl_setopt_array($curl, array(
+            CURLOPT_URL => $add_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $add_fields,
+            CURLOPT_HTTPHEADER => array(
+              'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15',
+            ),
+          ));
+          $response0 = curl_exec($curl);
+          curl_close($curl);
+          $json_resp0 = json_decode($response0);
+          if (empty($json_resp0->STATUS)) {
+            return response()->json(['status' => 'fail', 'data' => $json_resp0]);
+          }
+          if ($json_resp0->STATUS != "Success") {
+            return response()->json(['status' => 'fail', 'data' => $json_resp0]);
+          }
+        } 
+      } else {
+        // add new beneficiary code
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $add_url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS => $add_fields,
+          CURLOPT_HTTPHEADER => array(
+            'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15',
+          ),
+        ));
+  
+        $response0 = curl_exec($curl);
+        curl_close($curl);
+  
+        $json_resp0 = json_decode($response0);
+  
+        if (empty($json_resp0->STATUS)) {
+          return response()->json(['status' => 'fail', 'data' => $json_resp0]);
+        }
+  
+        if ($json_resp0->STATUS != "Success") {
+          return response()->json(['status' => 'fail', 'data' => $json_resp0]);
+        }
+      }
+
+      return redirect()->route('securepay.payout.add', ['user_id' => $user->id, 'payment_type' => $payment_type]); // send with payment type flag
+    }
   }
 
   public function addPayout(Request $request)
   {
     $user = External::where('id', $request->user_id)->first();
-    
-    $post_fields = [];
-    if ($user->payer_address) {
-      $post_fields = array(
-                        "BENEFICIARY_CD" => $user->beneficiary_cd,
-                        "BENE_NAME" => $user->cust_name,
-                        "MOBILE_NUMBER" => $user->phone,
-                        "EMAIL_ID" => $user->email,
-                        "PAYER_ADDRESS" => $user->payer_address,
-                        "BANK_NAME" => "YESB",
-                        "ACTION" => "ADD",
-                      );
-    } else  {
-      $post_fields = array(
-                      "BENEFICIARY_CD" => $user->beneficiary_cd,
-                      "BENE_NAME" => $user->cust_name,
-                      "MOBILE_NUMBER" => $user->phone,
-                      "EMAIL_ID" => $user->email,
-                      "IFSC_CODE" => $user->ifsc,
-                      "BENE_ACCOUNT_NO" => $user->account_no,
-                      "BANK_NAME" => "YESB",
-                      "ACTION" => "ADD",
-                    );
-    }
 
     // choose caller and PSP
     $used_deposit = Deposit::where('email', $user->email)->where('wallet', $user->wallet)->first();
 
-    if (!$this->verifyPayout($user->beneficiary_cd)) { // if not present in DB, then add
-      $url = "https://coinsplashgifts.com/payout/addben.php"; // have to select url based on routing logic
-
-      $curl = curl_init();
-      curl_setopt_array($curl, array(
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => $post_fields,
-        CURLOPT_HTTPHEADER => array(
-          'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15',
-        ),
-      ));
-
-      $response0 = curl_exec($curl);
-      curl_close($curl);
-
-      $json_resp0 = json_decode($response0);
-
-      if (empty($json_resp0->STATUS)) {
-        return response()->json(['status' => 'fail', 'data' => $json_resp0]);
-      }
-
-      if ($json_resp0->STATUS != "Success") {
-        return response()->json(['status' => 'fail', 'data' => $json_resp0]);
-      }
-    }
-
     // if present in DB, make transaction
-    $order_id = $user->cust_name . random_int(10000000, 99999999);
+    $order_id = strlen($user->cust_name) < 3 ? $user->cust_name . random_int(10000000, 99999999) : substr($user->cust_name, 0, 4) . random_int(10000000, 99999999);
     $amount = $user->amount;
     $comment = "payout test";
-
+  
     $curl = curl_init();
     curl_setopt_array($curl, array(
       CURLOPT_URL => 'https://coinsplashgifts.com/payout/release.php',
@@ -626,7 +707,7 @@ class MerchantController extends Controller
         "BENEFICIARY_CD" => $user->beneficiary_cd,
         "TXN_AMOUNT" => $amount,
         "BENE_COMMENT" => $comment,
-        "TXN_PAYMENT_TYPE" => "UPI",
+        "TXN_PAYMENT_TYPE" => $request->payment_type,
         "ORDER_ID" => $order_id,
       ),
       CURLOPT_HTTPHEADER => array(
