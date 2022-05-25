@@ -55,17 +55,6 @@ class UserController extends Controller
 
     public function index()
     {
-        $add_fields = array(
-            "BENEFICIARY_CD" => "user->beneficiary_cd",
-            "BENE_NAME" => "user->cust_name",
-            "MOBILE_NUMBER" => "user->phone",
-            "EMAIL_ID" => "user->email",
-            "BANK_NAME" => "YESB",
-            "ACTION" => "ADD",
-          );
-
-          $add_fields["ABC"] = "abvc";
-          print_r($add_fields); exit();
         return view('admin_merchant.users.login');
     }
 
