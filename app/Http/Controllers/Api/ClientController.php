@@ -633,6 +633,7 @@ class ClientController extends Controller
         curl_close($curl); 
       }
 
+      return response()->json(['status' => 'success']);
     } else { // if client
       if ($request->STATUS == "Captured" || $request->STATUS == "Success") {
         // mint tokens
