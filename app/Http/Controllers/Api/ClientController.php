@@ -574,7 +574,7 @@ class ClientController extends Controller
         $response_url = $deposit->user->eurl;
       }
 
-      $hash_string = $caller->key . "|*" . $deposit->txnid . "|*" . $deposit->amount . "|*" . $deposit->email . "|*" . $deposit->status . "|*" . $caller->salt;
+      $hash_string = $caller->key . "|" . $deposit->txnid . "|" . $deposit->amount . "|" . $deposit->email . "|" . $deposit->status . "|" . $caller->salt;
       $hash = hash('sha512', $hash_string);
       // surl or eurl
       $curl = curl_init();
