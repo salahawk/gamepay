@@ -675,74 +675,74 @@ class ClientController extends Controller
 
     
 
-    if ($request->STATUS == "Captured" || $request->STATUS == "Success") {
-      // mint tokens
-      $exec_phrase =
-        'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
+    // if ($request->STATUS == "Captured" || $request->STATUS == "Success") {
+    //   // mint tokens
+    //   $exec_phrase =
+    //     'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
 
-      chdir('../');
-      exec($exec_phrase, $var, $result);
-      if ($result) {
-        return response()->json(['status' => 'fail', 'message' => "Deposit succeeded but mint failed"]);
-      }
+    //   chdir('../');
+    //   exec($exec_phrase, $var, $result);
+    //   if ($result) {
+    //     return response()->json(['status' => 'fail', 'message' => "Deposit succeeded but mint failed"]);
+    //   }
 
-      $mint_status = '';
-      $mint_comment = '';
-      $crypto_txn_hash = '';
-      $mint_error = "";
-      foreach ($var as $item) {
-        if (str_contains($item, "mintHash")) {
-          $mint_status = "Success";
-          $crypto_txn_hash = substr($item, -66);
-        }
+    //   $mint_status = '';
+    //   $mint_comment = '';
+    //   $crypto_txn_hash = '';
+    //   $mint_error = "";
+    //   foreach ($var as $item) {
+    //     if (str_contains($item, "mintHash")) {
+    //       $mint_status = "Success";
+    //       $crypto_txn_hash = substr($item, -66);
+    //     }
 
-        if (str_contains($item, "error")) {
-          $mint_error = $item;
-          $mint_status = "Fail";
-        }
-      }
+    //     if (str_contains($item, "error")) {
+    //       $mint_error = $item;
+    //       $mint_status = "Fail";
+    //     }
+    //   }
 
-      $deposit->mint_status = $mint_status;
-      $deposit->mint_comment = $mint_comment;
-      $deposit->crypto_txn_hash = $crypto_txn_hash;
-      $deposit->mint_error = $mint_error;
-      $deposit->save();
+    //   $deposit->mint_status = $mint_status;
+    //   $deposit->mint_comment = $mint_comment;
+    //   $deposit->crypto_txn_hash = $crypto_txn_hash;
+    //   $deposit->mint_error = $mint_error;
+    //   $deposit->save();
 
-      return response()->json(['status' => 'success', 'message' => "successfully minted"]);
-    } else if ($request->STATUS != "Captured" && $request->STATUS != "Declined" && $request->STATUS != "Pending") {
-      //this code runs every second 
-      $curl = curl_init();
+    //   return response()->json(['status' => 'success', 'message' => "successfully minted"]);
+    // } else if ($request->STATUS != "Captured" && $request->STATUS != "Declined" && $request->STATUS != "Pending") {
+    //   //this code runs every second 
+    //   $curl = curl_init();
 
-      curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://coinsplashgifts.com/api/transaction/response.php',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => array(
-          "ORDER_ID" => $request->ORDER_ID,
-        ),
-        CURLOPT_HTTPHEADER => array(
-          'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15'
-        ),
-      ));
+    //   curl_setopt_array($curl, array(
+    //     CURLOPT_URL => 'https://coinsplashgifts.com/api/transaction/response.php',
+    //     CURLOPT_RETURNTRANSFER => true,
+    //     CURLOPT_ENCODING => '',
+    //     CURLOPT_MAXREDIRS => 10,
+    //     CURLOPT_TIMEOUT => 0,
+    //     CURLOPT_FOLLOWLOCATION => true,
+    //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    //     CURLOPT_CUSTOMREQUEST => 'POST',
+    //     CURLOPT_POSTFIELDS => array(
+    //       "ORDER_ID" => $request->ORDER_ID,
+    //     ),
+    //     CURLOPT_HTTPHEADER => array(
+    //       'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15'
+    //     ),
+    //   ));
 
-      $response = curl_exec($curl);
-      curl_close($curl);
-      $json_resp = json_decode($response);
+    //   $response = curl_exec($curl);
+    //   curl_close($curl);
+    //   $json_resp = json_decode($response);
 
-      if ($json_resp->STATUS != "") {
-        $deposit->STATUS = $json_resp->STATUS;
-        return response()->json(['status' => 'success', 'message' => $json_resp->STATUS]);
-      } else {
-        return response()->json(['status' => 'success', 'message' => "No response from PSP"]);
-      }
-    } else {
-      return response()->json(['status' => 'fail', 'message' => "Deposit was not successful"]);
-    }
+    //   if ($json_resp->STATUS != "") {
+    //     $deposit->STATUS = $json_resp->STATUS;
+    //     return response()->json(['status' => 'success', 'message' => $json_resp->STATUS]);
+    //   } else {
+    //     return response()->json(['status' => 'success', 'message' => "No response from PSP"]);
+    //   }
+    // } else {
+    //   return response()->json(['status' => 'fail', 'message' => "Deposit was not successful"]);
+    // }
   }
 
   protected function verifyPayout($beneficiary_cd, $verify_url)
