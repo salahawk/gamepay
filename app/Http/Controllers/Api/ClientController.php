@@ -576,7 +576,7 @@ class ClientController extends Controller
 
       $hash_string = $caller->key . "|*" . $deposit->txnid . "|*" . $deposit->amount . "|*" . $deposit->email . "|*" . $deposit->status . "|*" . $caller->salt;
       $hash = hash('sha512', $hash_string);
-      // surl
+      // surl or eurl
       $curl = curl_init();
       curl_setopt_array($curl, array(
         CURLOPT_URL => $response_url,
@@ -600,7 +600,7 @@ class ClientController extends Controller
 
       $response = curl_exec($curl);
       curl_close($curl); 
-      
+      print_r($response);
       // callback url
       if ($c_url) {
         // hash calculation
