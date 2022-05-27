@@ -577,7 +577,7 @@ class ClientController extends Controller
       $hash_string = $caller->key . "|" . $deposit->txnid . "|" . $deposit->amount . "|" . $deposit->email . "|" . $deposit->status . "|" . $caller->salt;
       $hash = hash('sha512', $hash_string);
       // surl or eurl
-      return redirect()->away($response_url)->with('KEY',$$caller->key)
+      return redirect()->away($response_url)->with('KEY',$caller->key)
                                 ->with('TXNID',$deposit->txnid)
                                 ->with('AMOUNT',$deposit->amount)
                                 ->with('EMAIL',$deposit->email)
