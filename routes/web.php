@@ -68,42 +68,23 @@ use Illuminate\Support\Facades\Route;
 
 
 
-//-------------------------------- Admin -------------------------------------------//
+//-------------------------------- Super Admin -------------------------------------------//
+Route::get('admin', 'Admin\UserController@index')->name('admin');
+Route::post('admin/login', 'Admin\UserController@login')->name('admin.login');
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], function() {
     Route::get('deposits', 'DepositController@index')->name('deposits');
     Route::post('deposits/data', 'DepositController@data')->name('deposits.data');
-    Route::get('deposits/missed', 'DepositController@missedDeposit')->name('deposits.missed');
-    Route::post('deposits/missed/data', 'DepositController@dataMissed')->name('deposits.missed.data');
-    Route::get('deposits/manual', 'DepositController@mintManual')->name('deposits.mint.manual');
+    Route::get('deposits/missed', 'DepositController@missed')->name('deposits.missed');
+    Route::post('deposits/missed/data', 'DepositController@missedData')->name('deposits.missed.data');
 
-    Route::get('dashboard', 'DashboardController@index')->name('dashboard');
-    Route::get('success', 'DepositController@successIndex')->name('success');
-    Route::get('pending', 'DepositController@pendingIndex')->name('pending');
-    Route::get('activation', 'DepositController@activationIndex')->name('activation'); 
-    Route::get('success/data', 'DepositController@successData')->name('success.data');
-    Route::get('pending/data', 'DepositController@pendingData')->name('pending.data');
-    Route::get('activation/data', 'DepositController@activationData')->name('activation.data');
-    Route::get('activation/updateData/{id}', 'DepositController@activationUpdateData')->name('activation.updateData');
-
-    Route::get('payouts', 'PayoutController@index')->name('payouts');
-    Route::post('payouts/data', 'PayoutController@data')->name('payouts.data');
-    Route::get('payouts/missed', 'PayoutController@missedPayout')->name('payouts.missed');
-    Route::post('payouts/missed/data', 'PayoutController@dataMissed')->name('payouts.missed.data');
-
-
-    Route::get('payouts/process', 'PayoutController@process')->name('payouts.process');
-    Route::get('payouts/success', 'PayoutController@success')->name('payouts.success');
-    Route::get('payouts/pending', 'PayoutController@pending')->name('payouts.pending');
-
-    Route::get('users', 'UserController@index')->name('users');
+    Route::get('withdrawals', 'WithdrawalController@index')->name('withdrawals');
+    Route::post('withdrawals/data', 'WithdrawalController@data')->name('withdrawals.data');
+    Route::get('withdrawals/missed', 'DepositController@missed')->name('withdrawals.missed');
+    Route::post('withdrawals/missed/data', 'DepositController@missedData')->name('withdrawals.missed.data');
+    Route::get('users', 'UserController@users')->name('users');
     Route::post('users/data', 'UserController@data')->name('users.data');
-    Route::get('users/approve', 'UserController@approve')->name('users.approve');
-
-    Route::get('clients', 'ClientController@index')->name('clients');
-    Route::post('clients/data', 'ClientController@data')->name('clients.data');
-    Route::post('clients/store', 'ClientController@store')->name('clients.store');
 });
-//-------------------------------- Admin end -------------------------------------------//
+//-------------------------------- Super Admin end -------------------------------------------//
 
 
 

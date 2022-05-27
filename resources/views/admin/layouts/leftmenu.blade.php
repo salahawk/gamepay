@@ -1,65 +1,43 @@
-<ul class="categories">
-    <li class="opend" id = "dash_liID">
-        <i class="fa fa-home fa-fw" aria-hidden="true"></i>
-        <a href="{{ route('admin.dashboard') }}"> Dashboard</a>
-    </li>
-    {{-- <li class="arr">
-        <i class="fa fa-file-text fa-fw"></i>
-        <a href="#">Today Deposits by Email</a>
-    </li> --}}
-    <li class="arr">
-        <i class="fa fa-envelope fa-fw"></i>
-        <a href="{{ route('admin.deposits') }}">Deposits</a>
-        <ul class="side-nav-dropdown">
-            <li><a href="{{ route('admin.deposits') }}">View All Deposit</a></li>
-            <li><a href="{{ route('admin.deposits.missed') }}">View Missed Deposits</a></li>
-        </ul>
-    </li>
-    <li class="arr">
-        <i class="fa fa-envelope fa-fw"></i>
-        <a href="{{ route('admin.payouts') }}">Payouts</a>
-        <ul class="side-nav-dropdown">
-            <li><a href="{{ route('admin.payouts') }}">View All Payout</a></li>
-            <li><a href="{{ route('admin.payouts.missed') }}">View Missed Payouts</a></li>
-        </ul>
-    </li>
-    {{-- <li class="arr"><i class="fa fa-users fa-fw"></i><a href="#">Transactions</a>
-        <ul class="side-nav-dropdown">
-            <li><a href="#">View Transaction</a></li>
-            <li><a href="#">View Txn Summary</a></li>
-        </ul>
-    </li> --}}
-    <li class="arr"><i class="fa fa-arrow-up fa-fw"></i><a href="{{ route('admin.users') }}">Users</a>
-        <ul class="side-nav-dropdown">
-            <li><a href="{{ route('admin.users') }}">Users Verification</a></li>
-        </ul>
-    </li>
-    <li class="arr"><i class="fa fa-arrow-up fa-fw"></i><a href="{{ route('admin.activation') }}">PSP</a>
-        <ul class="side-nav-dropdown">
-            <li><a href="{{ route('admin.activation') }}">Activation</a></li>
-        </ul>
-    </li>
-    <li class="arr"><i class="fa fa-arrow-up fa-fw"></i><a href="{{ route('admin.clients') }}">Clients</a>
-        <ul class="side-nav-dropdown">
-            <li><a href="{{ route('admin.clients') }}">Users</a></li>
-        </ul>
-    </li>
-
-</ul>
-
-
-<script>
-    $(document).ready(function($) {
-        var url = window.location.href;
-        $('ul.categories li').each(function() {
-            $(this).removeClass('opend');
-        });
-        $('ul li a[href="' + url + '"]').parents('li').addClass('opend');
-        $('ul li a[href="' + url + '"]').parents('ul').css('display', "block");
-        $('li.opend').children('a').attr('style', 'color: #ff5722 !important');
-
-        $("#dash_liID").click(function() {
-            window.location.replace($(this).children('a').attr('href'));
-        });
-    });
-</script>
+<nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+  <div class="sb-sidenav-menu">
+    <div class="nav">
+      <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#deposits" aria-expanded="true" aria-controls="collapseLayouts">
+        <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
+        Deposit
+        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+      </a>
+      <div class="collapse" id="deposits" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+        <nav class="sb-sidenav-menu-nested nav">
+          <a class="nav-link" href="{{ route('admin.deposits')}}"> Deposit</a>
+          <a class="nav-link" href="{{ route('admin.deposits')}}"> Missed Deposit</a>
+        </nav>
+      </div>
+      <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#withdraw" aria-expanded="false" aria-controls="collapsePages">
+        <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
+        Withdraw
+        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+      </a>
+      <div class="collapse" id="withdraw" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+        <nav class="sb-sidenav-menu-nested nav">
+          <a class="nav-link" href="{{ route('admin.withdrawals')}}"> Withdraw</a>
+          <a class="nav-link" href="{{ route('admin.withdrawals')}}"> Missed Withdraw</a>
+        </nav>
+      </div>
+      <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#userinfo" aria-expanded="false" aria-controls="userinfo">
+        <div class="sb-nav-link-icon"><i class="fa-solid fa-user"></i></div>
+        User info
+        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+      </a>
+      <div class="collapse" id="userinfo" aria-labelledby="headingThree" data-bs-parent="#sidenavAccordion">
+        <nav class="sb-sidenav-menu-nested nav">
+          <a class="nav-link" href="{{ route('admin.users')}}"> User info</a>
+          <a class="nav-link" href="{{ route('admin.users')}}"> KYC</a>
+        </nav>
+      </div>
+      <a class="nav-link" href="chargeback.html">
+        <div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+        Chargebacks
+      </a>
+    </div>
+  </div>
+</nav>

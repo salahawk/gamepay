@@ -5,44 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use App\Models\Payout;
+use App\Models\User;
 
 use Yajra\DataTables\DataTables;
 use Auth;
-use Session;
-use Hash;
 
-use App\Models\Merchant;
-use App\Models\User;
-use App\Models\External;
-
-
-class UserController extends Controller
+class WithdrawalController extends Controller
 {
     public function index()
     {
-        return view('admin.users.login');
+        return view('admin.withdrawals.index');
     }
-
-    public function login(Request $request)
-    {
-        $merchant = Merchant::where('email', $request->email)->first();
-        if (empty($merchant)) {
-            return response()->json(['status' => 'fail', 'message' => 'Unknown email.']);
-        }
-
-        if (Hash::check($request->password, $merchant->password)) {
-            Session::put('merchant_id', $merchant->id);
-            return redirect()->route('admin.deposits');
-        }
-
-        return redirect()->route('home');
-    }
-
-    public function users()
-    {
-        return view('admin.users.index');
-    }
-
 
     public function data(Request $request)
     {
@@ -55,14 +29,13 @@ class UserController extends Controller
         $order_id = $request->order_id == "" ?  "%" : $request->order_id;
         $order_id_sign = $request->order_id == "" ?  "like" : "=";
 
-        $users = User::where('created_at', '>=', $from . " 00:00:00")
+        $payouts = Payout::where('created_at', '>=', $from . " 00:00:00")
             ->where('created_at', '<=', $to . " 23:59:59")
-            ->where('pan_status', $status_sign, $status)
+            ->where('status', $status_sign, $status)
             ->where('email', $email_sign, $email)
-            ->where('account_no', $order_id_sign, $order_id)
+            ->where('order_id', $order_id_sign, $order_id)
             ->orderby('created_at', 'desc')->select('*');
-        return DataTables::of($users)
+        return DataTables::of($payouts)
             ->make(true);
     }
-    
 }

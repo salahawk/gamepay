@@ -34,8 +34,8 @@
         </div>
       </div>
     </div>
-    <h5 class="mt-4 fw-bold pb-0 mb-4">User Info</h5>
-
+    <h5 class="mt-4 fw-bold pb-0 mb-0">Withdrawals</h5>
+    <p class="text-success">Today withdraw: 10,00000</p>
     <div class="bg-white boxshadow rounded p-3 p-md-4 mb-4">
       <div class="row forms">
         <div class="col-6 col-md-4 mb-3">
@@ -87,41 +87,21 @@
     </div>
     <div class="admincard">
       <div class="card mb-4 boxshadow">
-        <div class="card-header py-3 fw-bold"> <i class="fas fa-table me-1"></i> View User Info </div>
+        <div class="card-header py-3 fw-bold"> <i class="fas fa-table me-1"></i> Transaction </div>
         <div class="card-body">
           <table id="datatablesSimple" class="table table-responsive">
             <thead>
               <tr>
-                <th>First name</th>
-                <th>Last name</th>
+                <th>Order ID</th>
+                <th>Txn ID</th>
                 <th>Email</th>
-                <th>Mobile</th>
-                <th>KYC status</th>
-                <th>PAN status</th>
-                <th>Account</th>
-                <th>IFSC</th>
-                <th>Payer address</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Req Date</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              <!-- <tr>
-                <td>Santoshi@gmail.com</td>
-                <td>+1234568789</td>
-                <td>1456485466465</td>
-                <td>ICICI2564</td>
-                <td>upi id</td>
-                <td><span class="alert-success rounded py-1 px-2">Verified</span></td>
-                <td><span class="alert-success rounded py-1 px-2">Verified</span></td>
-              </tr>
-              <tr>
-                <td>Santoshi@gmail.com</td>
-                <td>+1234568789</td>
-                <td>1456485466465</td>
-                <td>ICICI2564</td>
-                <td>upi id</td>
-                <td><span class="alert-warning rounded py-1 px-2">Pending</span></td>
-                <td><span class="alert-warning rounded py-1 px-2">Pending</span></td>
-              </tr> -->
             </tbody>
           </table>
         </div>
@@ -143,7 +123,7 @@
       headers: {
         'X-CSRF-TOKEN': '{{ csrf_token() }}'
       },
-      url: "{{ route('admin.users.data') }}",
+      url: "{{ route('admin.withdrawals.data') }}",
       type: "POST",
       data: function(data) {
         data["from"] = $('#from').val(),
@@ -154,40 +134,32 @@
       }
     },
     columns: [{
-        data: 'first_name',
-        name: 'first_name'
+        data: 'order_id',
+        name: 'order_id'
       },
       {
-        data: 'last_name',
-        name: 'last_name'
+        data: 'txnid',
+        name: 'txnid'
       },
       {
         data: 'email',
         name: 'email'
       },
       {
-        data: 'mobile',
-        name: 'mobile'
+        data: 'amount',
+        name: 'amount'
       },
       {
-        data: 'kyc_status',
-        name: 'kyc_status'
+        data: 'txn_type',
+        name: 'txn_type'
       },
       {
-        data: 'pan_status',
-        name: 'pan_status'
+        data: 'created_at',
+        name: 'created_at'
       },
       {
-        data: 'account_no',
-        name: 'account_no'
-      },
-      {
-        data: 'ifsc',
-        name: 'ifsc'
-      },
-      {
-        data: 'payer_address',
-        name: 'payer_address'
+        data: 'status',
+        name: 'status'
       }
     ],
   });

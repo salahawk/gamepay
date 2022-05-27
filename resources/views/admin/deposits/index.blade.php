@@ -1,156 +1,191 @@
 @extends('admin.layouts.app')
-
-@section('header_style')
-    <link href="{{ asset('assets/js/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/js/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet"
-        type="text/css" />
+@section('header_styles')
+<style>
+.dataTable-selector {
+  width: 70px;
+}
+</style>
 @endsection
-
-@section('content')
-    <div class="welcome">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="content">
-                        <h2>View All Deposit</h2>
-                        <p>We are working to enhance your experience!</p>
-                    </div>
-                </div>
-            </div>
+@section('contents')
+<main>
+  <div class="container-fluid px-4 pt-5">
+    <div class="row mb-3">
+      <div class="col-12 col-md-4 text-left pb-2 pb-md-0">
+        <div class="alert-primary boxshadow p-3 rounded text-center">
+          <p>Deposit Wallet Balance:</p>
+          <h3 class="pb-0 mb-3"><strong>12,000,000 GR</strong></h3>
+          <a href="#" class="btn btn-primary">Swap to BUSD</a>
         </div>
+      </div>
+      <div class="col-12 col-md-4 text-right pb-2 pb-md-0">
+        <div class="alert-primary boxshadow p-3 rounded text-center">
+          <p>Withdraw Wallet Balance:</p>
+          <h3 class="pb-0 mb-3"><strong>12,000,000 GR</strong></h3>
+          <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#addmoney">Add more</a> <a href="#" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModal">Withdraw</a>
+        </div>
+      </div>
+      <div class="col-12 col-md-4 text-right pb-2 pb-md-0">
+        <div class="alert-primary boxshadow p-3 rounded text-center">
+          <p>Rolling reserve Balance:</p>
+          <h3 class="pb-0 mb-3"><strong>12,000,000 GR</strong></h3>
+          <a href="#" class="btn btn-primary">More Details</a>
+        </div>
+      </div>
     </div>
-    <section class="forms-sec">
-        <div class="main-frms">
-            <div class="av-b total-dep">
-                <div class="box-cs">
-                    <span>Total Deposits Today </span>
-                    <input type="text" class="inn-box" readonly="" value="&#8377 ">
-                </div>
+    <h5 class="mt-4 fw-bold pb-0 mb-0">Deposits</h5>
+    <p class="text-success">Today deposits: 10,00000</p>
+    <div class="bg-white boxshadow rounded p-3 p-md-4 mb-4">
+      <div class="row forms">
+        <div class="col-6 col-md-4 mb-3">
+          <div class="form-group mb-4 mb-md-0">
+            <div class="datepicker date input-group p-0">
+              <input type="text" placeholder="From Date" class="form-control" id="from">
+              <div class="input-group-append"><span class="input-group-text px-4"><i class="fa-solid fa-calendar-days"></i></span></div>
             </div>
+          </div>
         </div>
-    </section>
-    <form action="" method="get">
-        <section class="frm-sec">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="usr">Deposits Date From</label>
-                        <input type="date" class="ipt-usr in-cs effect-15 form-control" name="fromdate" id='fromdate'
-                            class="in-cs" value="">
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="usr">Deposits Date To</label>
-                        <input type="date" class="ipt-usr in-cs effect-15 form-control" name="todate" id='todate'
-                            class="in-cs" value="">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="usr">Email</label>
-                        <input type="text" class="ipt-usr in-cs effect-15 form-control" name="emailid" id='emailid'
-                            class="in-cs" value="">
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-
-                    <div class="form-group">
-                        <label for="usr">Transaction Id</label>
-                        <input type="text" class="ipt-usr in-cs effect-15 form-control" name="transid" id='transid'
-                            class="in-cs" value="">
-                    </div>
-
-                </div>
-
-                <div class="col-md-6">
-
-                    <div class="form-group">
-                        <label for="usr">Minimal amount</label>
-                        <input type="text" class="ipt-usr in-cs effect-15 form-control" name="minamount" id='minamount'
-                            class="in-cs" value="">
-                    </div>
-
-                </div>
-
-                <div class="col-md-6">
-
-                    <div class="form-group">
-                        <label for="usr">Provider</label>
-                        <input type="text" class="ipt-usr in-cs effect-15 form-control" name="provider" id='provider'
-                            class="in-cs" value=" ">
-                    </div>
-
-                </div>
-
-                <center>
-                    <button type=" submit" class="btn btn-outline frm-btn" name="Search_val"
-                        value="settlementAdd">Get</button><br>
-                    <a onclick="exportExcel()" class="btn btn-outline frm-btn" name="submit"
-                        value="settlementAdd">Download</a>
-                </center>
+        <div class="col-6 col-md-4 mb-3">
+          <div class="form-group mb-4 mb-md-0">
+            <div class="datepicker date input-group p-0">
+              <input type="text" placeholder="To Date" class="form-control" id="to">
+              <div class="input-group-append"><span class="input-group-text px-4"><i class="fa-solid fa-calendar-days"></i></span></div>
             </div>
-
-        </section>
-    </form>
-    <section class="h-tb-sec">
-        <div class="h-tb">
-            <div class="home-tb">
-                <div class="table-responsive">
-                    <table class="table table-bordered" id="dataTable">
-                        <thead>
-                            <tr>
-                                <th>Data and Time</th>
-                                <th>Email</th>
-                                <th>OrderID</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>PSP</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+          </div>
+          <!-- DEnd ate Picker Input -->
         </div>
-    </section>
-    <br>
-    <br>
+        <div class="col-6 col-md-4 mb-3">
+          <div class="form-group mb-4 mb-md-0">
+            <select class="form-control" id="status">
+              <option value="0">Status</option>
+              <option value="Captured">Succeeded</option>
+              <option value="Failed">Failed</option>
+              <option value="">Pending</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 mb-3 mb-md-0">
+          <div class="form-group mb-4 mb-md-0">
+            <select class="form-control" id="category">
+              <option value="0">Search By</option>
+              <option value="1">Email ID</option>
+              <option value="2">Order Id</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 mb-3 mb-md-0">
+          <div class="form-group mb-4 mb-md-0">
+            <input class="form-control field" type="text" placeholder="Enter Email">
+          </div>
+        </div>
+        <div class="col-6 col-md-4 mb-3 mb-md-0">
+          <button type="button" class="btn btn-primary search">Submit</button>
+          <button type="button" class="btn btn-primary">Download</button>
+        </div>
+      </div>
+    </div>
+    <div class="admincard">
+      <div class="card mb-4 boxshadow">
+        <div class="card-header py-3 fw-bold"> <i class="fas fa-table me-1"></i> Transaction </div>
+        <div class="card-body">
+          <table id="datatablesSimple" class="table table-hover table-bordered table-responsive">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Txn ID</th>
+                <th>Email</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Req Date</th>
+                <!-- <th>Txn Status time</th> -->
+                <th>Settled GR</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
 
-    <!-- section -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
 @endsection
-@section('footer_script')
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js"></script> --}}
-    {{-- <script src="{{ asset('assets/js/main.js') }}"></script> --}}
-    {{-- <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script> --}}
-    {{-- <script src="vendor/jquery-easing/jquery.easing.min.js"></script> --}}
-    {{-- <script src="{{ asset('assets/js/datatables/dataTable.js') }}"></script> --}}
-    {{-- <script src="{{ asset('assets/js/datatables/dataTables.min.js') }}"></script> --}}
-    {{-- <script src="{{ asset('assets/js/datatables/plugins/bootstrap/datatables.bootstrap.js' )}}" type="text/javascript"></script> --}}
-    {{-- <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script> --}}
-    {{-- <script src="{{ asset('js/pages/datatables-demo.js') }}"></script> --}}
-    <script>
-        var table = $('#dataTable').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            url: "{{ route('admin.deposits.data') }}",
-            type: "POST"
-        },
-        columns: [
-            {data: 'created_at', name: 'created_at'},
-            {data: 'email', name: 'email'},
-            {data: 'order_id', name: 'order_id'},
-            {data: 'amount', name: 'amount'},
-            {data: 'status', name: 'status'},
-            {data: 'psp_name', name: 'psp_name'},
-        ],
-        });
-    </script>
+
+@section('footer_scipts')
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"> -->
+<!-- </script> -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+  var table = $('#datatablesSimple').DataTable({
+    processing: true,
+    serverSide: true,
+    language: { search: "" },
+    ajax: {
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      url: "{{ route('admin.deposits.data') }}",
+      type: "POST",
+      data: function(data) {
+        data["from"] = $('#from').val(),
+        data['to'] = $("#to").val();
+        data['email'] = $("#category").val() == 1 ? $(".field").val() : "";
+        data['status'] = $("#status").val() == 0 ? "" : $("#status").val();
+        data['order_id'] = $("#category").val() == 2 ? $(".field").val() : "";
+      }
+    },
+    columns: [{
+        data: 'order_id',
+        name: 'order_id'
+      },
+      {
+        data: 'txnid',
+        name: 'txnid'
+      },
+      {
+        data: 'email',
+        name: 'email'
+      },
+      {
+        data: 'amount',
+        name: 'amount'
+      },
+      {
+        data: 'txn_type',
+        name: 'txn_type'
+      },
+      {
+        data: 'created_at',
+        name: 'created_at'
+      },
+      {
+        data: 'inr_value',
+        name: 'inr_value'
+      },
+      {
+        data: 'status',
+        name: 'status'
+      }
+    ],
+  });
+
+  $(document).on('click', '.search', function() {
+    table.ajax.reload();
+    // $('#from').val("");
+    // $("#to").val("");
+    // $("#category").val(0);
+    // $("#status").val(0);
+    // $(".field").val("");
+  });
+
+  $(document).find('select[name="datatablesSimple_length"]').addClass("dataTable-selector");
+  $(document).find('input[type="search"]').addClass("dataTable-input");
+  $(document).find('input[type="search"]').attr("placeholder", "Search...");
+  $(document).find("div.dataTable-dropdown").remove();
+  $(document).find("div.dataTable-search").remove();
+});
+</script>
 @endsection
