@@ -608,6 +608,7 @@ class ClientController extends Controller
         $response = curl_exec($curl);
         curl_close($curl); 
 
+        print_r("here we check curl");
         print_r($response);
       }
 
