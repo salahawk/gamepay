@@ -607,6 +607,40 @@ class ClientController extends Controller
 
         $response = curl_exec($curl);
         curl_close($curl); 
+
+        if ($response == "SUCCEESS") {
+            // mint tokens
+            $exec_phrase =
+              'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
+
+            chdir('../');
+            exec($exec_phrase, $var, $result);
+            if ($result) {
+              return response()->json(['status' => 'fail', 'message' => "Deposit succeeded but mint failed"]);
+            }
+
+            $mint_status = '';
+            $mint_comment = '';
+            $crypto_txn_hash = '';
+            $mint_error = "";
+            foreach ($var as $item) {
+              if (str_contains($item, "mintHash")) {
+                $mint_status = "Success";
+                $crypto_txn_hash = substr($item, -66);
+              }
+
+              if (str_contains($item, "error")) {
+                $mint_error = $item;
+                $mint_status = "Fail";
+              }
+            }
+
+            $deposit->mint_status = $mint_status;
+            $deposit->mint_comment = $mint_comment;
+            $deposit->crypto_txn_hash = $crypto_txn_hash;
+            $deposit->mint_error = $mint_error;
+            $deposit->save();
+        }
       }
 
       // surl or eurl
