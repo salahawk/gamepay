@@ -677,7 +677,23 @@ class MerchantController extends Controller
         }
       }
 
-      return redirect()->route('securepay.payout.add', ['user_id' => $user->id, 'payment_type' => $payment_type]); // send with payment type flag
+      // create new payout entry, ready to go for payout
+      $payout = new Payout;
+      $payout->user_id = $user->id;
+      $payout->email = $user->email;
+      $payout->txn_hash = $user->txn_hash;
+      $payout->remarks = $user->remarks;
+      $payout->sender = $user->address;
+      $payout->receiver = $user->receiver;
+      $payout->network = $user->network;
+      $payout->currency = $user->crypto;
+      $payout->inr_value = $user->inr_value;
+      $payout->is_external = 1;
+      $payout->caller_id = 1; //$used_deposit->caller_id;
+      $payout->psp_id = 1; //$used_deposit->psp_id;
+      $saved = $payout->save();
+      // return redirect()->route('securepay.payout.add', ['user_id' => $user->id, 'payment_type' => $payment_type]); // send with payment type flag
+      return response()->json(['status' => 'success', 'message' => 'Please wait until the admin does the payout');
     }
   }
 
