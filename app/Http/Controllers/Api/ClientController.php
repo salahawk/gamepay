@@ -608,7 +608,7 @@ class ClientController extends Controller
         $response = curl_exec($curl);
         curl_close($curl); 
 
-        if ($response == "SUCCEESS") {
+        if ($response == "SUCCESS") {
             // mint tokens
             $exec_phrase =
               'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
