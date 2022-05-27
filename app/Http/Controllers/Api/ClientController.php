@@ -576,6 +576,39 @@ class ClientController extends Controller
 
       $hash_string = $caller->key . "|" . $deposit->txnid . "|" . $deposit->amount . "|" . $deposit->email . "|" . $deposit->status . "|" . $caller->salt;
       $hash = hash('sha512', $hash_string);
+
+      // curl
+      if ($c_url) {
+        // hash calculation
+        // $hash_sequence = "key|orderid|mobile|amount|email|pgtxnmessage|responsemessage|paymenttype|status";
+        $status = "Success";
+        $hash_sequence = $caller->key . "|" . $deposit->txnid . "|" . $deposit->amount . "|" . $deposit->email . "|" . $status . "|" . $caller->salt;
+        $hash_c = hash('sha512', $hash_sequence);
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $c_url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS => array(
+            "KEY" => $caller->key,
+            "TXNID" => $deposit->txnid,
+            "AMOUNT" => $deposit->amount,
+            "EMAIL" => $deposit->email,
+            "MOBILE" => $deposit->phone,
+            "STATUS" => $deposit->status,
+            "HASH" => $hash_c,
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        curl_close($curl); 
+      }
+      
       // surl or eurl
       return redirect()->away($response_url)->with('KEY',$caller->key)
                                 ->with('TXNID',$deposit->txnid)
@@ -609,36 +642,7 @@ class ClientController extends Controller
       // curl_close($curl); 
       // print_r($response);
       // callback url
-      if ($c_url) {
-        // hash calculation
-        // $hash_sequence = "key|orderid|mobile|amount|email|pgtxnmessage|responsemessage|paymenttype|status";
-        $status = "Success";
-        $hash_sequence = $caller->key . "|" . $deposit->txnid . "|" . $deposit->amount . "|" . $deposit->email . "|" . $status . "|" . $caller->salt;
-        $hash_c = hash('sha512', $hash_sequence);
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-          CURLOPT_URL => $c_url,
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => '',
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => 'POST',
-          CURLOPT_POSTFIELDS => array(
-            "KEY" => $caller->key,
-            "TXNID" => $deposit->txnid,
-            "AMOUNT" => $deposit->amount,
-            "EMAIL" => $deposit->email,
-            "MOBILE" => $deposit->phone,
-            "STATUS" => $deposit->status,
-            "HASH" => $hash_c,
-          ),
-        ));
-
-        $response = curl_exec($curl);
-        curl_close($curl); 
-      }
+      
 
       return response()->json(['status' => 'success']);
     } else { // if client
