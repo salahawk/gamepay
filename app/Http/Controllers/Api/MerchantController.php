@@ -693,7 +693,7 @@ class MerchantController extends Controller
       $payout->psp_id = 1; //$used_deposit->psp_id;
       $saved = $payout->save();
       // return redirect()->route('securepay.payout.add', ['user_id' => $user->id, 'payment_type' => $payment_type]); // send with payment type flag
-      return response()->json(['status' => 'success', 'message' => 'Please wait until the admin does the payout');
+      return response()->json(['status' => 'success', 'message' => 'Please wait until the admin does the payout']);
     }
   }
 
