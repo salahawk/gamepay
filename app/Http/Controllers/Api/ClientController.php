@@ -538,7 +538,7 @@ class ClientController extends Controller
     $hash = hash("sha512", $hash_string);
 
     if ($hash != $request->generateHash) {
-      return response()->json(['status' => 'fail', "message" => 'hash is wrong']);
+      return response()->json(['status' => 'fail', "message" => 'hash is wrong', "data"=>$hash_string]);
     }
 
     // amount and email double check
