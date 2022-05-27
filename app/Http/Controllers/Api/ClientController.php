@@ -607,19 +607,16 @@ class ClientController extends Controller
 
         $response = curl_exec($curl);
         curl_close($curl); 
-
-        print_r("here we check curl");
-        print_r($response);
       }
 
       // surl or eurl
-      // return redirect()->away($response_url)->with('KEY',$caller->key)
-      //                           ->with('TXNID',$deposit->txnid)
-      //                           ->with('AMOUNT',$deposit->amount)
-      //                           ->with('EMAIL',$deposit->email)
-      //                           ->with('MOBILE',$deposit->phone)
-      //                           ->with('STATUS',$deposit->status)
-      //                           ->with('HASH',$hash);
+      return redirect()->away($response_url)->with('KEY',$caller->key)
+                                ->with('TXNID',$deposit->txnid)
+                                ->with('AMOUNT',$deposit->amount)
+                                ->with('EMAIL',$deposit->email)
+                                ->with('MOBILE',$deposit->phone)
+                                ->with('STATUS',$deposit->status)
+                                ->with('HASH',$hash);
       // $curl = curl_init();
       // curl_setopt_array($curl, array(
       //   CURLOPT_URL => $response_url,
