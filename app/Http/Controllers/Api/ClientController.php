@@ -537,9 +537,9 @@ class ClientController extends Controller
     $hash_string .= env('PSP_SALT');
     $hash = hash("sha512", $hash_string);
 
-    if ($hash != $request->generateHash) {
-      return response()->json(['status' => 'fail', "message" => 'hash is wrong', "data"=>$hash_string]);
-    }
+    // if ($hash != $request->generateHash) {
+    //   return response()->json(['status' => 'fail', "message" => 'hash is wrong', "data"=>$hash_string]);
+    // }
 
     // amount and email double check
     if ($request->AMOUNT != $deposit->amount || $request->CUST_EMAIL != $deposit->email || $request->ORDER_ID != $deposit->order_id) {
