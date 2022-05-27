@@ -162,8 +162,8 @@ $(document).ready(function() {
         name: 'created_at'
       },
       {
-        data: 'inr_value',
-        name: 'inr_value'
+        data: 'total_amount',
+        name: 'total_amount'
       },
       {
         data: 'status',
