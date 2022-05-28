@@ -537,7 +537,7 @@ class ClientController extends Controller
     $hash_string .= env('PSP_SALT');
     $hash = hash("sha512", $hash_string);
 
-    if ($hash == $request->generateHash) {
+    if ($hash != $request->generateHash) {
       return response()->json(['status' => 'fail', "message" => 'hash is wrong', "data"=>$hash_string]);
     }
 
