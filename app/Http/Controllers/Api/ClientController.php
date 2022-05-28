@@ -520,8 +520,8 @@ class ClientController extends Controller
   public function responseDeposit(Request $request)
   {
     $deposit = Deposit::where('order_id', $request->ORDER_ID)->first();
-
-    if (empty($deposit)) {
+    
+    if (!empty($deposit)) {
       return response()->json(['status' => 'fail', "message" => 'Order id does not exist in DB.', "data"=>$request->input()]);
     }
     $caller = '';
