@@ -23,6 +23,7 @@ class MerchantController extends Controller
 {
   public function index(Request $request)
   {
+    return response()->json(['status' => 'fail', 'error' => $request->input()]);
     // validate key and salt
     $psp_key = env("PSP_KEY");
     $rules = [
