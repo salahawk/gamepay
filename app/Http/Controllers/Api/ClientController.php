@@ -631,7 +631,7 @@ class ClientController extends Controller
               }
 
               if (str_contains($item, "realValue")) {
-                  $real_value['realValue'] = $item;
+                  $real_value = substr($item, 10);
               }
 
               if (str_contains($item, "error")) {
