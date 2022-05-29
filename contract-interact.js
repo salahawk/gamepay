@@ -12,7 +12,8 @@ const abi =  require("./contract-abi.json");
 
 const Web3 = require('web3');
 
-const web3 = new Web3("https://data-seed-prebsc-1-s1.binance.org:8545/");
+// const web3 = new Web3("https://data-seed-prebsc-1-s1.binance.org:8545/");
+const web3 = new Web3("https://speedy-nodes-nyc.moralis.io/757c0b0984b6b1188345150a/bsc/testnet");
 
 // const web3 = new Web3({
 //     provider: "https://data-seed-prebsc-1-s1.binance.org:8545/",
@@ -89,6 +90,7 @@ async function mint(merchant, amount) {
     contract.methods.mint(merchant, amount).send({from: ADMIN_WALLET, gas: gas})
         .then(receipt => {
             console.log("mintHash: ", receipt.transactionHash);
+            console.log("realValue: ", receipt.events.Transfer[0].returnValues.to == merchant ? Web3.utils.fromWei(receipt.events.Transfer[0].returnValues.value, 'ether') : "0");
         })
         .catch((err) => {
             if(err.message.startsWith("Internal JSON-RPC error.")) {
@@ -100,7 +102,7 @@ async function mint(merchant, amount) {
 
 void async function main() {
     let check = await checkHaveoperator(merchant);
-    if (check) { 
+    if (check) {
         await mint(merchant, amount);
     } else {
         await setOperator(merchant);

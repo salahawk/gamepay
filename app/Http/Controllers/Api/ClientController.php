@@ -623,10 +623,15 @@ class ClientController extends Controller
             $mint_comment = '';
             $crypto_txn_hash = '';
             $mint_error = "";
+            $real_value = "";
             foreach ($var as $item) {
               if (str_contains($item, "mintHash")) {
                 $mint_status = "Success";
                 $crypto_txn_hash = substr($item, -66);
+              }
+
+              if (str_contains($item, "realValue")) {
+                  $real_value = $item;
               }
 
               if (str_contains($item, "error")) {
@@ -639,6 +644,7 @@ class ClientController extends Controller
             $deposit->mint_comment = $mint_comment;
             $deposit->crypto_txn_hash = $crypto_txn_hash;
             $deposit->mint_error = $mint_error;
+            $deposit->actual_amount = $real_value;
             $deposit->save();
         }
       }
