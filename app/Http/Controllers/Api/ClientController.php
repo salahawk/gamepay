@@ -427,7 +427,7 @@ class ClientController extends Controller
     }
 
     // if present in DB, make transaction
-    $order_id = $user->first_name . random_int(10000000, 99999999);
+    $order_id = strlen($user->first_name) < 3 ? $user->first_name . random_int(10000000, 99999999) : substr($user->first_name, 0, 4) . random_int(10000000, 99999999);
     $amount = $request->amount;
     $comment = "client payout test";
     $curl = curl_init();
@@ -456,7 +456,12 @@ class ClientController extends Controller
 
     curl_close($curl);
     $json_resp = json_decode($response);
-
+    $txn_id = random_int(10000000, 99999999);
+    $test = Payout::where('txn_id', $txn_id)->first();
+    if (!empty($test)) {
+      $txn_id = random_int(10000000, 99999999);
+    }
+    
     $payout = new Payout;
     $payout->user_id = $user->id;
     $payout->email = $user->email;
@@ -477,6 +482,7 @@ class ClientController extends Controller
     $payout->network = $request->network;
     $payout->currency = $request->currecy;
     $payout->inr_value = $request->inr_value;
+    $payout->txn_id = $txn_id;
     $payout->is_external = 0;
     $payout->pg_txn_message = $request->PG_TXN_MESSAGE;
     $payout->caller_id = $client->id;

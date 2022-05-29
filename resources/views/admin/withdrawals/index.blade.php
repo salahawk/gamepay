@@ -138,20 +138,20 @@
         name: 'order_id'
       },
       {
-        data: 'txnid',
-        name: 'txnid'
+        data: 'txn_id',
+        name: 'txn_id'
       },
       {
         data: 'email',
         name: 'email'
       },
       {
-        data: 'amount',
-        name: 'amount'
+        data: 'txn_amount',
+        name: 'txn_amount'
       },
       {
-        data: 'txn_type',
-        name: 'txn_type'
+        data: 'txn_payment_type',
+        name: 'txn_payment_type'
       },
       {
         data: 'created_at',
