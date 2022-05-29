@@ -164,8 +164,8 @@
           name: 'created_at'
         },
         {
-          data: 'inr_value',
-          name: 'inr_value'
+          data: 'actual_amount',
+          name: 'actual_amount'
         },
         {
           data: 'status',

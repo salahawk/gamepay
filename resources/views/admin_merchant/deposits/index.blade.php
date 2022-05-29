@@ -153,8 +153,8 @@ $(document).ready(function() {
         name: 'amount'
       },
       {
-        data: 'inr_value',
-        name: 'inr_value'
+        data: 'actual_amount',
+        name: 'actual_amount'
       },
       {
         data: 'status',

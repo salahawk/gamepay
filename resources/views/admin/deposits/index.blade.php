@@ -162,8 +162,8 @@ $(document).ready(function() {
         name: 'created_at'
       },
       {
-        data: 'total_amount',
-        name: 'total_amount'
+        data: 'actual_amount',
+        name: 'actual_amount'
       },
       {
         data: 'status',
