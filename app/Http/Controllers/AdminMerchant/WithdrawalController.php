@@ -38,6 +38,9 @@ class WithdrawalController extends Controller
             ->where('order_id', $order_id_sign, $order_id)
             ->orderby('created_at', 'desc')->select('*');
         return DataTables::of($payouts)
+            ->addColumn('created_at', function ($deposit) {
+                return $deposit->created_at->format('Y-m-d H:i:s');
+            })
             ->make(true);
     }
 
