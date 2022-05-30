@@ -36,7 +36,7 @@ class ProcessStatus implements ShouldQueue
     public function handle()
     {
         $test = Deposit::find($this->deposit_id);
-        if ($test->status == 'incomplete') {
+        if ($test->status == 'initiated') {
             // status inquiry
             $curl = curl_init();
 
@@ -61,6 +61,9 @@ class ProcessStatus implements ShouldQueue
             curl_close($curl);
             $json_resp = json_decode($response);
             
+            if ($json_resp->STATUS == "Invalid") {
+                $test->status = "ttttttteste";
+            }
             $test->status = $json_resp->STATUS;
             $test->save();
         }
