@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Twilio\Rest\Client;
 use Mail;
 use Auth;
+use Carbon\Carbon;
 
 use App\Models\User;
 use App\Models\Deposit;
@@ -183,7 +184,7 @@ class MerchantController extends Controller
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php'; // have to modify later based on routing logic
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
       $verify_url = "https://coinsplashgifts.com/api/transaction/response.php";
-      ProcessStatus::dispatch($deposit->id, $verify_url)->delay(now()->addMinutes(1));
+      ProcessStatus::dispatch($deposit->id, $verify_url)->delay(Carbon::now()->addMinutes(1));
       return redirect()->away($url . "?encdata=" . $encData);
     }
     
