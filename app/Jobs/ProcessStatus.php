@@ -34,7 +34,7 @@ class ProcessStatus implements ShouldQueue
      * @return void
      */
     public function handle()
-    {
+    {print_r($this->deposit_id . " here"); exit();
         $test = Deposit::find($this->deposit_id);
         if ($test->status == 'initiated') {
             // status inquiry
