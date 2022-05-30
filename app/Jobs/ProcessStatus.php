@@ -64,8 +64,10 @@ class ProcessStatus implements ShouldQueue
             
             if ($json_resp->STATUS == "Invalid") {
                 $test->status = "ttttttteste";
+            } else {
+                $test->status = $json_resp->STATUS;
             }
-            $test->status = $json_resp->STATUS;
+            
             $test->save();
         }
     }
