@@ -10,6 +10,7 @@ use App\Models\User;
 
 use Yajra\DataTables\DataTables;
 use Auth;
+use Session;
 
 class DepositController extends Controller
 {
@@ -30,7 +31,7 @@ class DepositController extends Controller
     $order_id_sign = $request->order_id == "" ?  "like" : "=";
     
     $deposits = Deposit::where('is_client', 0)
-      ->where('caller_id', 1)
+      ->where('caller_id', Session::get('merchant_id'))
       ->where('created_at', '>=', $from . " 00:00:00")
       ->where('created_at', '<=', $to . " 23:59:59")
       ->where('status', $status_sign, $status)

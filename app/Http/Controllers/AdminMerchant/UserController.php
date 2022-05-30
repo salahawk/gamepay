@@ -32,7 +32,7 @@ class UserController extends Controller
         $order_id = $request->order_id == "" ?  "%" : $request->order_id;
         $order_id_sign = $request->order_id == "" ?  "like" : "=";
 
-        $users = External::where('merchant_id', 1)
+        $users = External::where('merchant_id', Session::get('merchant_id'))
             ->where('created_at', '>=', $from . " 00:00:00")
             ->where('created_at', '<=', $to . " 23:59:59")
             ->where('pan_status', $status_sign, $status)
