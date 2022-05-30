@@ -76,6 +76,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
     Route::post('deposits/data', 'DepositController@data')->name('deposits.data');
     Route::get('deposits/missed', 'DepositController@missed')->name('deposits.missed');
     Route::post('deposits/missed/data', 'DepositController@missedData')->name('deposits.missed.data');
+    Route::get('deposits/release', 'DepositController@release')->name('deposits.release');
+    Route::get('deposits/reject', 'DepositController@reject')->name('deposits.reject');
 
     Route::get('withdrawals', 'WithdrawalController@index')->name('withdrawals');
     Route::post('withdrawals/data', 'WithdrawalController@data')->name('withdrawals.data');

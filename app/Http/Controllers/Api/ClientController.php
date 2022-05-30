@@ -10,6 +10,8 @@ use Mail;
 use Auth;
 use Illuminate\Support\Facades\Session;
 use DB;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 use App\Models\Deposit;
 use App\Models\User;
@@ -18,7 +20,8 @@ use App\Models\Payout;
 use App\Models\Psp;
 use App\Models\Client;
 use App\Models\Merchant;
-use Illuminate\Support\Facades\Validator;
+use App\Jobs\ProcessStatus;
+
 
 class ClientController extends Controller
 {
@@ -84,6 +87,7 @@ class ClientController extends Controller
     $hash = hash('sha512', $valuecheck);
     $url = $psp->deposit_url;
     $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$test->mobile&amount=$deposit->amount&email=$test->email&txnid=$deposit->order_id&eurl=$hash"));
+    ProcessStatus::dispatch($deposit->id, $psp->deposit_inquiry_url)->delay(Carbon::now()->addMinutes(10));
     return response()->json(['status' => 'success', 'url' => $url . "?encdata=" . $encData]);
   }
 
@@ -163,6 +167,7 @@ class ClientController extends Controller
       $hash = hash('sha512', $valuecheck);
       $url = $psp->deposit_url;
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
+      ProcessStatus::dispatch($deposit->id, $psp->deposit_inquiry_url)->delay(Carbon::now()->addMinutes(10));
       return response()->json(['status' => 'success', 'url' => $url . "?encdata=" . $encData]);
     }
   }
@@ -221,6 +226,7 @@ class ClientController extends Controller
       $hash = hash('sha512', $valuecheck);
       $url = $psp->deposit_url;
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
+      ProcessStatus::dispatch($deposit->id, $psp->deposit_inquiry_url)->delay(Carbon::now()->addMinutes(10));
       return response()->json(['status' => 'success', 'data' => $url . "?encdata=" . $encData]);
     } else {
       return response()->json(['status' => 'fail', 'message' => 'File types are not allowed image files']);
@@ -616,42 +622,7 @@ class ClientController extends Controller
 
         if ($response == "SUCCESS") {
             // mint tokens
-            $exec_phrase =
-              'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
-
-            chdir('../');
-            exec($exec_phrase, $var, $result);
-            if ($result) {
-              return response()->json(['status' => 'fail', 'message' => "Deposit succeeded but mint failed"]);
-            }
-
-            $mint_status = '';
-            $mint_comment = '';
-            $crypto_txn_hash = '';
-            $mint_error = "";
-            $real_value = "";
-            foreach ($var as $item) {
-              if (str_contains($item, "mintHash")) {
-                $mint_status = "Success";
-                $crypto_txn_hash = substr($item, -66);
-              }
-
-              if (str_contains($item, "realValue")) {
-                  $real_value = substr($item, 10);
-              }
-
-              if (str_contains($item, "error")) {
-                $mint_error = $item;
-                $mint_status = "Fail";
-              }
-            }
-
-            $deposit->mint_status = $mint_status;
-            $deposit->mint_comment = $mint_comment;
-            $deposit->crypto_txn_hash = $crypto_txn_hash;
-            $deposit->mint_error = $mint_error;
-            $deposit->actual_amount = $real_value;
-            $deposit->save();
+            $this->mint_token($deposit->id, $request->AMOUNT);
         }
       }
 
@@ -663,68 +634,10 @@ class ClientController extends Controller
                                 ->with('MOBILE',$deposit->phone)
                                 ->with('STATUS',$deposit->status)
                                 ->with('HASH',$hash);
-      // $curl = curl_init();
-      // curl_setopt_array($curl, array(
-      //   CURLOPT_URL => $response_url,
-      //   CURLOPT_RETURNTRANSFER => true,
-      //   CURLOPT_ENCODING => '',
-      //   CURLOPT_MAXREDIRS => 10,
-      //   CURLOPT_TIMEOUT => 0,
-      //   CURLOPT_FOLLOWLOCATION => true,
-      //   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-      //   CURLOPT_CUSTOMREQUEST => 'POST',
-      //   CURLOPT_POSTFIELDS => array(
-      //     "KEY" => $caller->key,
-      //     "TXNID" => $deposit->txnid,
-      //     "AMOUNT" => $deposit->amount,
-      //     "EMAIL" => $deposit->email,
-      //     "MOBILE" => $deposit->phone,
-      //     "STATUS" => $deposit->status,
-      //     "HASH" => $hash,
-      //   ),
-      // ));
-
-      // $response = curl_exec($curl);
-      // curl_close($curl); 
-      // print_r($response);
-      // callback url
-      
-
-      return response()->json(['status' => 'success']);
     } else { // if client
       if ($request->STATUS == "Captured" || $request->STATUS == "Success") {
         // mint tokens
-        $exec_phrase =
-          'node contract-interact.js ' . $deposit->wallet . ' ' . $request->AMOUNT;
-
-        chdir('../');
-        exec($exec_phrase, $var, $result);
-        if ($result) {
-          return response()->json(['status' => 'fail', 'message' => "Deposit succeeded but mint failed"]);
-        }
-
-        $mint_status = '';
-        $mint_comment = '';
-        $crypto_txn_hash = '';
-        $mint_error = "";
-        foreach ($var as $item) {
-          if (str_contains($item, "mintHash")) {
-            $mint_status = "Success";
-            $crypto_txn_hash = substr($item, -66);
-          }
-
-          if (str_contains($item, "error")) {
-            $mint_error = $item;
-            $mint_status = "Fail";
-          }
-        }
-
-        $deposit->mint_status = $mint_status;
-        $deposit->mint_comment = $mint_comment;
-        $deposit->crypto_txn_hash = $crypto_txn_hash;
-        $deposit->mint_error = $mint_error;
-        $deposit->save();
-
+        $this->mint_token($deposit->id, $request->AMOUNT);
         return response()->json(['status' => 'success', 'message' => "successfully minted"]);
       }
     }

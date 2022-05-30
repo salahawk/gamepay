@@ -57,9 +57,14 @@
           <div class="form-group mb-4 mb-md-0">
             <select class="form-control" id="status">
               <option value="0">Status</option>
-              <option value="Success">Succeeded</option>
-              <option value="Failure">Failed</option>
+              <option value="Success">Success</option>
+              <option value="Failure">Failure</option>
+              <option value="Declined">Declined</option>
               <option value="Rejected">Rejected</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Pending">Pending</option>
+              <option value="User Inactive">User Inactive</option>
+              <option value="Failed at Acquirer">Failed at Acquirer</option>
             </select>
           </div>
         </div>
@@ -174,11 +179,6 @@ $(document).ready(function() {
 
   $(document).on('click', '.search', function() {
     table.ajax.reload();
-    // $('#from').val("");
-    // $("#to").val("");
-    // $("#category").val(0);
-    // $("#status").val(0);
-    // $(".field").val("");
   });
 
   $(document).find('select[name="datatablesSimple_length"]').addClass("dataTable-selector");

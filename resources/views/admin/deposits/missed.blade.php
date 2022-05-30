@@ -57,9 +57,9 @@
           <div class="form-group mb-4 mb-md-0">
             <select class="form-control" id="status">
               <option value="0">Status</option>
-              <option value="Success">Succeeded</option>
+              <!-- <option value="Success">Succeeded</option>
               <option value="Failure">Failed</option>
-              <option value="Rejected">Rejected</option>
+              <option value="Rejected">Rejected</option> -->
             </select>
           </div>
         </div>
@@ -129,7 +129,7 @@
         headers: {
           'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
-        url: "{{ route('admin.deposits.data') }}",
+        url: "{{ route('admin.deposits.missed.data') }}",
         type: "POST",
         data: function(data) {
           data["from"] = $('#from').val(),
@@ -176,11 +176,6 @@
 
     $(document).on('click', '.search', function() {
       table.ajax.reload();
-      // $('#from').val("");
-      // $("#to").val("");
-      // $("#category").val(0);
-      // $("#status").val(0);
-      // $(".field").val("");
     });
 
     $(document).find('select[name="datatablesSimple_length"]').addClass("dataTable-selector");

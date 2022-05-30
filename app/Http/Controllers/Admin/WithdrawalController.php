@@ -40,7 +40,7 @@ class WithdrawalController extends Controller
             ->addColumn('created_at', function ($payout) {
                 return $payout->created_at->format('Y-m-d H:i:s');
             })
-            ->addColumn('status', function ($deposit) {
+            ->addColumn('status', function ($payout) {
                 return '<a type="button" href="' . route('admin.withdrawals.release') . '" class="btn btn-primary">Release</a>
                 <a type="button" class="btn btn-outline-primary">Reject</a>';
             })
