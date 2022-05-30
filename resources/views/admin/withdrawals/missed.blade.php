@@ -57,9 +57,9 @@
           <div class="form-group mb-4 mb-md-0">
             <select class="form-control" id="status">
               <option value="0">Status</option>
-              <option value="Captured">Succeeded</option>
-              <option value="Failed">Failed</option>
-              <option value="">Pending</option>
+              <option value="Success">Succeeded</option>
+              <option value="Failure">Failed</option>
+              <option value="Rejected">Rejected</option>
             </select>
           </div>
         </div>
