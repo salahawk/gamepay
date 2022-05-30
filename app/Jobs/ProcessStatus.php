@@ -15,8 +15,9 @@ class ProcessStatus implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $deposit_id;
-    protected $client_url;
+    public $tries = 1;
+    private $deposit_id;
+    private $client_url;
     /**
      * Create a new job instance.
      *
@@ -34,7 +35,7 @@ class ProcessStatus implements ShouldQueue
      * @return void
      */
     public function handle()
-    {print_r($this->deposit_id . " here"); exit();
+    {
         $test = Deposit::find($this->deposit_id);
         if ($test->status == 'initiated') {
             // status inquiry
