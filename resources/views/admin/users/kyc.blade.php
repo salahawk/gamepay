@@ -92,15 +92,13 @@
           <table id="datatablesSimple" class="table table-responsive">
             <thead>
               <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email </th>
-                <th>Mobile</th>
-                <th>KYC Status</th>
-                <th>PAN status</th>
-                <th>Account</th>
-                <th>IFSC</th>
-                <th>Payer address</th>
+                <th>Email</th>
+                <th>Proof1</th>
+                <th>Proof2</th>
+                <th>Status</th>
+                <th>Remarks Proof</th>
+                <th>Bank Proof</th>
+                <th>Remarks Bank</th>
               </tr>
             </thead>
             <tbody>
@@ -125,51 +123,43 @@
       headers: {
         'X-CSRF-TOKEN': '{{ csrf_token() }}'
       },
-      url: "{{ route('admin.users.data') }}",
+      url: "{{ route('admin.users.kycData') }}",
       type: "POST",
       data: function(data) {
         data["from"] = $('#from').val(),
-          data['to'] = $("#to").val();
+        data['to'] = $("#to").val();
         data['email'] = $("#category").val() == 1 ? $(".field").val() : "";
         data['status'] = $("#status").val() == 0 ? "" : $("#status").val();
         data['order_id'] = $("#category").val() == 2 ? $(".field").val() : "";
       }
     },
     columns: [{
-        data: 'first_name',
-        name: 'first_name'
-      },
-      {
-        data: 'last_name',
-        name: 'last_name'
-      },
-      {
         data: 'email',
         name: 'email'
       },
       {
-        data: 'mobile',
-        name: 'mobile'
+        data: 'proof1',
+        name: 'proof1'
       },
       {
-        data: 'kyc',
-        name: 'kyc_status'
+        data: 'proof2',
+        name: 'proof2'
       },
       {
-        data: 'pan_st',
-        name: 'pan_status'
+        data: 'status',
+        name: 'status'
       },
       {
-        data: 'account_no',
-        name: 'account_no'
+        data: 'remarks_proof',
+        name: 'remarks_proof'
       },
       {
-        data: 'ifsc',
-        name: 'ifsc'
+        data: 'bank_proof',
+        name: 'bank_proof'
       },
       {
-        data: 'payer_address',
-        name: 'payer_address'
+        data: 'remarks_bank',
+        name: 'remarks_bank'
       }
     ],
   });

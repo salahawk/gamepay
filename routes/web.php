@@ -84,8 +84,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
     Route::post('withdrawals/release', 'WithdrawalController@release')->name('withdrawals.release');
     Route::get('withdrawals/missed', 'DepositController@missed')->name('withdrawals.missed');
     Route::post('withdrawals/missed/data', 'DepositController@missedData')->name('withdrawals.missed.data');
+
     Route::get('users', 'UserController@users')->name('users');
     Route::post('users/data', 'UserController@data')->name('users.data');
+    Route::get('users/kyc', 'UserController@kyc')->name('users.kyc');
+    Route::post('users/kyc/kycData', 'UserController@kycData')->name('users.kycData');
+    // Route::get('users', 'UserController@kycData')->name('users');
+
 });
 //-------------------------------- Super Admin end -------------------------------------------//
 

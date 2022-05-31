@@ -31,7 +31,7 @@
       <div class="collapse" id="userinfo" aria-labelledby="headingThree" data-bs-parent="#sidenavAccordion">
         <nav class="sb-sidenav-menu-nested nav">
           <a class="nav-link" href="{{ route('admin.users')}}"> User info</a>
-          <a class="nav-link" href="{{ route('admin.users')}}"> KYC</a>
+          <a class="nav-link" href="{{ route('admin.users.kyc')}}"> KYC</a>
         </nav>
       </div>
       <a class="nav-link" href="chargeback.html">
