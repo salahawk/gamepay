@@ -6,7 +6,7 @@
   <!-- Navbar Search-->
   <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
     <div class="input-group dashsearch">
-      <button class="btn btn-dark" id="btnNavbarSearch" type="button">Connect Wallet</button>
+      <button class="btn btn-dark" id="btnNavbarSearch" type="button" onclick="onClickConnect()">Connect Wallet</button>
     </div>
   </form>
   <!-- Navbar-->
@@ -18,3 +18,4 @@
     </li>
   </ul>
 </nav>
+

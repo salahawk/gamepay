@@ -42,7 +42,7 @@ class DepositController extends Controller
       ->addColumn('created_at', function ($deposit) {
         return $deposit->created_at->format('Y-m-d H:i:s');
       })
-      ->addColumn('status', function ($deposit) {
+      ->addColumn('color_status', function ($deposit) {
         if ($deposit->status == "Success") {
           return '<span class="text-success">' . $deposit->status . '</span>';
         } else if ($deposit->status == "Pending") {
@@ -51,7 +51,7 @@ class DepositController extends Controller
           return '<span class="text-danger">' . $deposit->status . '</span>';
         }
       })
-      ->rawColumns(['status'])
+      ->rawColumns(['color_status'])
       ->make(true);
   }
 

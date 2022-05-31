@@ -168,11 +168,11 @@ $(document).ready(function() {
       },
       {
         data: 'actual_amount',
-        name: 'actual_amount'
+        name: 'actual_amount',
       },
       {
-        data: 'status',
-        name: 'status'
+        data: 'color_status',
+        name: 'status',
       }
     ],
   });

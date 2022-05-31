@@ -14,7 +14,7 @@
         <div class="col-12 col-md-4 text-left pb-2 pb-md-0">
           <div class="alert-primary boxshadow p-3 rounded text-center">
             <p>Deposit Wallet Balance:</p>
-            <h3 class="pb-0 mb-3"><strong>12,000,000 GR</strong></h3>
+            <h3 class="pb-0 mb-3"><strong class="balance">12,000,000 GR</strong></h3>
             <a href="#" class="btn btn-primary">Swap to BUSD</a>
           </div>
         </div>

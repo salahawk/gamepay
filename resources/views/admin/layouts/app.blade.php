@@ -66,11 +66,7 @@
     $("." + urlArray[urlArray.length - 1].replace("#", "")).addClass('active');
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script> 
-  <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>  -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> -->
   <script src="{{asset('assets/js/admin/scripts.js')}}"></script>
-  <!-- <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>  -->
-  <!-- <script src="{{asset('assets/js/admin/datatables-simple-demo.js')}}"></script> -->
   <script src="https://cdn.datatables.net/1.12.0/js/jquery.dataTables.min.js"></script>
   @yield('footer_scipts')
 
