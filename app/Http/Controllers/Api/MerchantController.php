@@ -30,7 +30,8 @@ class MerchantController extends Controller
       'KEY' => 'required',
       'TXNID' => 'required',
       'AMOUNT' => 'required|numeric|min: 500|max: 50000',
-      'CUSTOMER_NAME' => 'bail|required|alpha|between:2,40',
+      'FIRST_NAME' => 'bail|required|alpha|between:2,40',
+      'LAST_NAME' => 'bail|required|alpha|between:2,40',
       'EMAIL' => 'required|email',
       'PHONE' => 'required|numeric|digits_between:10,12',
       'CRYPTO' => 'required|alpha|in:USDT,BTC,GAMERE',
@@ -60,7 +61,8 @@ class MerchantController extends Controller
     $key = $request->KEY;
     $txn_id = $request->TXNID;
     $amount = $request->AMOUNT;
-    $customer_name = $request->CUSTOMER_NAME;
+    $first_name = $request->FIRST_NAME;
+    $last_name = $request->LAST_NAME;
     $email = $request->EMAIL;
     $phone = $request->PHONE;
     $crypto = $request->CRYPTO;
@@ -97,7 +99,9 @@ class MerchantController extends Controller
       '|' .
       $amount .
       '|' .
-      $customer_name .
+      $first_name .
+      '|' .
+      $last_name .
       '|' .
       $email .
       '|' .
@@ -125,7 +129,7 @@ class MerchantController extends Controller
       '|' .
       $salt;
 
-    $hash_value = hash('sha256', $hash_string);
+    $hash_value = hash('sha512', $hash_string);
 
     if ($hash != $hash_value) {
       var_dump("hash value error");
@@ -144,7 +148,8 @@ class MerchantController extends Controller
       $user->key = $key;
       $user->txnid = $txn_id;
       $user->amount = $amount;
-      $user->cust_name = $customer_name;
+      $user->first_name = $first_name;
+      $user->last_name = $last_name;
       $user->email = $email;
       $user->phone = $phone;
       $user->crypto = $crypto;
@@ -169,9 +174,10 @@ class MerchantController extends Controller
       $deposit->network = $network;
       $deposit->remarks = $remarks;
       $deposit->is_client = 0;
-      $deposit->cust_name = $customer_name;
+      $deposit->first_name = $first_name;
+      $deposit->last_name = $last_name;
       $deposit->wallet = $address;
-      $deposit->order_id = strlen($customer_name) < 3 ? $customer_name . random_int(10000000, 99999999) : substr($customer_name, 0, 4) . random_int(10000000, 99999999);
+      $deposit->order_id = strlen($first_name) < 3 ? $first_name . random_int(10000000, 99999999) : substr($first_name, 0, 4) . random_int(10000000, 99999999);
       $deposit->caller_id = $merchant->id;
       $deposit->email = $email;
       $deposit->psp_id = 1;  // have to modify later based on routing logic
@@ -179,10 +185,10 @@ class MerchantController extends Controller
 
       // add third party bank calculation
       
-      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
+      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php'; // have to modify later based on routing logic
-      $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
+      $encData = urlencode(base64_encode("key=$psp_key&firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
       $verify_url = "https://coinsplashgifts.com/api/transaction/response.php";
       ProcessStatus::dispatch($deposit->id, $verify_url)->delay(Carbon::now()->addMinutes(10));
       return redirect()->away($url . "?encdata=" . $encData);
@@ -196,7 +202,8 @@ class MerchantController extends Controller
     $sample->key = $key;
     $sample->txnid = $txn_id;
     $sample->amount = $amount;
-    $sample->cust_name = $customer_name;
+    $sample->first_name = $first_name;
+    $sample->last_name = $last_name;
     $sample->email = $email;
     $sample->phone = $phone;
     $sample->crypto = $crypto;
@@ -210,7 +217,7 @@ class MerchantController extends Controller
     $sample->eurl = $eurl;
     $sample->curl = $curl;
     $sample->hash = $hash;
-    $sample->beneficiary_cd = $customer_name . random_int(10000000000, 99999999999);
+    $sample->beneficiary_cd = $first_name . random_int(10000000000, 99999999999);
     $sample->merchant_id = $merchant->id;
     $saved = $sample->save();
 
@@ -224,9 +231,10 @@ class MerchantController extends Controller
     $deposit->network = $network;
     $deposit->remarks = $remarks;
     $deposit->is_client = 0;
-    $deposit->cust_name = $customer_name;
+    $deposit->first_name = $first_name;
+    $deposit->last_name = $last_name;
     $deposit->wallet = $address;
-    $deposit->order_id = strlen($customer_name) < 3 ? $customer_name . random_int(10000000, 99999999) : substr($customer_name, 0, 4) . random_int(10000000, 99999999);
+    $deposit->order_id = strlen($first_name) < 3 ? $first_name . random_int(10000000, 99999999) : substr($first_name, 0, 4) . random_int(10000000, 99999999);
     $deposit->caller_id = $merchant->id;
     $deposit->email = $email;
     $deposit->psp_id = 1;  // have to modify later
@@ -236,17 +244,17 @@ class MerchantController extends Controller
     if ($email_status == 'verified' && $mobile_status == "verified" && $kyc_status != 'verified') {
       return redirect()->route('securepay.kyc', ['user_id' => $user_id, 'deposit_id' => $deposit->id]);
     } else if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
-      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
+      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
-      $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
+      $encData = urlencode(base64_encode("key=$psp_key&firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
       $awayUrl = $url . "?encdata=" . $encData;
       // return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
       return view('external_users.status_verify', compact('user_id', 'amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
     } else {
-      $valuecheck = $psp_key . "|*" .$deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . env('PSP_SALT');
+      $valuecheck = $psp_key . "|*" .$deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
-      $encData = urlencode(base64_encode("key=$psp_key&firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
+      $encData = urlencode(base64_encode("key=$psp_key&firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
       $awayUrl = $url . "?encdata=" . $encData;
       $verify_url = "https://coinsplashgifts.com/api/transaction/response.php";
@@ -306,7 +314,7 @@ class MerchantController extends Controller
   public function kycProcess(Request $request)
   {
     $user = External::where('id', $request->user_id)->first();
-    $user->cust_name = $request->cust_name;
+    $user->first_name = $request->first_name;
     $user->kyc_type = "veriff";
     $user->save();
 
@@ -361,9 +369,9 @@ class MerchantController extends Controller
 
       $psp_key = env("PSP_KEY");
       $deposit = Deposit::where('id', $request->deposit_id)->first();
-      $valuecheck = env("PSP_KEY") . "|*" .$deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($deposit->email) . "|*" . $user->phone . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
+      $valuecheck = env("PSP_KEY") . "|*" .$deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($deposit->email) . "|*" . $user->phone . "|*" . urldecode($deposit->first_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
-      $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$user->phone&amount=$deposit->amount&email=$deposit->email&txnid=$deposit->order_id&eurl=$eurl"));
+      $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->first_name&mobile=$user->phone&amount=$deposit->amount&email=$deposit->email&txnid=$deposit->order_id&eurl=$eurl"));
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
       $awayUrl = $url . "?encdata=" . $encData;
       $verify_url = "https://coinsplashgifts.com/api/transaction/response.php";
@@ -428,7 +436,7 @@ class MerchantController extends Controller
     $key = $request->KEY;
     $txn_id = $request->TXNID;
     $amount = $request->AMOUNT;
-    $customer_name = $request->CUSTOMER_NAME;
+    $first_name = $request->CUSTOMER_NAME;
     $email = $request->EMAIL;
     $phone = $request->PHONE;
     $crypto = $request->CURRENCY;
@@ -460,7 +468,7 @@ class MerchantController extends Controller
       '|' .
       $amount .
       '|' .
-      $customer_name .
+      $first_name .
       '|' .
       $email .
       '|' .
@@ -547,7 +555,7 @@ class MerchantController extends Controller
 
       $add_fields = array(
         "BENEFICIARY_CD" => $user->beneficiary_cd,
-        "BENE_NAME" => $user->cust_name,
+        "BENE_NAME" => $user->first_name,
         "MOBILE_NUMBER" => $user->phone,
         "EMAIL_ID" => $user->email,
         "BANK_NAME" => "YESB",
@@ -793,11 +801,11 @@ class MerchantController extends Controller
     $amount = $user->amount;
     $email = $user->email;
     $phone = $user->phone;
-    $customer_name = $user->cust_name;
+    $first_name = $user->first_name;
 
-    $valuecheck = $txn_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($customer_name) . "|*" . $SALT;
+    $valuecheck = $txn_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . $SALT;
     $eurl = hash('sha512', $valuecheck);
-    $encData = urlencode(base64_encode("firstname=$customer_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
+    $encData = urlencode(base64_encode("firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$txn_id&eurl=$eurl"));
     $url = $psp->name;
     $awayUrl = $url . "?encdata=" . $encData;
 
@@ -885,7 +893,7 @@ class MerchantController extends Controller
     $used_deposit = Deposit::where('email', $user->email)->where('wallet', $user->wallet)->first();
 
     // if present in DB, make transaction
-    $order_id = strlen($user->cust_name) < 3 ? $user->cust_name . random_int(10000000, 99999999) : substr($user->cust_name, 0, 4) . random_int(10000000, 99999999);
+    $order_id = strlen($user->first_name) < 3 ? $user->first_name . random_int(10000000, 99999999) : substr($user->first_name, 0, 4) . random_int(10000000, 99999999);
     $amount = $user->amount;
     $comment = "payout test";
   
@@ -1107,7 +1115,7 @@ class MerchantController extends Controller
     $customerEmail = $user->email;
     $customerPhone = $user->phone;
     $productinfo = 'GAMERER';
-    $customerName = $user->cust_name;
+    $customerName = $user->first_name;
     $customerId = $orderId;
 
     $gwUrl = 'https://uat.cashlesso.com/pgws/upi/initiateCollect';
@@ -1185,7 +1193,7 @@ class MerchantController extends Controller
     $aDeposit->pay_id = $pay_id;
     $aDeposit->order_id = $orderId;
     $aDeposit->amount = $orderAmount;
-    $aDeposit->cust_name = $customerName;
+    $aDeposit->first_name = $customerName;
     $aDeposit->hash = $responsePayment->HASH;
     $aDeposit->email = $customerEmail;
     $aDeposit->phone = $customerPhone;

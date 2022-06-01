@@ -80,13 +80,6 @@ class UserController extends Controller
           return '<span class="alert-warning py-1 px-2 rounded">Pending</span>';
         }
       })
-      ->addColumn('full_name', function($user) {
-        if (empty($user->first_name)) {
-          return $user->cust_name;
-        } else {
-          return $user->first_name . "   " . $user->last_name;
-        }
-      })
       ->addColumn('mobile', function($user) {
         if (!empty($user->mobile)) {
           return $user->mobile;

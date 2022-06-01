@@ -130,7 +130,7 @@ $(document).on('click', '#mobile_submit', function() {
                 submit_value: $('#mobile_code').val(),
                 mobile_number: $('#mobile_number').val(),
                 wallet_address: $('#wallet_address').val(),
-                cust_name: $('#remarks').val(),
+                first_name: $('#remarks').val(),
             },
             success: function(resp) {
                 if (resp.status == "success") {

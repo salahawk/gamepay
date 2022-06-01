@@ -120,7 +120,7 @@
                     },
                     method: "post",
                     data: {
-                        cust_name: $("#veriff-given-name").val(),
+                        first_name: $("#veriff-given-name").val(),
                         user_id: "{{ $user_id }}",
                         veriff_id: response.verification.id,
                         veriff_url: response.verification.url,

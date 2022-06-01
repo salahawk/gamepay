@@ -73,7 +73,8 @@ class ClientController extends Controller
     $deposit->remarks = $request->remarks;
     $deposit->inr_value = $request->inr_value;
     $deposit->is_client = 1;
-    $deposit->cust_name = $test->first_name;
+    $deposit->first_name = $test->first_name;
+    $deposit->last_name = $test->last_name;
     $deposit->wallet = $request->wallet_address;
     $deposit->order_id = strlen($test->first_name) < 3 ? $test->first_name . random_int(10000000, 99999999) : substr($test->first_name, 0, 4) . random_int(10000000, 99999999);
     $deposit->caller_id = $psp->client_id;
@@ -83,10 +84,10 @@ class ClientController extends Controller
 
 
     // add third party bank calculation
-    $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($test->email) . "|*" . $test->mobile . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
+    $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($test->email) . "|*" . $test->mobile . "|*" . urldecode($deposit->first_name) . "|*" . env('PSP_SALT');
     $hash = hash('sha512', $valuecheck);
     $url = $psp->deposit_url;
-    $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$test->mobile&amount=$deposit->amount&email=$test->email&txnid=$deposit->order_id&eurl=$hash"));
+    $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->first_name&mobile=$test->mobile&amount=$deposit->amount&email=$test->email&txnid=$deposit->order_id&eurl=$hash"));
     ProcessStatus::dispatch($deposit->id, $psp->deposit_inquiry_url)->delay(Carbon::now()->addMinutes(10));
     return response()->json(['status' => 'success', 'url' => $url . "?encdata=" . $encData]);
   }
@@ -122,7 +123,8 @@ class ClientController extends Controller
     $deposit->remarks = $request->remarks;
     $deposit->inr_value = $request->inr_value;
     $deposit->is_client = 1;
-    $deposit->cust_name = $user->first_name;
+    $deposit->first_name = $user->first_name;
+    $deposit->last_name = $user->last_name;
     $deposit->wallet = $request->wallet_address;
     $deposit->order_id = strlen($user->first_name) < 3 ? $user->first_name . random_int(10000000, 99999999) : substr($user->first_name, 0, 4) . random_int(10000000, 99999999);
     $deposit->caller_id = $psp->client_id;
@@ -163,10 +165,10 @@ class ClientController extends Controller
       }
 
       // add third party bank calculation
-      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($user->email) . "|*" . $user->mobile . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
+      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($user->email) . "|*" . $user->mobile . "|*" . urldecode($deposit->first_name) . "|*" . env('PSP_SALT');
       $hash = hash('sha512', $valuecheck);
       $url = $psp->deposit_url;
-      $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
+      $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->first_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
       ProcessStatus::dispatch($deposit->id, $psp->deposit_inquiry_url)->delay(Carbon::now()->addMinutes(10));
       return response()->json(['status' => 'success', 'url' => $url . "?encdata=" . $encData]);
     }
@@ -222,10 +224,10 @@ class ClientController extends Controller
 
       $deposit = Deposit::where('id', $user->current_deposit_id)->first();
 
-      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($user->email) . "|*" . $user->mobile . "|*" . urldecode($deposit->cust_name) . "|*" . env('PSP_SALT');
+      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($user->email) . "|*" . $user->mobile . "|*" . urldecode($deposit->first_name) . "|*" . env('PSP_SALT');
       $hash = hash('sha512', $valuecheck);
       $url = $psp->deposit_url;
-      $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->cust_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
+      $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->first_name&mobile=$user->mobile&amount=$deposit->amount&email=$user->email&txnid=$deposit->order_id&eurl=$hash"));
       ProcessStatus::dispatch($deposit->id, $psp->deposit_inquiry_url)->delay(Carbon::now()->addMinutes(10));
       return response()->json(['status' => 'success', 'data' => $url . "?encdata=" . $encData]);
     } else {
@@ -908,7 +910,7 @@ class ClientController extends Controller
     $customerEmail = $deposit->user->email;
     $customerPhone = $deposit->user->mobile;
     $productinfo = 'GAMERE';
-    $customerName = $deposit->cust_name;
+    $customerName = $deposit->first_name;
     $customerId = $orderId;
 
     $gwUrl = 'https://uat.cashlesso.com/pgws/upi/initiateCollect';
