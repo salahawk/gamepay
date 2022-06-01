@@ -43,6 +43,9 @@ class DepositController extends Controller
         return $deposit->created_at->format('Y-m-d H:i:s');
       })
       ->addColumn('color_status', function ($deposit) {
+        if ($deposit->status == "Success" && $deposit->is_missed == 1) {
+          return '<span class="text-warning">Missed</span>';
+        }
         if ($deposit->status == "Success") {
           return '<span class="text-success">' . $deposit->status . '</span>';
         } else if ($deposit->status == "Pending") {

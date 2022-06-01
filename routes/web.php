@@ -89,8 +89,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
     Route::post('users/data', 'UserController@data')->name('users.data');
     Route::get('users/kyc', 'UserController@kyc')->name('users.kyc');
     Route::post('users/kyc/kycData', 'UserController@kycData')->name('users.kycData');
-    // Route::get('users', 'UserController@kycData')->name('users');
-
+    Route::get('users/kyc/verify', 'UserController@kycVerify')->name('users.kyc.verify');
+    Route::get('users/kyc/cancel', 'UserController@kycCancel')->name('users.kyc.cancel');
+    Route::post('users/kyc/remarks', 'UserController@remarks')->name('users.remarks');
+    Route::get('users/pan/verify', 'UserController@panVerify')->name('users.pan.verify');
+    Route::get('users/pan/cancel', 'UserController@panCancel')->name('users.pan.cancel');
 });
 //-------------------------------- Super Admin end -------------------------------------------//
 

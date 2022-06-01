@@ -98,6 +98,7 @@
                 <th>Status</th>
                 <th>Remarks Proof</th>
                 <th>Bank Proof</th>
+                <th>Status</th>
                 <th>Remarks Bank</th>
               </tr>
             </thead>
@@ -146,8 +147,8 @@
         name: 'proof2'
       },
       {
-        data: 'status',
-        name: 'status'
+        data: 'proof_status',
+        name: 'proof_status'
       },
       {
         data: 'remarks_proof',
@@ -156,6 +157,10 @@
       {
         data: 'bank_proof',
         name: 'bank_proof'
+      },
+      {
+        data: 'bank_status',
+        name: 'pan_status'
       },
       {
         data: 'remarks_bank',

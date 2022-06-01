@@ -92,8 +92,7 @@
           <table id="datatablesSimple" class="table table-responsive">
             <thead>
               <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
+                <th>Full Name</th>
                 <th>Email </th>
                 <th>Mobile</th>
                 <th>KYC Status</th>
@@ -136,12 +135,8 @@
       }
     },
     columns: [{
-        data: 'first_name',
-        name: 'first_name'
-      },
-      {
-        data: 'last_name',
-        name: 'last_name'
+        data: 'full_name',
+        name: 'cust_name'
       },
       {
         data: 'email',
