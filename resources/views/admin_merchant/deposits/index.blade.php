@@ -56,6 +56,7 @@
         <div class="col-6 col-md-4 mb-3">
           <div class="form-group mb-4 mb-md-0">
             <select class="form-control" id="status">
+              <option value="0">Status</option>  
               <option value="Success">Succeeded</option>
               <option value="Failure">Failed</option>
               <option value="Rejected">Rejected</option>
