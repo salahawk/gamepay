@@ -508,7 +508,7 @@ class MerchantController extends Controller
     $hash_value = hash('sha256', $hash_string);
     // print_r($hash_value); 
     if ($hash != $hash_value) {
-      return response()->json(['status' => 'fail', 'error' => 'Hash error', 'hash_string' => $hash_string, 'hash_value' => $hash_value]);
+      return response()->json(['status' => 'fail', 'error' => 'Hash error', 'hash_string' => $hash_string, 'hash_value' => $hash_value, "str" => $request->STR]);
     }
 
 
@@ -649,10 +649,10 @@ class MerchantController extends Controller
           curl_close($curl);
           $json_resp0 = json_decode($response0);
           if (empty($json_resp0->STATUS)) {
-            return response()->json(['status' => 'fail', 'data' => $json_resp0]);
+            return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'second add empty']);
           }
           if ($json_resp0->STATUS != "Success") {
-            return response()->json(['status' => 'fail', 'data' => $json_resp0]);
+            return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'second add empty']);
           }
         } 
       } else {
@@ -679,11 +679,11 @@ class MerchantController extends Controller
         $json_resp0 = json_decode($response0);
   
         if (empty($json_resp0->STATUS)) {
-          return response()->json(['status' => 'fail', 'data' => $json_resp0]);
+          return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'adding new empty']);
         }
   
         if ($json_resp0->STATUS != "Success") {
-          return response()->json(['status' => 'fail', 'data' => $json_resp0]);
+          return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'adding new fail']);
         }
       }
 
