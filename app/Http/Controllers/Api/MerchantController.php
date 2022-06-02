@@ -606,8 +606,9 @@ class MerchantController extends Controller
       }
       
       if ($this->verifyPayout($user->beneficiary_cd)) { // first check if it exists
-        return response()->json(['status' => 'exist', 'data' => $redo]);
+        
         if ($redo) {    // bank detail changed?
+          return response()->json(['status' => 'redo', 'data' => $redo]);
           // terminate & add new
           $curl = curl_init();   // first terminate
           curl_setopt_array($curl, array(
