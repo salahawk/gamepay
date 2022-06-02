@@ -147,8 +147,8 @@
         data["from"] = $('#from').val(),
           data['to'] = $("#to").val();
         data['email'] = $("#category").val() == 1 ? $(".field").val() : "";
-        data['status'] = $("#status").val() == 0 ? "" : $("#status").val();
-        data['order_id'] = $("#category").val() == 2 ? $(".field").val() : "";
+        // data['status'] = $("#status").val() == 0 ? "" : $("#status").val();
+        // data['order_id'] = $("#category").val() == 2 ? $(".field").val() : "";
       }
     },
     columns: [{
