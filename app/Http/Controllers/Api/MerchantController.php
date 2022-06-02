@@ -142,6 +142,7 @@ class MerchantController extends Controller
       ->where('email_status', 'verified')
       ->where('kyc_status', 'verified')
       ->where('mobile_status', 'verified')
+      ->where('merchant_id', $merchant->id)
       ->first();
 
     if (!empty($user)) {
