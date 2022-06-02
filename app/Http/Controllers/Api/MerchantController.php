@@ -606,6 +606,7 @@ class MerchantController extends Controller
       }
       
       if ($this->verifyPayout($user->beneficiary_cd)) { // first check if it exists
+        return response()->json(['status' => 'exist', 'data' => $redo]);
         if ($redo) {    // bank detail changed?
           // terminate & add new
           $curl = curl_init();   // first terminate
@@ -657,6 +658,7 @@ class MerchantController extends Controller
         } 
       } else {
         // add new beneficiary code
+        return response()->json(['status' => 'no exist', 'data' => $redo]);
         $curl = curl_init();
         curl_setopt_array($curl, array(
           CURLOPT_URL => $add_url,
