@@ -35,9 +35,9 @@ class UserController extends Controller
         $users = External::where('merchant_id', Session::get('merchant_id'))
             ->where('created_at', '>=', $from . " 00:00:00")
             ->where('created_at', '<=', $to . " 23:59:59")
-            ->where('pan_status', $status_sign, $status)
+            // ->where('status', $status_sign, $status)
             ->where('email', $email_sign, $email)
-            ->where('account_no', $order_id_sign, $order_id)
+            // ->where('account_no', $order_id_sign, $order_id)
             ->orderby('created_at', 'desc')->select('*');
         return DataTables::of($users)
             ->make(true);
