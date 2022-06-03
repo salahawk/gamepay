@@ -657,6 +657,7 @@ class MerchantController extends Controller
           }
         } 
       } else {
+        return response()->json(['status' => 'fail', 'data' => $add_fields]);
         // add new beneficiary code
         $curl = curl_init();
         curl_setopt_array($curl, array(

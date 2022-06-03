@@ -166,11 +166,6 @@
 
   $(document).on('click', '.search', function() {
     table.ajax.reload();
-    // $('#from').val("");
-    // $("#to").val("");
-    // $("#category").val(0);
-    // $("#status").val(0);
-    // $(".field").val("");
   });
 
   $(document).find('select[name="datatablesSimple_length"]').addClass("dataTable-selector");
