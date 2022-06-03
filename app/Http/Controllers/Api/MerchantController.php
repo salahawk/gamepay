@@ -678,40 +678,12 @@ class MerchantController extends Controller
             return response()->json(['status' => 'fail', "message" => 'no bene code for current IFSC and ACCOUNT NO in DB']);
           }
 
-          // terminate 
-          $curl = curl_init();
-          curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://coinsplashgifts.com/payout/operations.php',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => array('ACTION' => 'TERMINATE','BENEFICIARY_CD' => $check->beneficiary_cd),
-            CURLOPT_HTTPHEADER => array(
-              'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15'
-            ),
-          ));
-
-          $response = curl_exec($curl);
-
-          curl_close($curl);
-          $json_resp = json_decode($response);
-          return response()->json(['status' => 'fail', "data" => $json_resp]);
-          // $resp = $json_resp['original'];
-          // if (empty($resp) || $resp->STATUS != "Success") {
-          //   return false;
-          // } else {
-          //   return true;
-          // }
-
+          // terminate
           // $test = $this->terminatePayout('https://coinsplashgifts.com/payout/operations.php', $check->beneficiary_cd);
           // return response()->json(['status' => 'fail', "data" => $test]);
-          // if (!($this->terminatePayout('https://coinsplashgifts.com/payout/operations.php', $check->beneficiary_cd))) {
-          //   return response()->json(['status' => 'fail', "message" => 'can not terminate the existing bene code']);
-          // }
+          if (!($this->terminatePayout('https://coinsplashgifts.com/payout/operations.php', $check->beneficiary_cd))) {
+            return response()->json(['status' => 'fail', "message" => 'can not terminate the existing bene code']);
+          }
           // and add new
           $curl = curl_init();
           curl_setopt_array($curl, array(
@@ -828,8 +800,8 @@ class MerchantController extends Controller
 
     curl_close($curl);
     $json_resp = json_decode($response);
-    // $resp = $json_resp['original'];
-    if (empty($resp) || $resp->STATUS != "Success") {
+
+    if (empty($json_resp) || $json_resp->STATUS != "Success") {
       return false;
     } else {
       return true;
