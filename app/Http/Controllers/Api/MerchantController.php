@@ -667,9 +667,9 @@ class MerchantController extends Controller
         if (substr($json_resp0->PG_TXN_MESSAGE, 0, 30) == "Beneficiary already exists for" && $json_resp0->STATUS == "Failed") {
           // find matching bene code and terminate and add again.
           if ($added_bank_detail = "account") {
-            $check = External::where('ifsc', $user->ifsc)->where('account_no', $user->account_no)->first();
+            $check = External::where('ifsc', $user->ifsc)->where('account_no', $user->account_no)->where('email', "<>", $user->email)->first();
           } else {
-            $check = External::where('payer_address', $user->payer_address)->first();
+            $check = External::where('payer_address', $user->payer_address)->where('email', "<>", $user->email)->first();
           }
 
           if (empty($check)) {
