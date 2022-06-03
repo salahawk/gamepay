@@ -698,10 +698,10 @@ class MerchantController extends Controller
           curl_close($curl);
           $json_resp0 = json_decode($response0);
           if (empty($json_resp0->STATUS)) {
-            return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'second add empty']);
+            return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'third add empty']);
           }
           if ($json_resp0->STATUS != "Success") {
-            return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'second add empty']);
+            return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'third add empty']);
           }
         } else {
           if (empty($json_resp0->STATUS)) {
