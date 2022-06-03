@@ -670,12 +670,19 @@ class MerchantController extends Controller
           // find matching bene code and terminate and add again.
           if ($added_bank_detail = "account") {
             $check = External::where('ifsc', $user->ifsc)->where('account_no', $user->account_no)->where('email', "<>", $user->email)->first();
+            if (empty($check)) {
+              return response()->json(['status' => 'fail', "message" => 'no bene code for current IFSC and ACCOUNT NO in DB']);
+            }
+            $check->ifsc = '';
+            $check->account_no = '';
+            $check->save();
           } else {
             $check = External::where('payer_address', $user->payer_address)->where('email', "<>", $user->email)->first();
-          }
-
-          if (empty($check)) {
-            return response()->json(['status' => 'fail', "message" => 'no bene code for current IFSC and ACCOUNT NO in DB']);
+            if (empty($check)) {
+              return response()->json(['status' => 'fail', "message" => 'no bene code for current IFSC and ACCOUNT NO in DB']);
+            }
+            $check->payer_address = '';
+            $check->save();
           }
 
           // terminate
