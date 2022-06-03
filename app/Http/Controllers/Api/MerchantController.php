@@ -794,6 +794,7 @@ class MerchantController extends Controller
     ));
     $response = curl_exec($curl);
     curl_close($curl);
+    return response()->json(['status'=>'fail', 'data'=>$response]);
   }
 
   public function pan(Request $request)
