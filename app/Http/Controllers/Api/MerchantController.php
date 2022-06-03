@@ -657,7 +657,7 @@ class MerchantController extends Controller
           }
         } 
       } else {
-        return response()->json(['status' => 'fail', 'data' => $add_fields]);
+        
         // add new beneficiary code
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -679,7 +679,7 @@ class MerchantController extends Controller
         curl_close($curl);
   
         $json_resp0 = json_decode($response0);
-  
+        return response()->json(['status' => 'fail', 'data' => $json_resp0]);
         if (empty($json_resp0->STATUS)) {
           return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'adding new empty']);
         }
