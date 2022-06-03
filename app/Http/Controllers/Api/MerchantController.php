@@ -679,8 +679,8 @@ class MerchantController extends Controller
           }
 
           // terminate 
-          $test = $this->terminatePayout('https://coinsplashgifts.com/payout/operations.php', $check->beneficiary_cd);
-          return response()->json(['status' => 'fail', "data" => $test]);
+          // $test = $this->terminatePayout('https://coinsplashgifts.com/payout/operations.php', $check->beneficiary_cd);
+          // return response()->json(['status' => 'fail', "data" => $test]);
           if (!($this->terminatePayout('https://coinsplashgifts.com/payout/operations.php', $check->beneficiary_cd))) {
             return response()->json(['status' => 'fail', "message" => 'can not terminate the existing bene code']);
           }
@@ -780,7 +780,7 @@ class MerchantController extends Controller
   }
 
   protected function terminatePayout($url, $bene_code) {
-    $curl = curl_init();   
+    $curl = curl_init();
     curl_setopt_array($curl, array(
       CURLOPT_URL => $url,
       CURLOPT_RETURNTRANSFER => true,
@@ -790,20 +790,17 @@ class MerchantController extends Controller
       CURLOPT_FOLLOWLOCATION => true,
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
       CURLOPT_CUSTOMREQUEST => 'POST',
-      CURLOPT_POSTFIELDS => array(
-        'BENEFICIARY_CD' => $bene_code,
-        'ACTION' => 'TERMINATE'
-      ),
+      CURLOPT_POSTFIELDS => array('ACTION' => 'TERMINATE','BENEFICIARY_CD' => $bene_code),
       CURLOPT_HTTPHEADER => array(
         'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15'
       ),
     ));
+
     $response = curl_exec($curl);
-    
+
     curl_close($curl);
     $json_resp = json_decode($response);
     // $resp = $json_resp['original'];
-    return response()->json(['status' => 'fail', 'data' => $json_resp]);
     if (empty($resp) || $resp->STATUS != "Success") {
       return false;
     } else {
