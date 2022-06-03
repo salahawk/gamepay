@@ -801,7 +801,7 @@ class MerchantController extends Controller
     $response = curl_exec($curl);
     
     curl_close($curl);
-    $json_resp = json_decode($response)->original;
+    $json_resp = json_decode($response)['original'];
     return response()->json(['status' => 'fail', 'data' => $json_resp]);
     if (empty($json_resp) || $json_resp->STATUS != "Success") {
       return false;
