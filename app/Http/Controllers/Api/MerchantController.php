@@ -613,7 +613,9 @@ class MerchantController extends Controller
         
         if ($redo) {    // bank detail changed?
           // terminate & add new
-          $this->terminatePayout('https://coinsplashgifts.com/payout/terminate.php', $user->beneficiary_cd);
+          if (!($this->terminatePayout('https://coinsplashgifts.com/payout/operations.php', $user->beneficiary_cd))) {
+            return response()->json(['status' => 'fail', "message" => 'can not terminate the existing bene code in redo']);
+          }
           
           // second add
           $curl = curl_init();
