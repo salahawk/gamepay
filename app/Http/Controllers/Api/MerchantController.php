@@ -184,8 +184,8 @@ class MerchantController extends Controller
       $deposit->psp_id = 1;  // have to modify later based on routing logic
       $deposit->save();
 
-      // add third party bank calculation
       
+      // add third party bank calculation
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php'; // have to modify later based on routing logic
@@ -221,6 +221,31 @@ class MerchantController extends Controller
     $sample->beneficiary_cd = $first_name . random_int(10000000000, 99999999999);
     $sample->merchant_id = $merchant->id;
     $saved = $sample->save();
+
+    // if kyc verified, save image from merchant
+    if ($kyc_status == "verified") {
+      if (empty($user->front_img) || empty($user->back_img) || empty($user->pan_front) || empty($user->pan_back)) {
+        
+      }
+      $curl = curl_init();
+      curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://www.jungleraja.com/api/v1/admin/docs/types',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => array('email' => 'Jonydony108@gmail.com'),
+      ));
+
+      $response = curl_exec($curl);
+
+      curl_close($curl);
+      $json_resp = json_decode($response);
+      return response()->json(['status' => 'api', 'data' => $json_resp]);
+    }
 
     $user_id = $sample->id;
 
