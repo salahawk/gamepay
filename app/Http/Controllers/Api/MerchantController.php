@@ -532,6 +532,8 @@ class MerchantController extends Controller
     $user->address = $request->SENDER;
     $user->receiver = $request->RECEIVER;
     $user->txn_hash = $request->TXN_HASH;
+    $user->first_name = $first_name;
+    $user->phone = $phone;
     
     if ($request->PAN_STATUS != 'verified') {
       if (!empty($request->IFSC)) {
@@ -553,7 +555,7 @@ class MerchantController extends Controller
       $redo_ifsc = false;
       $redo_account_no = false;
       $redo_payer_address = false;
-
+      $added_bank_detail = "";
       $add_fields = array(
         "BENEFICIARY_CD" => $user->beneficiary_cd,
         "BENE_NAME" => $user->first_name,
@@ -593,7 +595,8 @@ class MerchantController extends Controller
       
       // add preparation
       $add_url = "https://coinsplashgifts.com/payout/addben.php"; // have to select url based on routing logic
-      if ($redo_payer_address) { 
+      if ($redo_payer_address) {
+        $added_bank_detail == "payer";
         $add_fields['PAYER_ADDRESS'] = $user->payer_address;
       }
 
@@ -602,6 +605,7 @@ class MerchantController extends Controller
       }
 
       if ($redo_ifsc) { 
+        $added_bank_detail = "ifsc";
         $add_fields['IFSC_CODE'] = $user->ifsc;
       }
       
@@ -609,26 +613,7 @@ class MerchantController extends Controller
         
         if ($redo) {    // bank detail changed?
           // terminate & add new
-          $curl = curl_init();   // first terminate
-          curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://coinsplashgifts.com/payout/terminate.php',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => array(
-              'BENEFICIARY_CD' => $user->beneficiary_cd,
-              'ACTION' => 'TERMINATE'
-            ),
-            CURLOPT_HTTPHEADER => array(
-              'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15'
-            ),
-          ));
-          $response = curl_exec($curl);
-          curl_close($curl);
+          $this->terminatePayout('https://coinsplashgifts.com/payout/terminate.php', $user->beneficiary_cd);
           
           // second add
           $curl = curl_init();
@@ -657,7 +642,6 @@ class MerchantController extends Controller
           }
         } 
       } else {
-        
         // add new beneficiary code
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -679,13 +663,54 @@ class MerchantController extends Controller
         curl_close($curl);
   
         $json_resp0 = json_decode($response0);
-        return response()->json(['status' => 'fail', 'data' => $json_resp0]);
-        if (empty($json_resp0->STATUS)) {
-          return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'adding new empty']);
-        }
-  
-        if ($json_resp0->STATUS != "Success") {
-          return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'adding new fail']);
+        
+        if (substr($json_resp0->PG_TXN_MESSAGE, 0, 30) == "Beneficiary already exists for" && $json_resp0->STATUS == "Failed") {
+          // find matching bene code and terminate and add again.
+          if ($added_bank_detail = "account") {
+            $check = External::where('ifsc', $user->ifsc)->where('account_no', $user->account_no)->first();
+          } else {
+            $check = External::where('payer_address', $user->payer_address)->first();
+          }
+
+          if (empty($check)) {
+            return response()->json(['status' => 'fail', "message" => 'no bene code for current IFSC and ACCOUNT NO in DB']);
+          }
+
+          // terminate 
+          $this->terminatePayout('https://coinsplashgifts.com/payout/terminate.php', $check->beneficiary_cd);
+          // and add new
+          $curl = curl_init();
+          curl_setopt_array($curl, array(
+            CURLOPT_URL => $add_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $add_fields,
+            CURLOPT_HTTPHEADER => array(
+              'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15',
+            ),
+          ));
+          $response0 = curl_exec($curl);
+          curl_close($curl);
+          $json_resp0 = json_decode($response0);
+          if (empty($json_resp0->STATUS)) {
+            return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'second add empty']);
+          }
+          if ($json_resp0->STATUS != "Success") {
+            return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'second add empty']);
+          }
+        } else {
+          if (empty($json_resp0->STATUS)) {
+            return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'adding new empty']);
+          }
+    
+          if ($json_resp0->STATUS != "Success") {
+            return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'adding new fail']);
+          }
         }
       }
 
@@ -746,6 +771,29 @@ class MerchantController extends Controller
     } else {
       return true;
     }
+  }
+
+  protected function teminatePayout($url, $bene_code) {
+    $curl = curl_init();   
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => $url,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_ENCODING => '',
+      CURLOPT_MAXREDIRS => 10,
+      CURLOPT_TIMEOUT => 0,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => 'POST',
+      CURLOPT_POSTFIELDS => array(
+        'BENEFICIARY_CD' => $bene_code,
+        'ACTION' => 'TERMINATE'
+      ),
+      CURLOPT_HTTPHEADER => array(
+        'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15'
+      ),
+    ));
+    $response = curl_exec($curl);
+    curl_close($curl);
   }
 
   public function pan(Request $request)
