@@ -610,6 +610,7 @@ class MerchantController extends Controller
       }
       
       if ($this->verifyPayout($user->beneficiary_cd)) { // first check if it exists
+        
         if ($redo) {    // bank detail changed?
           // terminate & add new
           if (!($this->terminatePayout('https://coinsplashgifts.com/payout/operations.php', $user->beneficiary_cd))) {
@@ -676,7 +677,7 @@ class MerchantController extends Controller
           if (empty($check)) {
             return response()->json(['status' => 'fail', "message" => 'no bene code for current IFSC and ACCOUNT NO in DB']);
           }
-          return response()->json(['status' => 'fail', "data" => $check->beneficiary_cd]);
+
           // terminate
           if (!($this->terminatePayout('https://coinsplashgifts.com/payout/operations.php', $check->beneficiary_cd))) {
             return response()->json(['status' => 'fail', "message" => 'can not terminate the existing bene code']);
