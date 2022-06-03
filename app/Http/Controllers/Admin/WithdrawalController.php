@@ -43,9 +43,10 @@ class WithdrawalController extends Controller
       ->addColumn('status', function ($payout) {
         if (!empty($payout->status)) {
           return $payout->status;
+        } else {
+          return '<a type="button" href="' . route('admin.withdrawals.release') . '?id=' . $payout->id . '" class="btn btn-primary">Release</a>
+                  <a type="button" class="btn btn-outline-primary">Reject</a>';
         }
-        return '<a type="button" href="' . route('admin.withdrawals.release') . '?id=' . $payout->id . '" class="btn btn-primary">Release</a>
-                <a type="button" class="btn btn-outline-primary">Reject</a>';
       })
       ->rawColumns(['status'])
       ->make(true);
