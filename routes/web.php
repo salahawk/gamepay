@@ -81,9 +81,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace'=>'Admin'], func
 
     Route::get('withdrawals', 'WithdrawalController@index')->name('withdrawals');
     Route::post('withdrawals/data', 'WithdrawalController@data')->name('withdrawals.data');
-    Route::post('withdrawals/release', 'WithdrawalController@release')->name('withdrawals.release');
-    Route::get('withdrawals/missed', 'DepositController@missed')->name('withdrawals.missed');
-    Route::post('withdrawals/missed/data', 'DepositController@missedData')->name('withdrawals.missed.data');
+    Route::get('withdrawals/release', 'WithdrawalController@release')->name('withdrawals.release');
+    Route::get('withdrawals/missed', 'WithdrawalController@missed')->name('withdrawals.missed');
+    Route::post('withdrawals/missed/data', 'WithdrawalController@missedData')->name('withdrawals.missed.data');
 
     Route::get('users', 'UserController@users')->name('users');
     Route::post('users/data', 'UserController@data')->name('users.data');

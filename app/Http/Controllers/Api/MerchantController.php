@@ -608,7 +608,6 @@ class MerchantController extends Controller
       if ($this->verifyPayout($user->beneficiary_cd)) { // first check if it exists
         
         if ($redo) {    // bank detail changed?
-          return response()->json(['status' => 'redo', 'data' => $redo]);
           // terminate & add new
           $curl = curl_init();   // first terminate
           curl_setopt_array($curl, array(
@@ -659,7 +658,6 @@ class MerchantController extends Controller
         } 
       } else {
         // add new beneficiary code
-        return response()->json(['status' => 'no exist', 'data' => $redo]);
         $curl = curl_init();
         curl_setopt_array($curl, array(
           CURLOPT_URL => $add_url,
@@ -705,6 +703,9 @@ class MerchantController extends Controller
       $payout->is_external = 1;
       $payout->caller_id = 1; //$used_deposit->caller_id;
       $payout->psp_id = 1; //$used_deposit->psp_id;
+      $payout->txn_payment_type = $payment_type;
+      $payout->beneficiary_cd = $user->beneficiary_cd;
+      $payout->order_id = strlen($user->first_name) < 3 ? $user->first_name . random_int(10000000, 99999999) : substr($user->first_name, 0, 4) . random_int(10000000, 99999999);
       $saved = $payout->save();
       // return redirect()->route('securepay.payout.add', ['user_id' => $user->id, 'payment_type' => $payment_type]); // send with payment type flag
       return response()->json(['status' => 'success', 'message' => 'Please wait until the admin does the payout']);
@@ -827,68 +828,6 @@ class MerchantController extends Controller
         ->with('pan_back', $request->pan_back);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /////////////////////////// LESS JUNK ///////////////////////////
-  
-  public function sendEmailOtp(Request $request)
-  {
-    $random_code = random_int(100000, 999999);
-    $email = $request->email_address;
-    $data = ['name' => 'Verification', 'code' => $random_code];
-    $aUser = External::where('id', $request->user_id)->first();
-
-    if (empty($aUser)) {
-      return response()->json(['status' => 'fail']);
-    }
-
-    // Mail::send('merchants.email-otp', $data, function ($message) use (
-    //     $email
-    // ) {
-    //     $message
-    //         ->to($email, 'GAMERE')
-    //         ->subject('GAMERE email confirming request');
-    //     $message->from('JAX@gamepay.com', 'GAMERE');
-    // });
-
-    $aUser->email = $email;
-    $aUser->otp_value = $random_code;
-    $aUser->save();
-
-    return response()->json(['status' => 'success']);
-  }
-
-  public function submitEmailOtp(Request $request)
-  {
-    $aUser = External::where('id', $request->user_id)->first();
-
-    if (empty($aUser)) {
-      return response()->json(['status' => 'fail']);
-    }
-
-    if ($aUser->otp_value == $request->submit_value) {
-      $aUser->email_status = 'verified';
-      $aUser->save();
-      return response()->json(['status' => 'success']);
-    } else {
-      return response()->json(['status' => 'fail']);
-    }
-  }
-
   public function addPayout(Request $request)
   {
     $user = External::where('id', $request->user_id)->first();
@@ -960,6 +899,68 @@ class MerchantController extends Controller
       return response()->json(['status' => 'false', 'data' => $json_resp]);
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /////////////////////////// LESS JUNK ///////////////////////////
+  
+  public function sendEmailOtp(Request $request)
+  {
+    $random_code = random_int(100000, 999999);
+    $email = $request->email_address;
+    $data = ['name' => 'Verification', 'code' => $random_code];
+    $aUser = External::where('id', $request->user_id)->first();
+
+    if (empty($aUser)) {
+      return response()->json(['status' => 'fail']);
+    }
+
+    // Mail::send('merchants.email-otp', $data, function ($message) use (
+    //     $email
+    // ) {
+    //     $message
+    //         ->to($email, 'GAMERE')
+    //         ->subject('GAMERE email confirming request');
+    //     $message->from('JAX@gamepay.com', 'GAMERE');
+    // });
+
+    $aUser->email = $email;
+    $aUser->otp_value = $random_code;
+    $aUser->save();
+
+    return response()->json(['status' => 'success']);
+  }
+
+  public function submitEmailOtp(Request $request)
+  {
+    $aUser = External::where('id', $request->user_id)->first();
+
+    if (empty($aUser)) {
+      return response()->json(['status' => 'fail']);
+    }
+
+    if ($aUser->otp_value == $request->submit_value) {
+      $aUser->email_status = 'verified';
+      $aUser->save();
+      return response()->json(['status' => 'success']);
+    } else {
+      return response()->json(['status' => 'fail']);
+    }
+  }
+
+  
   ////////////////////////////// JUNK ////////////////////////////
   public function responseCashlesso(Request $request)
   {
