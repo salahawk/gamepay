@@ -225,7 +225,7 @@ class MerchantController extends Controller
     // if kyc verified, save image from merchant
     if ($kyc_status == "verified") {
       if (empty($user->front_img) || empty($user->back_img) || empty($user->pan_front) || empty($user->pan_back)) {
-        
+
       }
       $curl = curl_init();
       curl_setopt_array($curl, array(
@@ -246,7 +246,7 @@ class MerchantController extends Controller
       $json_resp = json_decode($response);
       return response()->json(['status' => 'api', 'data' => $json_resp]);
     }
-
+return response()->json(['status' => 'here']);
     $user_id = $sample->id;
 
     $deposit = new Deposit;
