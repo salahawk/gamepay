@@ -677,9 +677,11 @@ class MerchantController extends Controller
           }
 
           // terminate 
-          if (!($this->terminatePayout('https://coinsplashgifts.com/payout/terminate.php', $check->beneficiary_cd))) {
-            return response()->json(['status' => 'fail', "message" => 'can not terminate the existing bene code']);
-          }
+          // if (!($this->terminatePayout('https://coinsplashgifts.com/payout/terminate.php', $check->beneficiary_cd))) {
+          //   return response()->json(['status' => 'fail', "message" => 'can not terminate the existing bene code']);
+          // }
+          $resp = $this->terminatePayout('https://coinsplashgifts.com/payout/terminate.php', $check->beneficiary_cd);
+          return response()->json(['status' => 'fail', "data" => $resp]);
           // and add new
           $curl = curl_init();
           curl_setopt_array($curl, array(
