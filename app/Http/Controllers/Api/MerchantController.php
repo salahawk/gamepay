@@ -700,6 +700,7 @@ class MerchantController extends Controller
       $payout->network = $user->network;
       $payout->currency = $user->crypto;
       $payout->inr_value = $user->inr_value;
+      $payout->txn_amount = $user->amount;
       $payout->is_external = 1;
       $payout->caller_id = 1; //$used_deposit->caller_id;
       $payout->psp_id = 1; //$used_deposit->psp_id;
