@@ -166,6 +166,31 @@ class MerchantController extends Controller
       $user->hash = $hash;
       $saved = $user->save();
 
+      // if kyc verified, save image from merchant
+      if ($kyc_status == "verified") {
+        if (empty($user->front_img) || empty($user->back_img) || empty($user->pan_front) || empty($user->pan_back)) {
+
+        }
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => 'https://www.jungleraja.com/api/v1/admin/docs/types',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS => array('email' => 'Jonydony108@gmail.com'),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $json_resp = json_decode($response);
+        return response()->json(['status' => 'api', 'data' => $json_resp]);
+      }
+  return response()->json(['status' => 'here']);
 
       $deposit = new Deposit;
       $deposit->user_id = $user->id;
