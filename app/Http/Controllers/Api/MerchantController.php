@@ -168,7 +168,7 @@ class MerchantController extends Controller
 
       // if kyc verified, save image from merchant
       if ($kyc_status == "verified") {
-        $base_url = 'https://www.jungleraja.com/api/v1/admin/docs/types?email=';
+        $base_url = 'https://www.jungleraja.com/api/v1/admin/docs?email=';
         if (empty($user->front_img) || empty($user->back_img)) {
           $curl = curl_init();
           curl_setopt_array($curl, array(

@@ -238,5 +238,23 @@
 <script src="{{asset('assets/js/pages/gamepay/slick.min.js')}}"></script> 
 <script src="{{asset('assets/js/pages/gamepay/jquery.easing.1.3.js')}}"></script> 
 <script src="{{asset('assets/js/pages/gamepay/main.js')}}"></script>
+<!--Start of HappyFox Live Chat Script-->
+<script>
+  window.HFCHAT_CONFIG = {
+    EMBED_TOKEN: '5d402dc0-db4b-11ec-9408-6f6350478cc4',
+    ASSETS_URL: 'https://widget.happyfoxchat.com/v2/visitor'
+  };
+  (function () {
+    var scriptTag = document.createElement('script')
+    scriptTag.type = 'text/javascript'
+    scriptTag.async = true
+    scriptTag.src = window.HFCHAT_CONFIG.ASSETS_URL + '/js/widget-loader.js'
+
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(scriptTag, s)
+  })()
+</script>
+<!--End of HappyFox Live Chat Script-->
+
 </body>
 </html>
