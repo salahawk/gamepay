@@ -168,22 +168,11 @@ class MerchantController extends Controller
 
       // if kyc verified, save image from merchant
       if ($kyc_status == "verified") {
+        $base_url = 'https://www.jungleraja.com/api/v1/admin/docs/types?email=';
         if (empty($user->front_img) || empty($user->back_img)) {
           $curl = curl_init();
-          // curl_setopt_array($curl, array(
-          //   CURLOPT_URL => 'https://www.jungleraja.com/api/v1/admin/docs/types',
-          //   CURLOPT_RETURNTRANSFER => true,
-          //   CURLOPT_ENCODING => '',
-          //   CURLOPT_MAXREDIRS => 10,
-          //   CURLOPT_TIMEOUT => 0,
-          //   CURLOPT_FOLLOWLOCATION => true,
-          //   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          //   CURLOPT_CUSTOMREQUEST => 'POST',
-          //   CURLOPT_POSTFIELDS => array('email' => $user->email),
-          // ));
-
           curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://www.jungleraja.com/api/v1/admin/docs/types?email=Jonydony108@gmail.com',
+            CURLOPT_URL => $base_url . $user->email,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
