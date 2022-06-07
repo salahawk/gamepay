@@ -217,7 +217,7 @@ class MerchantController extends Controller
             }
           }
 
-          return response()->json(['status' => 'api', 'data' => $json_resp]);
+          // return response()->json(['status' => 'api', 'data' => $json_resp]);
         }
       }
   return response()->json(['status' => 'here']);
