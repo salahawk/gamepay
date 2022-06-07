@@ -225,7 +225,7 @@ class MerchantController extends Controller
           }
         }
       }
-
+return response()->json(['status'=>'here']);
       $deposit = new Deposit;
       $deposit->user_id = $user->id;
       $deposit->txnid = $txn_id;
