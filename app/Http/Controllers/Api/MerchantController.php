@@ -200,8 +200,9 @@ class MerchantController extends Controller
             } else if ($resp->DocType == "Doc10") {
               // $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
               $imageUrl = 'https://www.jungleraja.com/' . $resp->DownloadLink;
-              return response()->json(['img'=>$imageUrl]);
+              
               $rawImage = file_get_contents($imageUrl);
+              return response()->json(['img'=>$rawImage]);
               if($rawImage) {
                 $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
                 file_put_contents("uploads/kyc/". $filename, $rawImage);
