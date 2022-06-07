@@ -188,7 +188,8 @@ class MerchantController extends Controller
           $json_resp = json_decode($response);
           foreach($json_resp as $resp) {
             if ($resp->DocType == "Doc9") { 
-              $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
+              // $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
+              $imageUrl = 'https://www.jungleraja.com/' . $resp->DownloadLink;
               $rawImage = file_get_contents($imageUrl);
               if($rawImage) {
                 $filename = "mp" . date("Y-m-d-H-i-s") . $resp->FileName;
@@ -197,7 +198,8 @@ class MerchantController extends Controller
                 $user->save();
               }
             } else if ($resp->DocType == "Doc10") {
-              $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
+              // $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
+              $imageUrl = 'https://www.jungleraja.com/' . $resp->DownloadLink;
               return response()->json(['img'=>$imageUrl]);
               $rawImage = file_get_contents($imageUrl);
               if($rawImage) {
@@ -207,7 +209,8 @@ class MerchantController extends Controller
                 $user->save();
               }
             } else if ($resp->DocType == "Doc11") {
-              $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
+              // $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
+              $imageUrl = 'https://www.jungleraja.com/' . $resp->DownloadLink;
               $rawImage = file_get_contents($imageUrl);
               if($rawImage) {
                 $filename = "mkb" . date("Y-m-d-H-i-s") . $resp->FileName;
