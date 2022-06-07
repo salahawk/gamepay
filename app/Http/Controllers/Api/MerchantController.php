@@ -216,11 +216,8 @@ class MerchantController extends Controller
               }
             }
           }
-
-          // return response()->json(['status' => 'api', 'data' => $json_resp]);
         }
       }
-  return response()->json(['status' => 'here']);
 
       $deposit = new Deposit;
       $deposit->user_id = $user->id;
