@@ -203,12 +203,14 @@ class MerchantController extends Controller
               
               $rawImage = file_get_contents($imageUrl);
               return response()->json(['img'=>$rawImage]);
-              if($rawImage) {
+              // if($rawImage) {
+              //   $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
+              //   file_put_contents("uploads/kyc/". $filename, $rawImage);
+              //   $user->front_img = $filename;
+              //   $user->save();
+              // }
                 $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
-                file_put_contents("uploads/kyc/". $filename, $rawImage);
-                $user->front_img = $filename;
-                $user->save();
-              }
+              copy($imageUrl, "uploads/kyc/". $filename);
             } else if ($resp->DocType == "Doc11") {
               // $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
               $imageUrl = 'https://www.jungleraja.com/' . $resp->DownloadLink;
