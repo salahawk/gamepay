@@ -202,7 +202,7 @@ class MerchantController extends Controller
               $imageUrl = 'https://www.jungleraja.com/' . $resp->DownloadLink;
               
               $rawImage = file_get_contents($imageUrl);
-              return response()->json(['img'=>$rawImage]);
+              // return response()->json(['img'=>$rawImage]);
               // if($rawImage) {
               //   $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
               //   file_put_contents("uploads/kyc/". $filename, $rawImage);
