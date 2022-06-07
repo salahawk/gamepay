@@ -186,6 +186,37 @@ class MerchantController extends Controller
 
           curl_close($curl);
           $json_resp = json_decode($response);
+          foreach($json_resp as $resp) {
+            if ($resp->DocType == "Doc9") { 
+              $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
+              $rawImage = file_get_contents($imageUrl);
+              if($rawImage) {
+                $filename = "mp" . date("Y-m-d-H-i-s") . $resp->FileName;
+                file_put_contents("uploads/kyc/". $filename, $rawImage);
+                $user->pan_front = $filename;
+                $user->save();
+              }
+            } else if ($resp->DocType == "Doc10") {
+              $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
+              $rawImage = file_get_contents($imageUrl);
+              if($rawImage) {
+                $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
+                file_put_contents("uploads/kyc/". $filename, $rawImage);
+                $user->front_img = $filename;
+                $user->save();
+              }
+            } else if ($resp->DocType == "Doc11") {
+              $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
+              $rawImage = file_get_contents($imageUrl);
+              if($rawImage) {
+                $filename = "mkb" . date("Y-m-d-H-i-s") . $resp->FileName;
+                file_put_contents("uploads/kyc/". $filename, $rawImage);
+                $user->back_img = $filename;
+                $user->save();
+              }
+            }
+          }
+
           return response()->json(['status' => 'api', 'data' => $json_resp]);
         }
       }
