@@ -192,20 +192,18 @@ class MerchantController extends Controller
               $rawImage = file_get_contents($imageUrl);
               if($rawImage) {
                 $filename = "mp" . date("Y-m-d-H-i-s") . $resp->FileName;
-                file_put_contents("uploads/kyc/". $filename, $rawImage);
+                file_put_contents("uploads/pan/". $filename, $rawImage);
                 $user->pan_front = $filename;
                 $user->save();
               }
             } else if ($resp->DocType == "Doc10") {
-              $rawImage = file_get_contents(urldecode(stripslashes($imageUrl)));
+              $rawImage = file_get_contents($imageUrl);
               if($rawImage) {
                 $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
                 file_put_contents("uploads/kyc/". $filename, $rawImage);
                 $user->front_img = $filename;
                 $user->save();
               }
-                $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
-              copy($imageUrl, "uploads/kyc/". $filename);
             } else if ($resp->DocType == "Doc11") {
               $rawImage = file_get_contents($imageUrl);
               if($rawImage) {
