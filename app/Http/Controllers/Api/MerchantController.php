@@ -199,8 +199,8 @@ class MerchantController extends Controller
               }
             } else if ($resp->DocType == "Doc10") {
               // $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
-              $imageUrl = 'https://www.jungleraja.com/' . stripslashes($resp->DownloadLink);
-              return response()->json(['img'=>urldecode($imageUrl)]);
+              $imageUrl = 'https://www.jungleraja.com' . stripslashes($resp->DownloadLink);
+              return response()->json(['imggggg'=>urldecode($imageUrl)]);
               $rawImage = file_get_contents($imageUrl);
               // return response()->json(['img'=>$rawImage]);
               // if($rawImage) {
