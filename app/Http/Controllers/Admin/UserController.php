@@ -149,7 +149,7 @@ class UserController extends Controller
         }
       })
       ->addColumn('bank_proof', function ($result) {
-        return '<a href="' . URL::to('/uploads/pan') . "/" . $result->pan . '" class="text-dark" target="_blank">prooflink</a>';
+        return '<a href="' . URL::to('/uploads/pan') . "/" . $result->pan_front . '" class="text-dark" target="_blank">prooflink</a>';
       })
       ->addColumn('bank_status', function ($result) {
         $is_client = !empty($result->mobile) ? 1 : 0;
