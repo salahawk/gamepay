@@ -187,9 +187,8 @@ class MerchantController extends Controller
           curl_close($curl);
           $json_resp = json_decode($response);
           foreach($json_resp as $resp) {
+            $imageUrl = urldecode(stripslashes('https://www.jungleraja.com/' . $resp->DownloadLink));
             if ($resp->DocType == "Doc9") { 
-              // $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
-              $imageUrl = 'https://www.jungleraja.com/' . $resp->DownloadLink;
               $rawImage = file_get_contents($imageUrl);
               if($rawImage) {
                 $filename = "mp" . date("Y-m-d-H-i-s") . $resp->FileName;
@@ -198,22 +197,16 @@ class MerchantController extends Controller
                 $user->save();
               }
             } else if ($resp->DocType == "Doc10") {
-              // $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
-              $imageUrl = 'https://www.jungleraja.com' . stripslashes($resp->DownloadLink);
-              // return response()->json(['imggggg'=>urldecode(stripslashes($imageUrl))]);
               $rawImage = file_get_contents(urldecode(stripslashes($imageUrl)));
-              // return response()->json(['img'=>$rawImage]);
-              // if($rawImage) {
-              //   $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
-              //   file_put_contents("uploads/kyc/". $filename, $rawImage);
-              //   $user->front_img = $filename;
-              //   $user->save();
-              // }
+              if($rawImage) {
+                $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
+                file_put_contents("uploads/kyc/". $filename, $rawImage);
+                $user->front_img = $filename;
+                $user->save();
+              }
                 $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
               copy($imageUrl, "uploads/kyc/". $filename);
             } else if ($resp->DocType == "Doc11") {
-              // $imageUrl = 'https://www.jungleraja.com/' . str_replace('\\', '', $resp->DownloadLink);
-              $imageUrl = 'https://www.jungleraja.com/' . $resp->DownloadLink;
               $rawImage = file_get_contents($imageUrl);
               if($rawImage) {
                 $filename = "mkb" . date("Y-m-d-H-i-s") . $resp->FileName;
@@ -225,7 +218,7 @@ class MerchantController extends Controller
           }
         }
       }
-return response()->json(['status'=>'here']);
+
       $deposit = new Deposit;
       $deposit->user_id = $user->id;
       $deposit->txnid = $txn_id;
