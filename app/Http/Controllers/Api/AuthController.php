@@ -19,7 +19,7 @@ use App\Models\Client;
 
 class AuthController extends Controller
 {
-    public function signup(Request $request) {return response()->json(['status' => 'fail']);
+    public function signup(Request $request) {
       $rules = [
         'firstname' => 'required',
         'lastname' => 'required',
