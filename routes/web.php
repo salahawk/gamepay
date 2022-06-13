@@ -124,5 +124,6 @@ Route::group(['prefix' => 'merchant/admin', 'as' => 'admin-merchant.', 'middlewa
     Route::get('swap', 'SwapController@index')->name('swap');
     Route::get('profile', 'UserController@profile')->name('users.profile');
     Route::post('profile/changePassworrd', 'UserController@changePassword')->name('users.changePassword');
+    Route::get('logout', 'UserController@logout')->name('logout');
 });
 //-------------------------------- Merchant Admin -------------------------------------------//

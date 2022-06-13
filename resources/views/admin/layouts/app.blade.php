@@ -85,7 +85,7 @@
             <div class="bg-light rounded p-2">
               <div class="row">
                 <div class="col-5 my-auto"><img src="{{asset('assets/img/admin/gamerupee.svg')}}" width="27px" /> <strong>GAMERE</strong></div>
-                <div class="col-7"><input type="text" class="form-control forninput mb-2 mr-sm-2" id="inlineFormInputName2" placeholder="00.00"></div>
+                <div class="col-7"><input type="text" class="form-control forninput mb-2 mr-sm-2" id="" placeholder="00.00"></div>
               </div>
               <div class="row">
                 <div class="col-12">
