@@ -43,6 +43,24 @@ class UserController extends Controller
             ->make(true);
     }
 
+    public function profile() {
+        $merchant = Merchant::find(Session::get('merchant_id'));
+        return view('admin_merchant.users.profile')->with('merchant', $merchant);
+    }
+
+    public function changePassword(Request $request) {
+        $merchant = Merchant::find(Session::get('merchant_id'));
+        if (!Hash::check($request->old, $merchant->password)) {
+            return response()->json(['status'=>'fail', 'message'=>'Your old password is incorrect']);
+        }
+
+        $merchant->password = Hash::make($request->new);
+        $saved = $merchant->save();
+        if ($saved) {
+            return response()->json(['status'=>'success', 'message'=>'Your password is successfully updated!']);
+        }
+    }
+
     public function rolling()
     {
         return view('admin_merchant.users.rolling');

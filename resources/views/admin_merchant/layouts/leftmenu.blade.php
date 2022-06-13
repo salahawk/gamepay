@@ -37,6 +37,10 @@
         <div class="sb-nav-link-icon"><i class="fa-solid fa-rectangle-list"></i></div>
         GR Txn History
       </a>
+      <a class="nav-link profile" href="{{ route('admin-merchant.users.profile') }}">
+        <div class="sb-nav-link-icon"><i class="fa-solid fa-rectangle-list"></i></div>
+        My Profile
+      </a>
     </div>
   </div>
 </nav>
