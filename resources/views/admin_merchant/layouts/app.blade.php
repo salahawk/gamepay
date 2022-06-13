@@ -94,6 +94,10 @@
       console.log(gamereBal);
       $(document).find('.balance').text(gamereBal + " GR");
     }
+
+    $('#navbarDropdown').on('click', function() {
+      $('.dropdown-menu').toggle();
+    })
   </script>
   @yield('footer_scipts')
 

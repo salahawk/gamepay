@@ -12,12 +12,12 @@
   <!-- Navbar-->
   <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4 logout">
     <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle topbar" id="navbarDropdown" href="{{ route('admin-merchant.logout') }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <a class="nav-link dropdown-toggle topbar" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="fas fa-user fa-fw"></i>
       </a>
-      <!-- <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-        <li><a class="dropdown-item" href="#">Logout</a></li>
-      </ul> -->
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style="right:0px;">
+        <li><a class="dropdown-item" href="{{ route('admin-merchant.logout') }}">Logout</a></li>
+      </ul>
     </li>
   </ul>
 </nav>
