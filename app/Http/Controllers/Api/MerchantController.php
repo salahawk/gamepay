@@ -236,6 +236,7 @@ class MerchantController extends Controller
       // redirect to PSP
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
+      return response()->json(['data' => $valuecheck]);
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php'; // have to modify later based on routing logic
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
       $verify_url = "https://coinsplashgifts.com/api/transaction/response.php";
