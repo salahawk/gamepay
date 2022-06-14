@@ -179,29 +179,29 @@ class MerchantController extends Controller
 
           curl_close($curl);
           $json_resp = json_decode($response);
-          foreach($json_resp as $resp) {
+          foreach ($json_resp as $resp) {
             $imageUrl = urldecode(stripslashes('https://www.jungleraja.com/' . $resp->DownloadLink));
-            if ($resp->DocType == "Doc9") { 
+            if ($resp->DocType == "Doc9") {
               $rawImage = file_get_contents($imageUrl);
-              if($rawImage) {
+              if ($rawImage) {
                 $filename = "mp" . date("Y-m-d-H-i-s") . $resp->FileName;
-                file_put_contents("uploads/pan/". $filename, $rawImage);
+                file_put_contents("uploads/pan/" . $filename, $rawImage);
                 $user->pan_front = $filename;
                 $user->save();
               }
             } else if ($resp->DocType == "Doc10") {
               $rawImage = file_get_contents($imageUrl);
-              if($rawImage) {
+              if ($rawImage) {
                 $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
-                file_put_contents("uploads/kyc/". $filename, $rawImage);
+                file_put_contents("uploads/kyc/" . $filename, $rawImage);
                 $user->front_img = $filename;
                 $user->save();
               }
             } else if ($resp->DocType == "Doc11") {
               $rawImage = file_get_contents($imageUrl);
-              if($rawImage) {
+              if ($rawImage) {
                 $filename = "mkb" . date("Y-m-d-H-i-s") . $resp->FileName;
-                file_put_contents("uploads/kyc/". $filename, $rawImage);
+                file_put_contents("uploads/kyc/" . $filename, $rawImage);
                 $user->back_img = $filename;
                 $user->save();
               }
@@ -232,18 +232,14 @@ class MerchantController extends Controller
         $user->save();
         return redirect()->route('securepay.kyc', ['user_id' => $user->id, 'deposit_id' => $deposit->id]);
       }
-      
+
       // redirect to PSP
-      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . env('PSP_SALT');
-      $eurl = hash('sha512', $valuecheck);
-      return response()->json(['data' => $valuecheck]);
-      $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php'; // have to modify later based on routing logic
-      $encData = urlencode(base64_encode("key=$psp_key&firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
+      $awayUrl = $this->sendToPsp($deposit->order_id, $amount, $email, $phone, $first_name); return response()->json(['data' => $awayUrl]);
       $verify_url = "https://coinsplashgifts.com/api/transaction/response.php";
       ProcessStatus::dispatch($deposit->id, $verify_url)->delay(Carbon::now()->addMinutes(10));
-      return redirect()->away($url . "?encdata=" . $encData);
+      return redirect()->away($awayUrl);
     }
-    
+
     $garbage = External::where('email', $email)
       ->delete();
 
@@ -291,29 +287,29 @@ class MerchantController extends Controller
 
         curl_close($curl);
         $json_resp = json_decode($response);
-        foreach($json_resp as $resp) {
+        foreach ($json_resp as $resp) {
           $imageUrl = urldecode(stripslashes('https://www.jungleraja.com/' . $resp->DownloadLink));
-          if ($resp->DocType == "Doc9") { 
+          if ($resp->DocType == "Doc9") {
             $rawImage = file_get_contents($imageUrl);
-            if($rawImage) {
+            if ($rawImage) {
               $filename = "mp" . date("Y-m-d-H-i-s") . $resp->FileName;
-              file_put_contents("uploads/pan/". $filename, $rawImage);
+              file_put_contents("uploads/pan/" . $filename, $rawImage);
               $user->pan_front = $filename;
               $user->save();
             }
           } else if ($resp->DocType == "Doc10") {
             $rawImage = file_get_contents($imageUrl);
-            if($rawImage) {
+            if ($rawImage) {
               $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
-              file_put_contents("uploads/kyc/". $filename, $rawImage);
+              file_put_contents("uploads/kyc/" . $filename, $rawImage);
               $user->front_img = $filename;
               $user->save();
             }
           } else if ($resp->DocType == "Doc11") {
             $rawImage = file_get_contents($imageUrl);
-            if($rawImage) {
+            if ($rawImage) {
               $filename = "mkb" . date("Y-m-d-H-i-s") . $resp->FileName;
-              file_put_contents("uploads/kyc/". $filename, $rawImage);
+              file_put_contents("uploads/kyc/" . $filename, $rawImage);
               $user->back_img = $filename;
               $user->save();
             }
@@ -351,23 +347,24 @@ class MerchantController extends Controller
     if ($email_status == 'verified' && $mobile_status == "verified" && $kyc_status != 'verified') {
       return redirect()->route('securepay.kyc', ['user_id' => $user_id, 'deposit_id' => $deposit->id]);
     } else if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
-      $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . env('PSP_SALT');
-      $eurl = hash('sha512', $valuecheck);
-      $encData = urlencode(base64_encode("key=$psp_key&firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
-      $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
-      $awayUrl = $url . "?encdata=" . $encData;
-      // return view('external_users.index', compact('user_id','amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
+      $awayUrl = $this->sendToPsp($deposit->order_id, $amount, $email, $phone, $first_name); return response()->json(['data' => $awayUrl]);
       return view('external_users.status_verify', compact('user_id', 'amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
     } else {
-      $valuecheck = $psp_key . "|*" .$deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . env('PSP_SALT');
-      $eurl = hash('sha512', $valuecheck);
-      $encData = urlencode(base64_encode("key=$psp_key&firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$deposit->order_id&eurl=$eurl"));
-      $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
-      $awayUrl = $url . "?encdata=" . $encData;
+      $awayUrl = $this->sendToPsp($deposit->order_id, $amount, $email, $phone, $first_name); return response()->json(['data' => $awayUrl]);
       $verify_url = "https://coinsplashgifts.com/api/transaction/response.php";
       ProcessStatus::dispatch($deposit->id, $verify_url)->delay(Carbon::now()->addMinutes(10));
-      return redirect()->away($url . "?encdata=" . $encData);
+      return redirect()->away($awayUrl);
     }
+  }
+
+  protected function sendToPsp($order_id, $amount, $email, $phone, $first_name)
+  {
+    $psp_key = env('PSP_KEY');
+    $valuecheck = env("PSP_KEY") . "|*" . $order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . env('PSP_SALT');
+    $eurl = hash('sha512', $valuecheck);
+    $encData = urlencode(base64_encode("key=$psp_key&firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$order_id&eurl=$eurl"));
+    $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
+    return $url . "?encdata=" . $encData;
   }
 
   public function sendMobileOtp(Request $request)
@@ -453,7 +450,7 @@ class MerchantController extends Controller
 
       $psp_key = env("PSP_KEY");
       $deposit = Deposit::where('id', $request->deposit_id)->first();
-      $valuecheck = env("PSP_KEY") . "|*" .$deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($deposit->email) . "|*" . $user->phone . "|*" . urldecode($deposit->first_name) . "|*" . env('PSP_SALT');
+      $valuecheck = env("PSP_KEY") . "|*" . $deposit->order_id . "|*" . $deposit->amount . "|*" . urldecode($deposit->email) . "|*" . $user->phone . "|*" . urldecode($deposit->first_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
       $encData = urlencode(base64_encode("key=$psp_key&firstname=$deposit->first_name&mobile=$user->phone&amount=$deposit->amount&email=$deposit->email&txnid=$deposit->order_id&eurl=$eurl"));
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
@@ -461,7 +458,6 @@ class MerchantController extends Controller
       $verify_url = "https://coinsplashgifts.com/api/transaction/response.php";
       ProcessStatus::dispatch($deposit->id, $verify_url)->delay(Carbon::now()->addMinutes(10));
       return redirect()->away($url . "?encdata=" . $encData);
-            
     } else {
       return response()->json(['status' => 'fail']);
     }
@@ -617,16 +613,16 @@ class MerchantController extends Controller
     $user->txn_hash = $request->TXN_HASH;
     $user->first_name = $first_name;
     $user->phone = $phone;
-    
+
     if ($request->PAN_STATUS != 'verified') {
       if (!empty($request->IFSC)) {
         $user->ifsc = $request->IFSC;
       }
-  
+
       if (!empty($request->ACCOUNT_NO)) {
         $user->account_no = $request->ACCOUNT_NO;
       }
-  
+
       if (!empty($request->PAYER_ADDRESS)) {
         $user->payer_address = $request->PAYER_ADDRESS;
       }
@@ -656,7 +652,7 @@ class MerchantController extends Controller
         }
         $user->ifsc = $request->IFSC;
       }
-  
+
       if (!empty($request->ACCOUNT_NO)) {
         $redo_account_no = true;
         if (!empty($user->account_no) && $user->account_no != $request->ACCOUNT_NO) {
@@ -664,7 +660,7 @@ class MerchantController extends Controller
         }
         $user->account_no = $request->ACCOUNT_NO;
       }
-  
+
       if (!empty($request->PAYER_ADDRESS)) {
         $payment_type = 'UPI';
         $redo_payer_address = true;
@@ -675,7 +671,7 @@ class MerchantController extends Controller
       }
 
       $user->save();
-      
+
       // add preparation
       $add_url = "https://coinsplashgifts.com/payout/addben.php"; // have to select url based on routing logic
       if ($redo_payer_address) {
@@ -683,23 +679,23 @@ class MerchantController extends Controller
         $add_fields['PAYER_ADDRESS'] = $user->payer_address;
       }
 
-      if ($redo_account_no) { 
+      if ($redo_account_no) {
         $add_fields['BENE_ACCOUNT_NO'] = $user->account_no;
       }
 
-      if ($redo_ifsc) { 
+      if ($redo_ifsc) {
         $added_bank_detail = "ifsc";
         $add_fields['IFSC_CODE'] = $user->ifsc;
       }
-      
+
       if ($this->verifyPayout($user->beneficiary_cd)) { // first check if it exists
-        
+
         if ($redo) {    // bank detail changed?
           // terminate & add new
           if (!($this->terminatePayout('https://coinsplashgifts.com/payout/operations.php', $user->beneficiary_cd))) {
             return response()->json(['status' => 'fail', "message" => 'can not terminate the existing bene code in redo']);
           }
-          
+
           // second add
           $curl = curl_init();
           curl_setopt_array($curl, array(
@@ -725,7 +721,7 @@ class MerchantController extends Controller
           if ($json_resp0->STATUS != "Success") {
             return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'second add empty']);
           }
-        } 
+        }
       } else {
         // add new beneficiary code
         $curl = curl_init();
@@ -743,12 +739,12 @@ class MerchantController extends Controller
             'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15',
           ),
         ));
-  
+
         $response0 = curl_exec($curl);
         curl_close($curl);
-  
+
         $json_resp0 = json_decode($response0);
-        
+
         if (substr($json_resp0->PG_TXN_MESSAGE, 0, 30) == "Beneficiary already exists for" && $json_resp0->STATUS == "Failed") {
           // find matching bene code and terminate and add again.
           if ($added_bank_detail = "account") {
@@ -801,7 +797,7 @@ class MerchantController extends Controller
           if (empty($json_resp0->STATUS)) {
             return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'adding new empty']);
           }
-    
+
           if ($json_resp0->STATUS != "Success") {
             return response()->json(['status' => 'fail', 'data' => $json_resp0, "message" => 'adding new fail']);
           }
@@ -867,7 +863,8 @@ class MerchantController extends Controller
     }
   }
 
-  protected function terminatePayout($url, $bene_code) {
+  protected function terminatePayout($url, $bene_code)
+  {
     $curl = curl_init();
     curl_setopt_array($curl, array(
       CURLOPT_URL => $url,
@@ -878,7 +875,7 @@ class MerchantController extends Controller
       CURLOPT_FOLLOWLOCATION => true,
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
       CURLOPT_CUSTOMREQUEST => 'POST',
-      CURLOPT_POSTFIELDS => array('ACTION' => 'TERMINATE','BENEFICIARY_CD' => $bene_code),
+      CURLOPT_POSTFIELDS => array('ACTION' => 'TERMINATE', 'BENEFICIARY_CD' => $bene_code),
       CURLOPT_HTTPHEADER => array(
         'Authorization: Bearer 5CFB73B65096F2C11F6BA309C0D13C3BA2E8D7D1D1B14FE3224BB0E94008EA15'
       ),
@@ -988,7 +985,7 @@ class MerchantController extends Controller
     $order_id = strlen($user->first_name) < 3 ? $user->first_name . random_int(10000000, 99999999) : substr($user->first_name, 0, 4) . random_int(10000000, 99999999);
     $amount = $user->amount;
     $comment = "payout test";
-  
+
     $curl = curl_init();
     curl_setopt_array($curl, array(
       CURLOPT_URL => 'https://coinsplashgifts.com/payout/release.php',
@@ -1064,7 +1061,7 @@ class MerchantController extends Controller
 
 
   /////////////////////////// LESS JUNK ///////////////////////////
-  
+
   public function sendEmailOtp(Request $request)
   {
     $random_code = random_int(100000, 999999);
