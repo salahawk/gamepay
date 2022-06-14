@@ -133,6 +133,7 @@ class MerchantController extends Controller
 
     if ($hash != $hash_value) {
       var_dump("hash value error");
+      var_dump($hash_string);
       return view('external_user.error');
     }
 
@@ -296,7 +297,7 @@ class MerchantController extends Controller
       $json_resp = json_decode($response);
       return response()->json(['status' => 'api', 'data' => $json_resp]);
     }
-return response()->json(['status' => 'here']);
+
     $user_id = $sample->id;
 
     $deposit = new Deposit;
