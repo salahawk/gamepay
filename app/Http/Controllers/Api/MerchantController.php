@@ -234,7 +234,7 @@ class MerchantController extends Controller
       }
 
       // redirect to PSP
-      $awayUrl = $this->sendToPsp($deposit->order_id, $amount, $email, $phone, $first_name); return response()->json(['data' => $awayUrl]);
+      $awayUrl = $this->sendToPsp($deposit->order_id, $amount, $email, $phone, $first_name);
       $verify_url = "https://coinsplashgifts.com/api/transaction/response.php";
       ProcessStatus::dispatch($deposit->id, $verify_url)->delay(Carbon::now()->addMinutes(10));
       return redirect()->away($awayUrl);
@@ -347,10 +347,10 @@ class MerchantController extends Controller
     if ($email_status == 'verified' && $mobile_status == "verified" && $kyc_status != 'verified') {
       return redirect()->route('securepay.kyc', ['user_id' => $user_id, 'deposit_id' => $deposit->id]);
     } else if ($email_status != "verified" || $mobile_status != "verified" || $kyc_status != "verified") {
-      $awayUrl = $this->sendToPsp($deposit->order_id, $amount, $email, $phone, $first_name); return response()->json(['data' => $awayUrl]);
+      $awayUrl = $this->sendToPsp($deposit->order_id, $amount, $email, $phone, $first_name);
       return view('external_users.status_verify', compact('user_id', 'amount', 'crypto', 'network', 'address', 'remarks', 'email_status', 'mobile_status', 'kyc_status', 'phone', 'email', 'awayUrl'));
     } else {
-      $awayUrl = $this->sendToPsp($deposit->order_id, $amount, $email, $phone, $first_name); return response()->json(['data' => $awayUrl]);
+      $awayUrl = $this->sendToPsp($deposit->order_id, $amount, $email, $phone, $first_name);
       $verify_url = "https://coinsplashgifts.com/api/transaction/response.php";
       ProcessStatus::dispatch($deposit->id, $verify_url)->delay(Carbon::now()->addMinutes(10));
       return redirect()->away($awayUrl);
@@ -364,8 +364,8 @@ class MerchantController extends Controller
     $eurl = hash('sha512', $valuecheck);
     $encData = urlencode(base64_encode("key=$psp_key&firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$order_id&eurl=$eurl"));
     $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
-    // return $url . "?encdata=" . $encData;
-    return $valuecheck;
+    return $url . "?encdata=" . $encData;
+    // return $valuecheck;
   }
 
   public function sendMobileOtp(Request $request)
