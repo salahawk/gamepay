@@ -364,7 +364,8 @@ class MerchantController extends Controller
     $eurl = hash('sha512', $valuecheck);
     $encData = urlencode(base64_encode("key=$psp_key&firstname=$first_name&mobile=$phone&amount=$amount&email=$email&txnid=$order_id&eurl=$eurl"));
     $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php';
-    return $url . "?encdata=" . $encData;
+    // return $url . "?encdata=" . $encData;
+    return $valuecheck;
   }
 
   public function sendMobileOtp(Request $request)
