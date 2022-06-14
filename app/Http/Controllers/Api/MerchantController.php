@@ -133,7 +133,8 @@ class MerchantController extends Controller
 
     if ($hash != $hash_value) {
       var_dump("hash value error");
-      var_dump($hash_string);
+      // var_dump($hash_string);
+      // var_dump($hash_value);
       return view('external_user.error');
     }
 
