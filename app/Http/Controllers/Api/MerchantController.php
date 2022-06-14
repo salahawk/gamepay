@@ -77,12 +77,6 @@ class MerchantController extends Controller
     $curl = $request->CURL;
     $hash = $request->HASH;
 
-    // select PSP for merchant
-    // $ip_string = $request->header('origin');
-    // $pieces = explode("//", $ip_string);
-    // $merchant = Merchant::where('ip', $pieces[1])->first();
-    // $salt = $merchant->salt;
-
     $merchant = Merchant::where('key', $key)->first();
     if (empty($merchant)) {
       return response()->json(['status' => 'fail', 'message' => 'merchant key is not registered']);
@@ -133,14 +127,11 @@ class MerchantController extends Controller
 
     if ($hash != $hash_value) {
       var_dump("hash value error");
-      // var_dump($hash_string);
-      // var_dump($hash_value);
-      return view('external_user.error');
+      return redirect()->away($eurl . "?data=hash missmatch");
     }
 
     // check user if existing by wallet and email
-    $user = External::where('address', $address)
-      ->where('email', $email)
+    $user = External::where('email', $email)
       ->where('email_status', 'verified')
       ->where('kyc_status', 'verified')
       ->where('mobile_status', 'verified')
@@ -169,8 +160,8 @@ class MerchantController extends Controller
       $saved = $user->save();
 
       // if kyc verified, save image from merchant
-      if ($kyc_status == "verified") {
-        $base_url = 'https://www.jungleraja.com/api/v1/admin/docs?email=';
+      if ($kyc_status == "verified" && !empty($merchant->kyc_url)) {
+        $base_url = $merchant->kyc_url . "?email=";
         if (empty($user->front_img) || empty($user->back_img)) {
           $curl = curl_init();
           curl_setopt_array($curl, array(
@@ -236,8 +227,13 @@ class MerchantController extends Controller
       $deposit->psp_id = 1;  // have to modify later based on routing logic
       $deposit->save();
 
+      if ($kyc_status == "verified" && empty($merchant->kyc_url) && empty($user->front_img) && empty($user->back_img)) {
+        $user->kyc_status = "pending";
+        $user->save();
+        return redirect()->route('securepay.kyc', ['user_id' => $user->id, 'deposit_id' => $deposit->id]);
+      }
       
-      // add third party bank calculation
+      // redirect to PSP
       $valuecheck = $psp_key . "|*" . $deposit->order_id . "|*" . $amount . "|*" . urldecode($email) . "|*" . $phone . "|*" . urldecode($first_name) . "|*" . env('PSP_SALT');
       $eurl = hash('sha512', $valuecheck);
       $url = 'https://coinsplashgifts.com/pgway/acquirernew/upipay.php'; // have to modify later based on routing logic
@@ -275,28 +271,54 @@ class MerchantController extends Controller
     $saved = $sample->save();
 
     // if kyc verified, save image from merchant
-    if ($kyc_status == "verified") {
-      if (empty($user->front_img) || empty($user->back_img) || empty($user->pan_front) || empty($user->pan_back)) {
+    if ($kyc_status == "verified" && !empty($merchant->kyc_url)) {
+      $base_url = $merchant->kyc_url . "?email=";
+      if (empty($user->front_img) || empty($user->back_img)) {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $base_url . $user->email,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
 
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $json_resp = json_decode($response);
+        foreach($json_resp as $resp) {
+          $imageUrl = urldecode(stripslashes('https://www.jungleraja.com/' . $resp->DownloadLink));
+          if ($resp->DocType == "Doc9") { 
+            $rawImage = file_get_contents($imageUrl);
+            if($rawImage) {
+              $filename = "mp" . date("Y-m-d-H-i-s") . $resp->FileName;
+              file_put_contents("uploads/pan/". $filename, $rawImage);
+              $user->pan_front = $filename;
+              $user->save();
+            }
+          } else if ($resp->DocType == "Doc10") {
+            $rawImage = file_get_contents($imageUrl);
+            if($rawImage) {
+              $filename = "mkf" . date("Y-m-d-H-i-s") . $resp->FileName;
+              file_put_contents("uploads/kyc/". $filename, $rawImage);
+              $user->front_img = $filename;
+              $user->save();
+            }
+          } else if ($resp->DocType == "Doc11") {
+            $rawImage = file_get_contents($imageUrl);
+            if($rawImage) {
+              $filename = "mkb" . date("Y-m-d-H-i-s") . $resp->FileName;
+              file_put_contents("uploads/kyc/". $filename, $rawImage);
+              $user->back_img = $filename;
+              $user->save();
+            }
+          }
+        }
       }
-      $curl = curl_init();
-      curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://www.jungleraja.com/api/v1/admin/docs/types',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => array('email' => 'Jonydony108@gmail.com'),
-      ));
-
-      $response = curl_exec($curl);
-
-      curl_close($curl);
-      $json_resp = json_decode($response);
-      return response()->json(['status' => 'api', 'data' => $json_resp]);
     }
 
     $user_id = $sample->id;
@@ -317,6 +339,12 @@ class MerchantController extends Controller
     $deposit->email = $email;
     $deposit->psp_id = 1;  // have to modify later
     $deposit->save();
+
+    if ($kyc_status == "verified" && empty($merchant->kyc_url) && empty($user->front_img) && empty($user->back_img)) {
+      $user->kyc_status = "pending";
+      $user->save();
+      return redirect()->route('securepay.kyc', ['user_id' => $user->id, 'deposit_id' => $deposit->id]);
+    }
 
     // redirect to the verification
     if ($email_status == 'verified' && $mobile_status == "verified" && $kyc_status != 'verified') {
@@ -387,29 +415,6 @@ class MerchantController extends Controller
     } else {
       return response()->json(['status' => 'fail']);
     }
-  }
-  
-  public function kycProcess(Request $request)
-  {
-    $user = External::where('id', $request->user_id)->first();
-    $user->first_name = $request->first_name;
-    $user->kyc_type = "veriff";
-    $user->save();
-
-    $veriff = new Verification;
-    $veriff->is_external = 1;
-    $veriff->user_id = $user->id;
-    $veriff->veriff_id = $request->veriff_id;
-    $veriff->veriff_url = $request->veriff_url;
-    $veriff->sessionToken = $request->sessionToken;
-    $veriff->is_verified = $request->is_verified;
-    $veriff->save();
-  }
-
-  public function kycResponse(Request $request)
-  {
-
-    exit();
   }
 
   public function kycManual(Request $request)
@@ -1103,7 +1108,28 @@ class MerchantController extends Controller
     }
   }
 
-  
+  public function kycProcess(Request $request)
+  {
+    $user = External::where('id', $request->user_id)->first();
+    $user->first_name = $request->first_name;
+    $user->kyc_type = "veriff";
+    $user->save();
+
+    $veriff = new Verification;
+    $veriff->is_external = 1;
+    $veriff->user_id = $user->id;
+    $veriff->veriff_id = $request->veriff_id;
+    $veriff->veriff_url = $request->veriff_url;
+    $veriff->sessionToken = $request->sessionToken;
+    $veriff->is_verified = $request->is_verified;
+    $veriff->save();
+  }
+
+  public function kycResponse(Request $request)
+  {
+
+    exit();
+  }
   ////////////////////////////// JUNK ////////////////////////////
   public function responseCashlesso(Request $request)
   {
